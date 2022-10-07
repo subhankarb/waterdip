@@ -1,0 +1,39 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - 'main'
+      - 'beta'
+      - 'releases/**'
+  pull_request:
+    branches:
+      - 'main'
+      - 'beta'
+      - 'releases/**'
+
+jobs:
+  pytest:
+    name: Backend Pytest Job
+    runs-on: ubuntu-latest
+    container: python:3.8.10
+    strategy:
+      matrix:
+        python-version: [ "3.8" ]
+        mongodb-version: [ "5.0" ]
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install dependencies
+        run: |
+          apt-get -y install --no-install-recommends make=*
+          pip install poetry==1.2.1
+          poetry config virtualenvs.create false
+          python -m pip install --upgrade pip
+          poetry install
+      - name: Run Tests
+        run: |
+          make pytest

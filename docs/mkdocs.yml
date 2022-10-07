@@ -1,0 +1,26 @@
+site_name: Waterdip Documentation
+repo_url: https://github.com/WaterdipAI/waterdip
+theme:
+  name: material
+  icon:
+    repo: fontawesome/brands/github
+  features:
+#    - navigation.indexes
+    - navigation.expand
+    - toc.follow
+extra_css:
+  - stylesheets/extra.css
+nav:
+  - Home: index.md
+  - Getting Started:
+    - Quick Start: getting_started/quick_start.md
+
+extra:
+  generator: true
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/waterdipai/waterdip
+    - icon: fontawesome/brands/linkedin
+      link: https://www.linkedin.com/company/waterdip
+
+copyright: "&copy; 2022 BY WATERDIPS LABS"
