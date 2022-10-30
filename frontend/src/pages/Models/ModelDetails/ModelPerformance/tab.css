@@ -1,0 +1,12 @@
+.css-5vyc69-MuiTab-wrapper {
+  justify-content: flex-start;
+}
+.tabs-left .Mui-selected {
+  background: #d1d9f5;
+  color: #6780dc;
+}
+.apexcharts-yaxis-title {
+  left: 0;
+  letter-spacing: 0.1rem;
+  text-transform: capitalize;
+}
