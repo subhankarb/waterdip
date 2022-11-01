@@ -1,0 +1,6 @@
+.css-1e2iv42-MuiTableCell-root:first-of-type,
+.css-1e2iv42-MuiTableCell-root:last-of-type {
+  box-shadow: none !important;
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+}
