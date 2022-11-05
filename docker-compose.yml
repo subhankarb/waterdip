@@ -33,6 +33,20 @@ services:
       - waterdip
     depends_on:
       - wd-mongodb
+  
+  wd-frontend:
+    image: waterdip/wd-frontend
+    build:
+      context: .
+      dockerfile: ./docker/frontend.Dockerfile
+    ports:
+      - "4433:4433"
+    environment:
+      - WD_BACKEND_URL=http://wd-backend:4422
+    networks:
+      - waterdip
+    depends_on:
+      - wd-backend
 
 volumes:
   # default dir on Ubuntu: /var/lib/docker/volumes
