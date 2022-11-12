@@ -12,31 +12,38 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
-import uuid
+from typing import List
 
 from fastapi import Depends
 
-from waterdip.server.db.models.models import ModelInDB
-from waterdip.server.db.repositories.model_repository import ModelRepository
+from waterdip.server.db.models.dataset_rows import BaseDatasetBatchRowDB
+from waterdip.server.db.repositories.dataset_row_repository import (
+    BatchDatasetRowRepository,
+)
 
 
-class ModelService:
-    _INSTANCE: "ModelService" = None
+class ServiceDatasetBatchRow(BaseDatasetBatchRowDB):
+    pass
+
+
+class BatchDatasetRowService:
+
+    _INSTANCE: "BatchDatasetRowService" = None
 
     @classmethod
     def get_instance(
         cls,
-        repository: ModelRepository = Depends(ModelRepository.get_instance),
+        repository: BatchDatasetRowRepository = Depends(
+            BatchDatasetRowRepository.get_instance
+        ),
     ):
         if not cls._INSTANCE:
             cls._INSTANCE = cls(repository=repository)
         return cls._INSTANCE
 
-    def __init__(self, repository: ModelRepository):
+    def __init__(self, repository: BatchDatasetRowRepository):
         self._repository = repository
 
-    def register_model(self):
-        generated_model_id = uuid.uuid4()
-        model_db = ModelInDB(model_id=generated_model_id, model_name="")
-
-        self._repository.register_model(model_db)
+    def insert_rows(self, rows: List[ServiceDatasetBatchRow]) -> int:
+        inserted_rows = self._repository.inset_rows(rows)
+        return len(inserted_rows)
