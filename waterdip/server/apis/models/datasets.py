@@ -12,12 +12,16 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
-from fastapi import APIRouter
+from typing import Dict, List, Optional, Union
 
-from waterdip.server.apis.routes.dataset_routers import router as dataset_routers
-from waterdip.server.apis.routes.logging_routes import router as logging_routes
+from pydantic import UUID4, BaseModel
 
-api_router = APIRouter()
 
-api_router.include_router(dataset_routers, tags=["datasets"], prefix="/v1")
-api_router.include_router(logging_routes, tags=["logging"], prefix="/v1")
+class DatasetListRow(BaseModel):
+    dataset_name: str
+    dataset_id: UUID4
+
+
+class DatasetListResponse(BaseModel):
+    dataset_list: List[DatasetListRow]
+    meta: Optional[Dict[str, Union[str, int]]]

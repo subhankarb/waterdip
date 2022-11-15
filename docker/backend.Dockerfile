@@ -13,4 +13,4 @@ RUN apt-get -y install --no-install-recommends make=* && \
 
 COPY ./waterdip/ ./waterdip
 
-ENTRYPOINT ["python", "-m", "waterdip"]
+CMD ["python", "-m", "waterdip"]

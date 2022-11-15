@@ -12,11 +12,16 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
-from pydantic import BaseModel
+from datetime import datetime
+from typing import Dict, Optional, TypeVar
+
+from pydantic import BaseModel, Field
 from pydantic.types import UUID4
 
+from waterdip.server.commons.models import ColumnDataType
 
-class ModelInDB(BaseModel):
+
+class BaseModelDB(BaseModel):
     model_id: UUID4
     model_name: str
 
@@ -24,3 +29,32 @@ class ModelInDB(BaseModel):
         model = super().dict(*args, **kwargs)
         model["model_id"] = str(model["model_id"])
         return model
+
+
+ModelDB = TypeVar("ModelDB", bound=BaseModelDB)
+
+
+class ModelVersionSchemaFieldDetails(BaseModel):
+    data_type: ColumnDataType
+    list_index: Optional[int]
+
+
+class ModelVersionSchemaInDB(BaseModel):
+    features: Dict[str, ModelVersionSchemaFieldDetails]
+    predictions: Dict[str, ModelVersionSchemaFieldDetails]
+
+
+class ModelVersionDB(BaseModel):
+    model_version_id: UUID4 = Field(default=None)
+    model_version: str = Field(default=None)
+    model_id: UUID4 = Field(default=None)
+    description: Optional[str] = None
+    task_type: Optional[str] = None
+    created_at: Optional[datetime] = None
+    version_schema: ModelVersionSchemaInDB = None
+
+    def dict(self, *args, **kwargs) -> "DictStrAny":
+        model_version = super().dict(*args, **kwargs)
+        model_version["model_id"] = str(model_version["model_id"])
+        model_version["model_version_id"] = str(model_version["model_version_id"])
+        return model_version

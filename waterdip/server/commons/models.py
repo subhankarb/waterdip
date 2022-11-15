@@ -12,12 +12,26 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
-from fastapi import APIRouter
+from enum import Enum
 
-from waterdip.server.apis.routes.dataset_routers import router as dataset_routers
-from waterdip.server.apis.routes.logging_routes import router as logging_routes
 
-api_router = APIRouter()
+class DatasetType(str, Enum):
+    BATCH = "BATCH"
+    EVENT = "EVENT"
 
-api_router.include_router(dataset_routers, tags=["datasets"], prefix="/v1")
-api_router.include_router(logging_routes, tags=["logging"], prefix="/v1")
+
+class ColumnDataType(str, Enum):
+    NUMERIC = "NUMERIC"
+    CATEGORICAL = "CATEGORICAL"
+    BOOLEAN = "BOOLEAN"
+
+
+class ColumnMappingType(str, Enum):
+    FEATURE = "FEATURE"
+    RAW = "RAW"
+    PREDICTION = "PREDICTION"
+    PREDICTION_SCORE = "PREDICTION_SCORE"
+    ACTUAL = "ACTUAL"
+    ACTUAL_SCORE = "ACTUAL_SCORE"
+    ACTUAL_RANK_SEQUENCE = "ACTUAL_RANK_SEQUENCE"
+    GROUP_BY = "GROUP_BY"

@@ -24,6 +24,9 @@ class ServerSettings(BaseSettings):
     mongo_database: str = "waterdip"
     mongo_collection_models: str = "wd_models"
     mongo_collection_model_version: str = "wd_model_versions"
+    mongo_collection_datasets: str = "wd_datasets"
+    mongo_collection_batch_rows: str = "wd_dataset_batch_rows"
+    mongo_collection_event_rows: str = "wd_dataset_event_rows"
 
     docs_enabled: bool = True
 
