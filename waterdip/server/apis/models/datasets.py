@@ -24,4 +24,4 @@ class DatasetListRow(BaseModel):
 
 class DatasetListResponse(BaseModel):
     dataset_list: List[DatasetListRow]
-    meta: Optional[Dict[str, Union[str, int]]]
+    meta: Optional[Dict[str, Union[int, str]]]

@@ -13,6 +13,7 @@
 #  limitations under the License.
 
 from typing import List
+from urllib.parse import urlparse
 
 from pydantic import BaseSettings
 
@@ -23,7 +24,7 @@ class ServerSettings(BaseSettings):
     mongo_url: str = "mongodb://dbuser:dbpass@127.0.0.1:27017/"
     mongo_database: str = "waterdip"
     mongo_collection_models: str = "wd_models"
-    mongo_collection_model_version: str = "wd_model_versions"
+    mongo_collection_model_versions: str = "wd_model_versions"
     mongo_collection_datasets: str = "wd_datasets"
     mongo_collection_batch_rows: str = "wd_dataset_batch_rows"
     mongo_collection_event_rows: str = "wd_dataset_event_rows"
@@ -31,6 +32,13 @@ class ServerSettings(BaseSettings):
     docs_enabled: bool = True
 
     cors_origins: List[str] = ["*"]
+
+    def obfuscated_mongodb(self) -> str:
+        """Returns configured mongodb url obfuscating the provided password, if any"""
+        parsed = urlparse(self.mongo_url)
+        if parsed.password:
+            return self.mongo_url.replace(parsed.password, "XXXX")
+        return self.mongo_url
 
     class Config:
         env_prefix = "WD_"

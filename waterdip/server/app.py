@@ -18,6 +18,7 @@ import traceback
 
 from fastapi import FastAPI
 from loguru import logger
+from pydantic import ConfigError
 from starlette.middleware.cors import CORSMiddleware
 from starlette.requests import Request
 from starlette.responses import Response
@@ -26,12 +27,29 @@ from starlette.status import HTTP_500_INTERNAL_SERVER_ERROR
 from waterdip import __version__ as wd_version
 from waterdip.server.apis.router import api_router
 from waterdip.server.commons.config import settings
+from waterdip.server.db.mongodb import MongodbBackend
 from waterdip.utils.logging import configure_logging
 
 
 def configure_api_router(app: FastAPI):
     """Configures the api router"""
     app.include_router(api_router, prefix="/api")
+
+
+def configure_database(app: FastAPI):
+    @app.on_event("startup")
+    async def configure_mongo():
+        try:
+            MongodbBackend.get_instance()
+
+        except BaseException as error:
+            raise ConfigError(
+                f"Mongodb endpoint at {settings.obfuscated_mongodb()} "
+                "is not available or not responding.\n"
+                "Please make sure your Mongodb instance is launched and correctly running and\n"
+                "you have the necessary access permissions. "
+                "Once you have verified this, restart the Waterdip server.\n"
+            ) from error
 
 
 def configure_middleware(app: FastAPI):
@@ -81,8 +99,5 @@ app = FastAPI(
     openapi_url="/api/docs/spec.json",
 )
 
-for app_configure in [
-    configure_api_router,
-    configure_middleware,
-]:
+for app_configure in [configure_api_router, configure_middleware, configure_database]:
     app_configure(app)

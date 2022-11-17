@@ -42,7 +42,6 @@ class BaseDatasetDB(BaseModel):
     )
     model_id: UUID4 = Field(description="Reference model id")
     model_version_id: UUID4 = Field(description="Reference model version id")
-    columns_info: Optional[List[ColumnInfoDB]] = None
     environment: Optional[str] = None
     meta: Optional[Dict] = None
 

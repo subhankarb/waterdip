@@ -16,9 +16,16 @@ import uuid
 
 import pytest
 
-from waterdip.server.db.models.models import BaseModelDB, ModelVersionDB
+from tests.testing_helpers import MODEL_VERSION_ID_V1
+from waterdip.server.commons.models import ColumnDataType
+from waterdip.server.db.models.models import (
+    BaseModelDB,
+    BaseModelVersionDB,
+    ModelVersionSchemaFieldDetails,
+    ModelVersionSchemaInDB,
+)
 from waterdip.server.db.mongodb import (
-    MONGO_COLLECTION_MODEL_VERSION,
+    MONGO_COLLECTION_MODEL_VERSIONS,
     MONGO_COLLECTION_MODELS,
     MongodbBackend,
 )
@@ -46,13 +53,31 @@ class TestModelVersionsRepository:
         model_uuid, model_version_uuid = uuid.uuid4(), uuid.uuid4()
 
         inserted_model = model_repo.register_model_version(
-            ModelVersionDB(
+            BaseModelVersionDB(
                 model_version_id=model_version_uuid,
                 model_version="v1",
                 model_id=model_uuid,
+                version_schema=ModelVersionSchemaInDB(
+                    features={
+                        "f1": ModelVersionSchemaFieldDetails(
+                            data_type=ColumnDataType.NUMERIC
+                        )
+                    },
+                    predictions={
+                        "p1": ModelVersionSchemaFieldDetails(
+                            data_type=ColumnDataType.NUMERIC
+                        )
+                    },
+                ),
             )
         )
         assert model_version_uuid == inserted_model.model_version_id
+
+        created_model_version_in_db = mock_mongo_backend.database[
+            MONGO_COLLECTION_MODEL_VERSIONS
+        ].find_one(filter={"model_version_id": str(model_version_uuid)})
+
+        assert created_model_version_in_db["model_id"] == str(model_uuid)
 
     def test_should_return_model_version_by_id(
         self, mock_mongo_backend: MongodbBackend
@@ -64,11 +89,23 @@ class TestModelVersionsRepository:
             "v1",
         )
 
-        mock_mongo_backend.database[MONGO_COLLECTION_MODEL_VERSION].insert_one(
-            ModelVersionDB(
+        mock_mongo_backend.database[MONGO_COLLECTION_MODEL_VERSIONS].insert_one(
+            BaseModelVersionDB(
                 model_version_id=model_version_uuid,
                 model_version=model_version_name,
                 model_id=model_uuid,
+                version_schema=ModelVersionSchemaInDB(
+                    features={
+                        "f1": ModelVersionSchemaFieldDetails(
+                            data_type=ColumnDataType.NUMERIC
+                        )
+                    },
+                    predictions={
+                        "p1": ModelVersionSchemaFieldDetails(
+                            data_type=ColumnDataType.NUMERIC
+                        )
+                    },
+                ),
             ).dict()
         )
 
@@ -86,11 +123,23 @@ class TestModelVersionsRepository:
             "v1",
         )
 
-        mock_mongo_backend.database[MONGO_COLLECTION_MODEL_VERSION].insert_one(
-            ModelVersionDB(
+        mock_mongo_backend.database[MONGO_COLLECTION_MODEL_VERSIONS].insert_one(
+            BaseModelVersionDB(
                 model_version_id=model_version_uuid,
                 model_version=model_version_name,
                 model_id=model_uuid,
+                version_schema=ModelVersionSchemaInDB(
+                    features={
+                        "f1": ModelVersionSchemaFieldDetails(
+                            data_type=ColumnDataType.NUMERIC
+                        )
+                    },
+                    predictions={
+                        "p1": ModelVersionSchemaFieldDetails(
+                            data_type=ColumnDataType.NUMERIC
+                        )
+                    },
+                ),
             ).dict()
         )
 

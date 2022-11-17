@@ -13,6 +13,7 @@
 #  limitations under the License.
 
 from dataclasses import dataclass
+from typing import Optional
 
 import pymongo
 from fastapi import Query
@@ -28,7 +29,7 @@ class RequestPagination:
 
 
 class RequestSort(BaseModel):
-    sort: str = Query(description="")
+    sort: str = Query(default=None, description="Sort field for records list")
 
     @validator("sort")
     def name_must_contain_sort_order(cls, v):
@@ -43,13 +44,17 @@ class RequestSort(BaseModel):
 
     @property
     def get_sort_order(self) -> int:
-        sort_order = self.sort.rsplit("_", 1)[1]
-        if sort_order == "desc":
-            return pymongo.DESCENDING
-        else:
-            return pymongo.ASCENDING
+        if self.sort is not None:
+            sort_order = self.sort.rsplit("_", 1)[1]
+            if sort_order == "desc":
+                return pymongo.DESCENDING
+            else:
+                return pymongo.ASCENDING
+        return pymongo.DESCENDING
 
     @property
-    def get_sort_field(self) -> str:
-        sort_config = self.sort.rsplit("_", 1)
-        return sort_config[0]
+    def get_sort_field(self) -> Optional[str]:
+        if self.sort is not None:
+            sort_config = self.sort.rsplit("_", 1)
+            return sort_config[0]
+        return None

@@ -106,7 +106,7 @@ class TestDatasetService:
         )
         sort_order = RequestSort(sort=_sort)
         result = data_service.list_dataset(
-            model_version_id=self._model_version_id, sort=sort_order
+            model_version_id=self._model_version_id, sort_request=sort_order
         )
         assert result[1] == 1
         assert len(result[0]) == 1
@@ -139,5 +139,6 @@ class TestDatasetService:
 
         with pytest.raises(ValidationError):
             result = data_service.list_dataset(
-                model_version_id=self._model_version_id, sort=RequestSort(sort=sort)
+                model_version_id=self._model_version_id,
+                sort_request=RequestSort(sort=sort),
             )

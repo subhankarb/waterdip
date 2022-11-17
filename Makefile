@@ -7,7 +7,7 @@ pytest:
 pytest_with_coverage:
 	set -e
 	set -x
-	coverage run -m pytest -p no:warnings ./tests/*
+	pytest -p no:warnings --cov ./tests/*
 # Start Waterdip server
 start_wd_server:
 	python -m waterdip

@@ -23,7 +23,7 @@ from fastapi import Depends
 from waterdip.server.commons.models import ColumnDataType, ColumnMappingType
 from waterdip.server.db.models.dataset_rows import DataColumn, DatasetBatchRowDB
 from waterdip.server.db.models.models import (
-    ModelVersionDB,
+    BaseModelVersionDB,
     ModelVersionSchemaFieldDetails,
     ModelVersionSchemaInDB,
 )
@@ -135,7 +135,7 @@ class BatchLoggingService:
     def log(
         self, model_version_id: UUID, environment: str, rows: List[ServiceLogRow]
     ) -> int:
-        model_version: ModelVersionDB = self._model_version_service.find_by_id(
+        model_version: BaseModelVersionDB = self._model_version_service.find_by_id(
             model_version_id=model_version_id
         )
         dataset_id = uuid.uuid4()
