@@ -18,7 +18,7 @@ from pymongo.database import Database
 from waterdip.server.commons.config import settings
 
 MONGO_COLLECTION_MODELS = settings.mongo_collection_models
-MONGO_COLLECTION_MODEL_VERSION = settings.mongo_collection_model_version
+MONGO_COLLECTION_MODEL_VERSIONS = settings.mongo_collection_model_versions
 MONGO_COLLECTION_DATASETS = settings.mongo_collection_datasets
 MONGO_COLLECTION_BATCH_ROWS = settings.mongo_collection_batch_rows
 MONGO_COLLECTION_EVENT_ROWS = settings.mongo_collection_event_rows

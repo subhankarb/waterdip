@@ -11,14 +11,20 @@
 #  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
+
 from typing import Optional
 from uuid import UUID
 
 from fastapi import Depends
 
-from waterdip.server.db.models.models import BaseModelDB, ModelDB, ModelVersionDB
+from waterdip.server.db.models.models import (
+    BaseModelDB,
+    BaseModelVersionDB,
+    ModelDB,
+    ModelVersionDB,
+)
 from waterdip.server.db.mongodb import (
-    MONGO_COLLECTION_MODEL_VERSION,
+    MONGO_COLLECTION_MODEL_VERSIONS,
     MONGO_COLLECTION_MODELS,
     MongodbBackend,
 )
@@ -68,21 +74,21 @@ class ModelVersionRepository:
 
     def register_model_version(self, model: ModelVersionDB) -> ModelVersionDB:
         inserted_model_version = self._mongo.database[
-            MONGO_COLLECTION_MODEL_VERSION
+            MONGO_COLLECTION_MODEL_VERSIONS
         ].insert_one(document=model.dict())
 
-        created_model = self._mongo.database[MONGO_COLLECTION_MODEL_VERSION].find_one(
+        created_model = self._mongo.database[MONGO_COLLECTION_MODEL_VERSIONS].find_one(
             {"_id": inserted_model_version.inserted_id}
         )
 
-        return ModelVersionDB(**created_model)
+        return BaseModelVersionDB(**created_model)
 
-    def find_by_id(self, model_version_id: UUID) -> Optional[ModelVersionDB]:
-        result = self._mongo.database[MONGO_COLLECTION_MODEL_VERSION].find_one(
+    def find_by_id(self, model_version_id: UUID) -> Optional[BaseModelVersionDB]:
+        result = self._mongo.database[MONGO_COLLECTION_MODEL_VERSIONS].find_one(
             {"model_version_id": str(model_version_id)}
         )
 
         if not result:
             return None
 
-        return ModelVersionDB(**result)
+        return BaseModelVersionDB(**result)

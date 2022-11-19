@@ -44,17 +44,22 @@ class ModelVersionSchemaInDB(BaseModel):
     predictions: Dict[str, ModelVersionSchemaFieldDetails]
 
 
-class ModelVersionDB(BaseModel):
+class BaseModelVersionDB(BaseModel):
     model_version_id: UUID4 = Field(default=None)
     model_version: str = Field(default=None)
     model_id: UUID4 = Field(default=None)
     description: Optional[str] = None
     task_type: Optional[str] = None
     created_at: Optional[datetime] = None
-    version_schema: ModelVersionSchemaInDB = None
+    version_schema: ModelVersionSchemaInDB = Field(
+        description="Schema for the model version"
+    )
 
     def dict(self, *args, **kwargs) -> "DictStrAny":
         model_version = super().dict(*args, **kwargs)
         model_version["model_id"] = str(model_version["model_id"])
         model_version["model_version_id"] = str(model_version["model_version_id"])
         return model_version
+
+
+ModelVersionDB = TypeVar("ModelVersionDB", bound=BaseModelVersionDB)

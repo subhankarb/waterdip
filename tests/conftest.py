@@ -12,17 +12,36 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
+import warnings
+
 import mongomock
 import pytest
+from fastapi import FastAPI
+from fastapi.testclient import TestClient
 
+from tests.testing_helpers import MongodbBackendTesting
 from waterdip.server.db.mongodb import MongodbBackend
+
+
+@pytest.fixture(scope="class")
+def app() -> FastAPI:
+    warnings.filterwarnings("ignore", category=DeprecationWarning)
+    from waterdip.server.app import app
+
+    app.dependency_overrides[
+        MongodbBackend.get_instance
+    ] = MongodbBackendTesting.get_instance
+    return app
 
 
 @pytest.fixture(autouse=True)
 def mock_mongo_backend(monkeypatch) -> MongodbBackend:
     mock_mongo_client = mongomock.MongoClient()
-    mock_mongo_database = mock_mongo_client.db
-    mongo_backend = MongodbBackend(mock_mongo_client, "")
-    # monkeypatch.setattr(mongo_backend, "client", mock_mongo_client)
-    # monkeypatch.setattr(mongo_backend, "database", mock_mongo_database)
-    return mongo_backend
+    return MongodbBackendTesting(mock_mongo_client)
+
+
+@pytest.fixture(scope="class")
+def test_client(app: FastAPI) -> TestClient:
+    warnings.filterwarnings("ignore", category=DeprecationWarning)
+    client = TestClient(app)
+    return client

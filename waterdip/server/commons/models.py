@@ -15,6 +15,11 @@
 from enum import Enum
 
 
+class PredictionTaskType(str, Enum):
+    BINARY = "BINARY"
+    MULTI_CLASS = "MULTICLASS"
+
+
 class DatasetType(str, Enum):
     BATCH = "BATCH"
     EVENT = "EVENT"

@@ -11,13 +11,14 @@
 #  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
-from typing import Optional
+from typing import List, Optional
 
 from fastapi import APIRouter, Depends
 from pydantic import UUID4, conint
 
-from waterdip.server.apis.models.datasets import DatasetListResponse
+from waterdip.server.apis.models.datasets import DatasetListResponse, DatasetListRow
 from waterdip.server.apis.models.params import RequestPagination, RequestSort
+from waterdip.server.db.models.datasets import DatasetDB
 from waterdip.server.services.dataset_service import DatasetService
 
 router = APIRouter()
@@ -30,10 +31,27 @@ router = APIRouter()
     response_model_exclude_none=True,
 )
 def get_dataset_list(
-    model_id: Optional[UUID4] = None,
+    model_version_id: UUID4,
     pagination: RequestPagination = Depends(),
     sort: RequestSort = Depends(),
     service: DatasetService = Depends(DatasetService.get_instance),
 ):
 
-    service.list_dataset(model_id=model_id, pagination=pagination, sort=sort)
+    list_dataset: tuple[List[DatasetDB], int] = service.list_dataset(
+        model_version_id=model_version_id, pagination=pagination, sort_request=sort
+    )
+
+    response = DatasetListResponse(
+        dataset_list=[
+            DatasetListRow(
+                dataset_id=data_set.dataset_id, dataset_name=data_set.dataset_name
+            )
+            for data_set in list_dataset[0]
+        ],
+        meta={
+            "page": pagination.page,
+            "limit": pagination.limit,
+            "total": list_dataset[1],
+        },
+    )
+    return response

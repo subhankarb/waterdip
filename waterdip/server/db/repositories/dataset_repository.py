@@ -42,18 +42,21 @@ class DatasetRepository:
         created_dataset = self._mongo.database[MONGO_COLLECTION_DATASETS].find_one(
             {"_id": inserted_dataset.inserted_id}
         )
-        print(created_dataset)
         return BaseDatasetDB(**created_dataset)
 
     def list_datasets(
-        self, filters: Dict, sort: List, skip: int, limit: int
+        self,
+        filters: Dict,
+        sort: List,
+        skip: int = 0,
+        limit: int = 10,
     ) -> List[DatasetDB]:
         result = (
             self._mongo.database[MONGO_COLLECTION_DATASETS]
             .find(filters)
             .sort(sort)
-            .limit(limit=limit)
-            .skip(skip=skip)
+            .limit(limit)
+            .skip(skip)
         )
 
         return [BaseDatasetDB(**dataset) for dataset in result]
