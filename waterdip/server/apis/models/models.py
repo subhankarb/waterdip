@@ -12,8 +12,9 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 from typing import Dict, Optional
+from uuid import UUID
 
-from pydantic import UUID4, BaseModel
+from pydantic import BaseModel
 
 from waterdip.server.commons.models import ColumnDataType, PredictionTaskType
 
@@ -23,7 +24,7 @@ class RegisterModelRequest(BaseModel):
 
 
 class RegisterModelResponse(BaseModel):
-    model_id: UUID4
+    model_id: UUID
     model_name: str
 
 
@@ -33,7 +34,7 @@ class ModelVersionSchema(BaseModel):
 
 
 class RegisterModelVersionRequest(BaseModel):
-    model_id: UUID4
+    model_id: UUID
     model_version: str
     task_type: PredictionTaskType
     description: Optional[str]
@@ -41,5 +42,5 @@ class RegisterModelVersionRequest(BaseModel):
 
 
 class RegisterModelVersionResponse(BaseModel):
-    model_version_id: UUID4
+    model_version_id: UUID
     model_version: str

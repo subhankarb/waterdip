@@ -44,20 +44,21 @@ class DatasetRepository:
         )
         return BaseDatasetDB(**created_dataset)
 
-    def list_datasets(
+    def find_datasets(
         self,
         filters: Dict,
-        sort: List,
+        sort: List = None,
         skip: int = 0,
         limit: int = 10,
     ) -> List[DatasetDB]:
         result = (
             self._mongo.database[MONGO_COLLECTION_DATASETS]
             .find(filters)
-            .sort(sort)
             .limit(limit)
             .skip(skip)
         )
+        if sort:
+            result = result.sort(sort)
 
         return [BaseDatasetDB(**dataset) for dataset in result]
 

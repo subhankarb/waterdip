@@ -1,3 +1,20 @@
+/*
+ *  Copyright 2022-present, the Waterdip Labs Pvt. Ltd.
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ *
+ */
+
 import { Icon } from '@iconify/react';
 import menu2Fill from '@iconify/icons-eva/menu-2-fill';
 // material
@@ -5,10 +22,6 @@ import { alpha, experimentalStyled as styled } from '@material-ui/core/styles';
 import { Box, Stack, AppBar, Toolbar, IconButton } from '@material-ui/core';
 //
 import { MHidden } from '../../components/@material-extend';
-// import Searchbar from './Searchbar';
-// import AccountPopover from './AccountPopover';
-// import LanguagePopover from './LanguagePopover';
-import NotificationsPopover from './NotificationsPopover';
 
 // ----------------------------------------------------------------------
 
@@ -51,10 +64,6 @@ export default function DashboardNavbar({ onOpenSidebar }: DashboardNavbarProps)
         </MHidden>
 
         <Box sx={{ flexGrow: 1 }} />
-
-        <Stack direction="row" spacing={{ xs: 0.5, sm: 1.5 }}>
-          <NotificationsPopover />
-        </Stack>
       </ToolbarStyle>
     </RootStyle>
   );

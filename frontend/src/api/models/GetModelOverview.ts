@@ -1,7 +1,7 @@
 import { useQuery, UseQueryResult } from 'react-query';
 import axios from '../../utils/axios';
-import { CREATE_MODEL_ANOMALOUS_EXPORT, GET_MODEL_Overview_API } from '../apis';
-import { Model, ModelFeatures, data_type, ModelTasksStat } from '../../@types/model';
+import { GET_MODEL_Overview_API } from '../apis';
+import { data_type } from '../../@types/model';
 
 interface GetModelInfoParams {
   id: string;

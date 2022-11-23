@@ -117,7 +117,6 @@ const HeaderTable = ({ title, onDelete, data, onEdit }: Props) => {
                       <Icon icon={editFill} />
                     </Button>
                     <Button
-                      color="error"
                       size="small"
                       className={classes.button}
                       onClick={() => setDeleteIndex(index)}

@@ -14,7 +14,12 @@
 
 import uuid
 from datetime import datetime
-from typing import Literal, Optional
+from typing import Optional
+
+try:
+    from typing import Literal
+except ImportError:
+    from typing_extensions import Literal
 
 from fastapi import Depends
 

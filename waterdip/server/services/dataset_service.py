@@ -12,15 +12,17 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 from typing import List, Optional, TypeVar
+from uuid import UUID
 
 from fastapi import Depends
-from pydantic import UUID4, Field
+from pydantic import Field
 
 from waterdip.server.apis.models.params import RequestPagination, RequestSort
 from waterdip.server.commons.models import DatasetType
 from waterdip.server.db.models.datasets import BaseDatasetDB, DatasetDB
 from waterdip.server.db.repositories.dataset_repository import DatasetRepository
 from waterdip.server.db.repositories.model_repository import ModelVersionRepository
+from waterdip.server.errors.base_errors import EntityNotFoundError
 
 
 class ServiceBaseDataset(BaseDatasetDB):
@@ -65,17 +67,17 @@ class DatasetService:
 
     def list_dataset(
         self,
-        model_version_id: UUID4,
+        model_version_id: UUID,
         sort_request: Optional[RequestSort] = None,
         pagination: Optional[RequestPagination] = None,
-    ) -> tuple[List[DatasetDB], int]:
+    ):
         filters = (
             {"model_version_id": str(model_version_id)}
             if model_version_id is not None
             else {}
         )
 
-        dataset_list: List[DatasetDB] = self._repository.list_datasets(
+        dataset_list: List[DatasetDB] = self._repository.find_datasets(
             filters=filters,
             sort=[(sort_request.get_sort_field, sort_request.get_sort_order)]
             if sort_request and sort_request.sort
@@ -96,3 +98,15 @@ class DatasetService:
         self._model_version_repository.find_by_id(dataset.model_version_id)
 
         return self._repository.create_dataset(dataset=dataset)
+
+    def find_event_dataset_by_model_version_id(
+        self, model_version_id: UUID
+    ) -> DatasetDB:
+        filters = {"model_version_id": str(model_version_id), "dataset_type": "EVENT"}
+
+        dataset_list: List[DatasetDB] = self._repository.find_datasets(filters=filters)
+
+        if len(dataset_list) == 0:
+            raise EntityNotFoundError(name=str(model_version_id), type="Event Dataset")
+
+        return dataset_list[0]

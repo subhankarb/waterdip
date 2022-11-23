@@ -65,7 +65,7 @@ class TestDatasetService:
         self, mocker, dataset_lists, dataset_count, mock_mongo_backend: MongodbBackend
     ):
         mocker.patch(
-            "waterdip.server.db.repositories.dataset_repository.DatasetRepository.list_datasets",
+            "waterdip.server.db.repositories.dataset_repository.DatasetRepository.find_datasets",
             return_value=dataset_lists,
         )
         mocker.patch(
@@ -85,7 +85,7 @@ class TestDatasetService:
         self, mocker, _sort, mock_mongo_backend: MongodbBackend
     ):
         mocker.patch(
-            "waterdip.server.db.repositories.dataset_repository.DatasetRepository.list_datasets",
+            "waterdip.server.db.repositories.dataset_repository.DatasetRepository.find_datasets",
             return_value=[
                 BaseDatasetDB(
                     dataset_id=uuid.uuid4(),
@@ -117,7 +117,7 @@ class TestDatasetService:
         self, mocker, sort, mock_mongo_backend: MongodbBackend
     ):
         mocker.patch(
-            "waterdip.server.db.repositories.dataset_repository.DatasetRepository.list_datasets",
+            "waterdip.server.db.repositories.dataset_repository.DatasetRepository.find_datasets",
             return_value=[
                 BaseDatasetDB(
                     dataset_id=uuid.uuid4(),
