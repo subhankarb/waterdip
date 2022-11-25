@@ -13,13 +13,14 @@
 #  limitations under the License.
 
 from typing import Dict, List, Optional, Union
+from uuid import UUID
 
-from pydantic import UUID4, BaseModel
+from pydantic import BaseModel
 
 
 class DatasetListRow(BaseModel):
     dataset_name: str
-    dataset_id: UUID4
+    dataset_id: UUID
 
 
 class DatasetListResponse(BaseModel):

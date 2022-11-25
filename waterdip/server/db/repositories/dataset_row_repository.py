@@ -30,8 +30,34 @@ from typing import List
 
 from fastapi import Depends
 
-from waterdip.server.db.models.dataset_rows import BaseDatasetBatchRowDB
-from waterdip.server.db.mongodb import MONGO_COLLECTION_BATCH_ROWS, MongodbBackend
+from waterdip.server.db.models.dataset_rows import BaseDatasetBatchRowDB, BaseEventRowDB
+from waterdip.server.db.mongodb import (
+    MONGO_COLLECTION_BATCH_ROWS,
+    MONGO_COLLECTION_EVENT_ROWS,
+    MongodbBackend,
+)
+
+
+class EventDatasetRowRepository:
+
+    _INSTANCE: "EventDatasetRowRepository" = None
+
+    @classmethod
+    def get_instance(
+        cls, mongodb: MongodbBackend = Depends(MongodbBackend.get_instance)
+    ):
+        if cls._INSTANCE is None:
+            cls._INSTANCE = cls(mongodb=mongodb)
+        return cls._INSTANCE
+
+    def __init__(self, mongodb: MongodbBackend):
+        self._mongo = mongodb
+
+    def inset_rows(self, rows: List[BaseEventRowDB]):
+        created_rows = self._mongo.database[MONGO_COLLECTION_EVENT_ROWS].insert_many(
+            [row.dict() for row in rows]
+        )
+        return created_rows.inserted_ids
 
 
 class BatchDatasetRowRepository:

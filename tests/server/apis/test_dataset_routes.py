@@ -32,8 +32,8 @@ class TestDatasetList:
 
         dataset_list, meta = response["dataset_list"], response["meta"]
 
-        assert len(dataset_list) == 2
-        assert meta["total"] == 2
+        assert len(dataset_list) == 3
+        assert meta["total"] == 3
 
     def test_should_return_no_dataset_if_pagination_beyond_size(
         self, test_client: TestClient
@@ -46,7 +46,7 @@ class TestDatasetList:
         dataset_list, meta = response["dataset_list"], response["meta"]
 
         assert len(dataset_list) == 0
-        assert meta["total"] == 2
+        assert meta["total"] == 3
 
     def test_should_return_limited_dataset(self, test_client: TestClient):
         response = test_client.get(
@@ -57,7 +57,7 @@ class TestDatasetList:
         dataset_list, meta = response["dataset_list"], response["meta"]
 
         assert len(dataset_list) == 1
-        assert meta["total"] == 2
+        assert meta["total"] == 3
         assert dataset_list[0]["dataset_id"] == DATASET_BATCH_ID_V1_1
 
     def test_should_return_created_at_sorted_dataset_desc(
@@ -71,7 +71,7 @@ class TestDatasetList:
         dataset_list, meta = response["dataset_list"], response["meta"]
 
         assert len(dataset_list) == 1
-        assert meta["total"] == 2
+        assert meta["total"] == 3
         assert dataset_list[0]["dataset_id"] == DATASET_BATCH_ID_V1_2
 
     def test_should_return_with_default_param(self, test_client: TestClient):
@@ -81,5 +81,5 @@ class TestDatasetList:
 
         dataset_list, meta = response["dataset_list"], response["meta"]
 
-        assert len(dataset_list) == 2
-        assert meta["total"] == 2
+        assert len(dataset_list) == 3
+        assert meta["total"] == 3

@@ -142,7 +142,6 @@ export const ConfigAdvanced = () => {
       <Button
         className={classes.delete}
         variant="outlined"
-        color="error"
         onClick={() => setExpandForm((state) => !state)}
       >
         Delete Model

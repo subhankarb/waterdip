@@ -11,13 +11,14 @@
 #  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
-
-from typing import List
+from datetime import datetime
+from typing import List, Optional
+from uuid import UUID
 
 from pydantic import UUID4
 from pydantic.dataclasses import dataclass
 
-from waterdip.server.services.logging_service import ServiceLogRow
+from waterdip.server.services.logging_service import ServiceLogEvent, ServiceLogRow
 
 
 class BatchDatasetLogRowReq(ServiceLogRow):
@@ -26,6 +27,17 @@ class BatchDatasetLogRowReq(ServiceLogRow):
 
 @dataclass
 class BatchDatasetLogRequest:
-    model_version_id: UUID4
+    model_version_id: UUID
     environment: str
     rows: List[BatchDatasetLogRowReq]
+
+
+class EventLogRowReq(ServiceLogEvent):
+    pass
+
+
+@dataclass
+class EventLogRequest:
+    model_version_id: UUID
+    events: List[EventLogRowReq]
+    timestamp: Optional[datetime]

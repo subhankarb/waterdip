@@ -12,9 +12,9 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 from typing import List, Optional
+from uuid import UUID
 
 from fastapi import APIRouter, Depends
-from pydantic import UUID4, conint
 
 from waterdip.server.apis.models.datasets import DatasetListResponse, DatasetListRow
 from waterdip.server.apis.models.params import RequestPagination, RequestSort
@@ -31,7 +31,7 @@ router = APIRouter()
     response_model_exclude_none=True,
 )
 def get_dataset_list(
-    model_version_id: UUID4,
+    model_version_id: UUID,
     pagination: RequestPagination = Depends(),
     sort: RequestSort = Depends(),
     service: DatasetService = Depends(DatasetService.get_instance),

@@ -3,7 +3,6 @@ import { isString } from 'lodash';
 // material
 import { Typography, Link, Grid, Box } from '@material-ui/core';
 //
-import { MBreadcrumbs } from './@material-extend';
 import { MBreadcrumbsProps } from './@material-extend/MBreadcrumbs';
 
 // ----------------------------------------------------------------------

@@ -14,15 +14,15 @@
 
 from datetime import datetime
 from typing import Dict, Optional, TypeVar
+from uuid import UUID
 
 from pydantic import BaseModel, Field
-from pydantic.types import UUID4
 
 from waterdip.server.commons.models import ColumnDataType
 
 
 class BaseModelDB(BaseModel):
-    model_id: UUID4
+    model_id: UUID
     model_name: str
 
     def dict(self, *args, **kwargs) -> "DictStrAny":
@@ -45,9 +45,9 @@ class ModelVersionSchemaInDB(BaseModel):
 
 
 class BaseModelVersionDB(BaseModel):
-    model_version_id: UUID4 = Field(default=None)
+    model_version_id: UUID = Field(default=None)
     model_version: str = Field(default=None)
-    model_id: UUID4 = Field(default=None)
+    model_id: UUID = Field(default=None)
     description: Optional[str] = None
     task_type: Optional[str] = None
     created_at: Optional[datetime] = None

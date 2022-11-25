@@ -12,13 +12,18 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
-from typing import List
+from typing import List, Union
 
 from fastapi import Depends
 
-from waterdip.server.db.models.dataset_rows import BaseDatasetBatchRowDB
+from waterdip.server.db.models.dataset_rows import (
+    BaseClassificationEventRowDB,
+    BaseDatasetBatchRowDB,
+    BaseEventRowDB,
+)
 from waterdip.server.db.repositories.dataset_row_repository import (
     BatchDatasetRowRepository,
+    EventDatasetRowRepository,
 )
 
 
@@ -45,5 +50,38 @@ class BatchDatasetRowService:
         self._repository = repository
 
     def insert_rows(self, rows: List[ServiceDatasetBatchRow]) -> int:
+        inserted_rows = self._repository.inset_rows(rows)
+        return len(inserted_rows)
+
+
+class ServiceEventRow(BaseEventRowDB):
+    pass
+
+
+class ServiceClassificationEventRow(BaseClassificationEventRowDB):
+    pass
+
+
+class EventDatasetRowService:
+
+    _INSTANCE: "EventDatasetRowService" = None
+
+    @classmethod
+    def get_instance(
+        cls,
+        repository: EventDatasetRowRepository = Depends(
+            EventDatasetRowRepository.get_instance
+        ),
+    ):
+        if not cls._INSTANCE:
+            cls._INSTANCE = cls(repository=repository)
+        return cls._INSTANCE
+
+    def __init__(self, repository: EventDatasetRowRepository):
+        self._repository = repository
+
+    def insert_rows(
+        self, rows: Union[List[ServiceEventRow], List[ServiceClassificationEventRow]]
+    ) -> int:
         inserted_rows = self._repository.inset_rows(rows)
         return len(inserted_rows)

@@ -14,8 +14,9 @@
 
 from datetime import datetime
 from typing import Any, Dict, List, Optional, TypeVar
+from uuid import UUID
 
-from pydantic import UUID4, BaseModel, Field
+from pydantic import BaseModel, Field
 
 from waterdip.server.commons.models import ColumnDataType, DatasetType
 
@@ -34,14 +35,14 @@ ColumnInfoDB = TypeVar("ColumnInfoDB", bound=BaseColumnInfoDB)
 
 class BaseDatasetDB(BaseModel):
 
-    dataset_id: UUID4 = Field(default=None)
+    dataset_id: UUID = Field(default=None)
     dataset_name: str = Field(default=None)
     created_at: datetime = Field(default=None)
     dataset_type: DatasetType = Field(
         description="Dataset type. It can be batch dataset or event dataset"
     )
-    model_id: UUID4 = Field(description="Reference model id")
-    model_version_id: UUID4 = Field(description="Reference model version id")
+    model_id: UUID = Field(description="Reference model id")
+    model_version_id: UUID = Field(description="Reference model version id")
     environment: Optional[str] = None
     meta: Optional[Dict] = None
 

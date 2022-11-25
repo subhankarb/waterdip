@@ -37,18 +37,27 @@ from waterdip.server.db.mongodb import (
 
 MODEL_ID = "de6af49c-e80b-4852-b8dd-3b8fdd7f98f8"
 MODEL_VERSION_ID_V1 = "1e195bf6-9a3f-4a33-b7b1-37a603aadf41"
-MODEL_VERSION_ID_V2 = "2e195bf6-9a3f-4a33-b7b1-37a603aadf42"
+DATASET_EVENT_ID_V1 = "1e195bf6-7a1f-4a33-b7b1-37a603aadde1"
 DATASET_BATCH_ID_V1_1 = "1d195bf6-7a1f-4a33-b7b1-37a603aadd31"
 DATASET_BATCH_ID_V1_2 = "1d195bf6-7a1f-4a33-b7b1-37a603aadd32"
 
+MODEL_VERSION_ID_V2 = "2e195bf6-9a3f-4a33-b7b1-37a603aadf42"
+
+
 MODEL_VERSION_V1_SCHEMA = {
-    "features": {"f1": {"data_type": "NUMERIC"}},
-    "predictions": {"p1": {"data_type": "NUMERIC"}},
+    "features": {
+        "f1": {"data_type": "NUMERIC", "list_index": 0},
+        "f2": {"data_type": "CATEGORICAL", "list_index": 0},
+    },
+    "predictions": {"p1": {"data_type": "NUMERIC", "list_index": 0}},
 }
 
 MODEL_VERSION_V2_SCHEMA = {
-    "features": {"f2": {"data_type": "NUMERIC"}},
-    "predictions": {"p2": {"data_type": "NUMERIC"}},
+    "features": {
+        "f3": {"data_type": "NUMERIC", "list_index": 0},
+        "f4": {"data_type": "CATEGORICAL", "list_index": 0},
+    },
+    "predictions": {"p2": {"data_type": "CATEGORICAL", "list_index": 0}},
 }
 
 
@@ -93,7 +102,7 @@ class MongodbBackendTesting(MongodbBackend):
 def setup_data(database):
     setup_model_data(database)
     setup_model_version_data(database)
-    setup_batch_dataset_data(database)
+    setup_dataset_data(database)
 
 
 def setup_model_data(database):
@@ -127,7 +136,7 @@ def setup_model_version_data(database):
     )
 
 
-def setup_batch_dataset_data(database):
+def setup_dataset_data(database):
     datasets = [
         BaseDatasetDB(
             dataset_id=UUID(DATASET_BATCH_ID_V1_1),
@@ -146,6 +155,15 @@ def setup_batch_dataset_data(database):
             dataset_name="V1_validation",
             environment="validation",
             created_at=datetime(year=2022, month=11, day=18),
+        ),
+        BaseDatasetDB(
+            dataset_id=UUID(DATASET_EVENT_ID_V1),
+            model_id=UUID(MODEL_ID),
+            model_version_id=UUID(MODEL_VERSION_ID_V1),
+            dataset_type=DatasetType.EVENT,
+            dataset_name="V1_production",
+            environment="production",
+            created_at=datetime(year=2022, month=11, day=17),
         ),
     ]
     database[MONGO_COLLECTION_DATASETS].insert_many(
