@@ -117,3 +117,6 @@ processor/runnotebook.ipynb
 
 # Ignore DevSpace cache and log folder
 .devspace/
+
+# OSX
+.DS_Store

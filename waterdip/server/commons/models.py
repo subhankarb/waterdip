@@ -16,27 +16,79 @@ from enum import Enum
 
 
 class PredictionTaskType(str, Enum):
+    """
+    prediction task type for any model version.
+
+    Attributes:
+    ------------------
+    BINARY:
+        Binary Classification
+    MULTI_CLASS:
+        Multi Class Classification
+
+    """
+
     BINARY = "BINARY"
     MULTI_CLASS = "MULTICLASS"
 
 
 class DatasetType(str, Enum):
+    """
+    dataset type of the datasets associated to model versions
+
+    Attributes:
+    ------------------
+    BATCH:
+        One time uploaded dataset. It is a non-time series dataset
+    """
+
     BATCH = "BATCH"
     EVENT = "EVENT"
 
 
 class ColumnDataType(str, Enum):
+    """
+    data type of the dataset
+
+    Attributes:
+    ------------------
+    NUMERIC:
+        numeric data type. It can be integer or float
+    CATEGORICAL:
+        categorical data type can take on one of a limited,
+        and usually fixed, number of possible values
+    BOOLEAN:
+        boolean data type, i.e. True or False
+
+    """
+
     NUMERIC = "NUMERIC"
     CATEGORICAL = "CATEGORICAL"
     BOOLEAN = "BOOLEAN"
 
 
 class ColumnMappingType(str, Enum):
+    """
+    mapping of column type to model version schema.
+
+    Attributes:
+    ------------------
+    FEATURE:
+        column type is a feature input type
+    PREDICTION:
+        column type is a prediction output type
+    PREDICTION_SCORE:
+        column type is a prediction score type
+    ACTUAL:
+        column type is an actual type. Actual is realized and final output
+    ACTUAL_SCORE:
+        column type is an actual score.
+
+
+    """
+
     FEATURE = "FEATURE"
-    RAW = "RAW"
     PREDICTION = "PREDICTION"
     PREDICTION_SCORE = "PREDICTION_SCORE"
     ACTUAL = "ACTUAL"
     ACTUAL_SCORE = "ACTUAL_SCORE"
-    ACTUAL_RANK_SEQUENCE = "ACTUAL_RANK_SEQUENCE"
-    GROUP_BY = "GROUP_BY"

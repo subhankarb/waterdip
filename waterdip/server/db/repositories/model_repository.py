@@ -12,7 +12,7 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
-from typing import Optional
+from typing import Dict, List, Optional
 from uuid import UUID
 
 from fastapi import Depends
@@ -31,7 +31,6 @@ from waterdip.server.db.mongodb import (
 
 
 class ModelRepository:
-
     _INSTANCE = None
 
     @classmethod
@@ -56,9 +55,32 @@ class ModelRepository:
 
         return BaseModelDB(**created_model)
 
+    def find_models(
+        self,
+        filters: Dict,
+        sort: List = None,
+        skip: int = 0,
+        limit: int = 10,
+    ) -> List[ModelDB]:
+        result = (
+            self._mongo.database[MONGO_COLLECTION_MODELS]
+            .find(filters)
+            .limit(limit)
+            .skip(skip)
+        )
+        if sort:
+            result = result.sort(sort)
+
+        return [BaseModelDB(**model) for model in result]
+
+    def count_models(self, filters: Dict) -> int:
+        total = self._mongo.database[MONGO_COLLECTION_MODELS].count_documents(
+            filter=filters
+        )
+        return total
+
 
 class ModelVersionRepository:
-
     _INSTANCE = None
 
     @classmethod
@@ -92,3 +114,25 @@ class ModelVersionRepository:
             return None
 
         return BaseModelVersionDB(**result)
+
+    def agg_model_versions_per_model(
+        self, model_ids: List[str], top_n=1
+    ) -> Dict[str, List[str]]:
+
+        pipeline = [
+            {"$match": {"model_id": {"$in": model_ids}}},
+            {"$sort": {"created_at": -1}},
+            {"$group": {"_id": "$model_id", "docs": {"$push": "$$ROOT"}}},
+            {"$project": {"versions": {"$slice": ["$docs", top_n]}}},
+        ]
+
+        agg_model_versions: Dict[str, List[str]] = dict()
+        for doc in self._mongo.database[MONGO_COLLECTION_MODEL_VERSIONS].aggregate(
+            pipeline=pipeline
+        ):
+            model_id = doc["_id"]
+            model_versions = []
+            for version in doc["versions"]:
+                model_versions.append(version["model_version_id"])
+            agg_model_versions[model_id] = model_versions
+        return agg_model_versions

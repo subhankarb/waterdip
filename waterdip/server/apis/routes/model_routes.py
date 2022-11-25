@@ -15,22 +15,44 @@
 from fastapi import APIRouter, Body, Depends
 
 from waterdip.server.apis.models.models import (
+    ModelListResponse,
     RegisterModelRequest,
     RegisterModelResponse,
     RegisterModelVersionRequest,
     RegisterModelVersionResponse,
 )
+from waterdip.server.apis.models.params import RequestPagination, RequestSort
 from waterdip.server.db.models.models import ModelVersionDB
 from waterdip.server.services.model_service import ModelService, ModelVersionService
 
 router = APIRouter()
 
 
+@router.get("/list.models", response_model=ModelListResponse, name="list:models")
+def model_list(
+    pagination: RequestPagination = Depends(),
+    sort: RequestSort = Depends(),
+    service: ModelService = Depends(ModelService.get_instance),
+):
+    list_models = service.list_models(sort_request=sort, pagination=pagination)
+    response = ModelListResponse(
+        model_list=list_models,
+        meta={
+            "page": pagination.page,
+            "limit": pagination.limit,
+            "total": service.count_models(),
+        },
+    )
+    return response
+
+
 @router.post(
     "/model.register", response_model=RegisterModelResponse, name="model:register"
 )
 def register_model(
-    request: RegisterModelRequest = Body(...),
+    request: RegisterModelRequest = Body(
+        ..., description="the request model register info"
+    ),
     service: ModelService = Depends(ModelService.get_instance),
 ):
     registered_model = service.register_model(request.model_name)
@@ -46,7 +68,9 @@ def register_model(
     name="model_version:register",
 )
 def register_model_version(
-    request: RegisterModelVersionRequest = Body(...),
+    request: RegisterModelVersionRequest = Body(
+        ..., description="the request model version register info"
+    ),
     service: ModelVersionService = Depends(ModelVersionService.get_instance),
 ):
     registered_model_version: ModelVersionDB = service.register_model_version(

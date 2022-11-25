@@ -29,7 +29,7 @@ class TestRegisterModel:
     def test_should_register_model(self, test_client: TestClient):
         model_name = "test_model_p1"
         response = test_client.post(
-            url="/api/v1/model.register", json={"model_name": model_name}
+            url="/v1/model.register", json={"model_name": model_name}
         )
         response_data = response.json()
         model_uuid_version = UUID(response_data["model_id"]).version
@@ -62,9 +62,7 @@ class TestRegisterModelVersion:
                 "predictions": {"p1": "NUMERIC"},
             },
         }
-        response = test_client.post(
-            url="/api/v1/model.version.register", json=request_body
-        )
+        response = test_client.post(url="/v1/model.version.register", json=request_body)
 
         assert response.status_code == 200
 

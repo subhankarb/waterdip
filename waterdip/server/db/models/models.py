@@ -24,6 +24,7 @@ from waterdip.server.commons.models import ColumnDataType
 class BaseModelDB(BaseModel):
     model_id: UUID
     model_name: str
+    created_at: Optional[datetime]
 
     def dict(self, *args, **kwargs) -> "DictStrAny":
         model = super().dict(*args, **kwargs)

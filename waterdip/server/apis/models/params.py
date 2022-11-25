@@ -22,13 +22,25 @@ from pydantic import BaseModel, validator
 
 @dataclass
 class RequestPagination:
-    """Query pagination params"""
+    """
+    Query pagination params
+
+    Attributes:
+    ------------------
+    limit:
+        page size of the pagination attribute
+    page:
+        page number of the pagination
+
+    """
 
     limit: int = Query(default=10, gte=0, le=1000, description="Response records limit")
     page: int = Query(default=0, ge=0, le=10000, description="Record page")
 
 
 class RequestSort(BaseModel):
+    """Sorting option for any list API"""
+
     sort: str = Query(default=None, description="Sort field for records list")
 
     @validator("sort")

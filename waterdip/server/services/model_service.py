@@ -14,7 +14,9 @@
 
 import uuid
 from datetime import datetime
-from typing import Optional
+from typing import Dict, List, Optional
+
+from waterdip.server.apis.models.params import RequestPagination, RequestSort
 
 try:
     from typing import Literal
@@ -23,7 +25,7 @@ except ImportError:
 
 from fastapi import Depends
 
-from waterdip.server.apis.models.models import ModelVersionSchema
+from waterdip.server.apis.models.models import ModelListRow, ModelVersionSchema
 from waterdip.server.db.models.models import (
     BaseModelDB,
     BaseModelVersionDB,
@@ -38,28 +40,6 @@ from waterdip.server.db.repositories.model_repository import (
 )
 from waterdip.server.errors.base_errors import EntityNotFoundError
 from waterdip.server.services.dataset_service import DatasetService, ServiceEventDataset
-
-
-class ModelService:
-    _INSTANCE: "ModelService" = None
-
-    @classmethod
-    def get_instance(
-        cls,
-        repository: ModelRepository = Depends(ModelRepository.get_instance),
-    ):
-        if not cls._INSTANCE:
-            cls._INSTANCE = cls(repository=repository)
-        return cls._INSTANCE
-
-    def __init__(self, repository: ModelRepository):
-        self._repository = repository
-
-    def register_model(self, model_name: str) -> ModelDB:
-        generated_model_id = uuid.uuid4()
-        model_db = BaseModelDB(model_id=generated_model_id, model_name=model_name)
-
-        return self._repository.register_model(model_db)
 
 
 class ModelVersionService:
@@ -142,3 +122,78 @@ class ModelVersionService:
         )
 
         return self._repository.register_model_version(model_version_db)
+
+    def agg_model_versions_per_model(
+        self, model_ids: List[str]
+    ) -> Dict[str, List[str]]:
+        return self._repository.agg_model_versions_per_model(
+            model_ids=model_ids, top_n=1
+        )
+
+
+class ModelService:
+    _INSTANCE: "ModelService" = None
+
+    @classmethod
+    def get_instance(
+        cls,
+        repository: ModelRepository = Depends(ModelRepository.get_instance),
+        model_version_service: ModelVersionService = Depends(
+            ModelVersionService.get_instance
+        ),
+    ):
+        if not cls._INSTANCE:
+            cls._INSTANCE = cls(
+                repository=repository, model_version_service=model_version_service
+            )
+        return cls._INSTANCE
+
+    def __init__(
+        self, repository: ModelRepository, model_version_service: ModelVersionService
+    ):
+        self._repository = repository
+        self._model_version_service = model_version_service
+
+    def register_model(self, model_name: str) -> ModelDB:
+        generated_model_id = uuid.uuid4()
+        model_db = BaseModelDB(
+            model_id=generated_model_id,
+            model_name=model_name,
+            created_at=datetime.utcnow(),
+        )
+
+        return self._repository.register_model(model_db)
+
+    def list_models(
+        self,
+        sort_request: Optional[RequestSort] = None,
+        pagination: Optional[RequestPagination] = None,
+    ) -> List[ModelListRow]:
+        list_models: [ModelDB] = self._repository.find_models(
+            filters={},
+            sort=[(sort_request.get_sort_field, sort_request.get_sort_order)]
+            if sort_request and sort_request.sort
+            else [("created_at", -1)],
+            skip=(pagination.page - 1) * pagination.limit if pagination else 0,
+            limit=pagination.limit if pagination else 10,
+        )
+
+        agg_model_versions = self._model_version_service.agg_model_versions_per_model(
+            model_ids=[str(model.model_id) for model in list_models]
+        )
+
+        model_rows = [
+            ModelListRow(
+                model_id=model.model_id,
+                model_name=model.model_name,
+                model_version_id=agg_model_versions[str(model.model_id)][0]
+                if len(agg_model_versions[str(model.model_id)]) > 0
+                else None,
+            )
+            for model in list_models
+        ]
+
+        return model_rows
+
+    def count_models(self) -> int:
+        return self._repository.count_models(filters={})

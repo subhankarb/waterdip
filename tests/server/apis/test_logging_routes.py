@@ -32,7 +32,7 @@ class TestLogDataset:
                 {"features": {"f1": 100, "f2": "yellow"}, "predictions": {"p1": 1}},
             ],
         }
-        response = test_client.post(url="/api/v1/log.dataset", json=request_body)
+        response = test_client.post(url="/v1/log.dataset", json=request_body)
 
         assert response.status_code == 200
 
@@ -53,7 +53,7 @@ class TestLogEvents:
             ],
         }
 
-        response = test_client.post(url="/api/v1/log.events", json=request_body)
+        response = test_client.post(url="/v1/log.events", json=request_body)
 
         assert response.status_code == 200
         assert response.json()["total"] == 2

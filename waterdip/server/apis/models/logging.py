@@ -22,22 +22,57 @@ from waterdip.server.services.logging_service import ServiceLogEvent, ServiceLog
 
 
 class BatchDatasetLogRowReq(ServiceLogRow):
+    """batch dataset row in API request"""
+
     pass
 
 
 @dataclass
 class BatchDatasetLogRequest:
+    """
+    Request Body for batch dataset upload API
+
+    Attributes:
+    ------------------
+    model_version_id:
+        unique id of the model version
+    environment:
+        the environment this dataset will be used for. possible values can ve training, testing and validation
+    rows:
+        list of rows of the dataset
+
+    TODO Make environment attribute an ENUM
+    """
+
     model_version_id: UUID
     environment: str
     rows: List[BatchDatasetLogRowReq]
 
 
 class EventLogRowReq(ServiceLogEvent):
+    """event row in Event logging API request"""
+
     pass
 
 
 @dataclass
 class EventLogRequest:
+    """
+    Request Body for model prediction event upload API
+
+    Attributes:
+    ------------------
+     model_version_id:
+        unique id of the model version
+    events:
+        list of prediction events need to be logged
+    timestamp:
+        timestamp of all the events. This is an optional attribute.
+        If timestamp is not present then current server utc time will be
+        generated and attached to the events
+
+    """
+
     model_version_id: UUID
     events: List[EventLogRowReq]
     timestamp: Optional[datetime]

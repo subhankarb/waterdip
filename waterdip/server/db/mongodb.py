@@ -12,6 +12,7 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
+from loguru import logger
 from pymongo import MongoClient
 from pymongo.database import Database
 
@@ -35,6 +36,7 @@ class MongodbBackend:
             cls._INSTANCE = cls(
                 mongo_client=mongo_client, mongo_database=settings.mongo_database
             )
+            logger.info(f"connected to mongodb {mongo_client.server_info()}")
         return cls._INSTANCE
 
     def __init__(self, mongo_client: MongoClient, mongo_database: str):
