@@ -5,10 +5,8 @@ import { Box, Drawer, Typography } from '@material-ui/core';
 import Logo from '../../components/Logo';
 import Scrollbar from '../../components/Scrollbar';
 import NavSection from '../../components/NavSection';
-import AccountPopover from './AccountPopover';
 import { MHidden } from '../../components/@material-extend';
 import sidebarConfig from './SidebarConfig';
-import NotificationsPopover from './NotificationsPopover';
 
 const DRAWER_WIDTH = 80;
 
