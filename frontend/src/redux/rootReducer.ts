@@ -2,7 +2,6 @@ import { combineReducers } from 'redux';
 // import { persistReducer } from 'redux-persist';
 import storage from 'redux-persist/lib/storage';
 // slices
-import userReducer from './slices/user';
 import dateRangeFilterReducer from './slices/dateRangeFilter';
 import modelMonitorStateReducer from './slices/ModelMonitorState';
 
@@ -23,7 +22,6 @@ const rootPersistConfig = {
 // };
 
 const rootReducer = combineReducers({
-  user: userReducer,
   dateRangeFilter: dateRangeFilterReducer,
   modelMonitorState: modelMonitorStateReducer
 });
