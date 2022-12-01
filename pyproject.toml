@@ -11,6 +11,7 @@ python = ">=3.7,<4.0"
 pymongo = {version = "4.1.1", extras = ["srv"]}
 loguru = "^0.6.0"
 requests = "^2.28.1"
+python-dotenv = "^0.21.0"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^7.1.3"

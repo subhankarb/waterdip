@@ -27,13 +27,13 @@ services:
     ports:
       - "4422:4422"
     environment:
-      - WD_MONGODB_URL=http://dbuser:dbpass@wd-mongodb:27017/waterdip
+      - WD_MONGODB_URL=mongodb://dbuser:dbpass@wd-mongodb:27017/waterdip
       - WD_MONGODB_DATABASE=waterdip
     networks:
       - waterdip
     depends_on:
       - wd-mongodb
-  
+
   wd-frontend:
     image: waterdip/wd-frontend
     build:
@@ -42,7 +42,7 @@ services:
     ports:
       - "4433:4433"
     environment:
-      - WD_BACKEND_URL=http://wd-backend:4422
+      - REACT_APP_API_URL=http://127.0.0.1:4422
     networks:
       - waterdip
     depends_on:

@@ -1,11 +1,10 @@
 {
   "name": "@waterdip/ui",
   "author": "Waterdip",
-  "licence": "UNLICENSED",
   "version": "0.1.0-beta",
   "private": true,
   "scripts": {
-    "start": "react-scripts start",
+    "start": "PORT=4433 react-scripts start",
     "build": "react-scripts build",
     "test": "jest",
     "eject": "react-scripts eject",

@@ -1,6 +1,8 @@
 import {BASE_URL} from "../config";
 
-const makeUrl = (path: string) => `${BASE_URL}/api/v1/${path}`;
+console.log("==================")
+console.log(BASE_URL)
+const makeUrl = (path: string) => `${BASE_URL}/v1/${path}`;
 
 export const GET_MODELS_API = makeUrl('list.models');
 export const GET_MODEL_Overview_API = makeUrl('model.info');

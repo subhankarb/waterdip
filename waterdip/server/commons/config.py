@@ -19,7 +19,9 @@ from pydantic import BaseSettings
 
 
 class ServerSettings(BaseSettings):
-    """ """
+    """
+    Configuration for the backend server
+    """
 
     mongo_url: str = "mongodb://dbuser:dbpass@127.0.0.1:27017/"
     mongo_database: str = "waterdip"
@@ -41,6 +43,8 @@ class ServerSettings(BaseSettings):
         return self.mongo_url
 
     class Config:
+        env_file = ".env"
+        env_file_encoding = "utf-8"
         env_prefix = "WD_"
         fields = {
             "mongo_url": {"env": ["MONGODB_URL", f"{env_prefix}MONGODB_URL"]},

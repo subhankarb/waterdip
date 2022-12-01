@@ -33,16 +33,26 @@ from waterdip.utils.logging import configure_logging
 
 def configure_api_router(app: FastAPI):
     """Configures the api router"""
-    app.include_router(api_router, prefix="/api")
+    app.include_router(api_router)
 
 
 def configure_database(app: FastAPI):
+    """
+    Configures database for the server.
+    On Startup, it will create mongodb backend instance
+
+    """
+
     @app.on_event("startup")
     async def configure_mongo():
         try:
+            print(settings.obfuscated_mongodb())
             MongodbBackend.get_instance()
 
         except BaseException as error:
+            logger.error(
+                f"failed to connect to mongo instance [{settings.obfuscated_mongodb()}]"
+            )
             raise ConfigError(
                 f"Mongodb endpoint at {settings.obfuscated_mongodb()} "
                 "is not available or not responding.\n"
@@ -53,7 +63,9 @@ def configure_database(app: FastAPI):
 
 
 def configure_middleware(app: FastAPI):
-    """Configures fastapi middleware"""
+    """
+    Configures fastapi middleware
+    """
 
     app.add_middleware(
         CORSMiddleware,
@@ -65,6 +77,10 @@ def configure_middleware(app: FastAPI):
 
     @app.middleware("http")
     async def add_process_time_header(request: Request, call_next):
+        """
+        Middleware to add response time HEADER to the response.
+        Every response will have total time taken in millisecond for the API.
+        """
         try:
             start_time = time.time()
             response = await call_next(request)

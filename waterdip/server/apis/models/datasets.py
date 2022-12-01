@@ -19,10 +19,34 @@ from pydantic import BaseModel
 
 
 class DatasetListRow(BaseModel):
+    """
+    Dataset entity for dataset_list API response
+
+    Attributes:
+    ------------------
+    dataset_name:
+        name of the dataset
+    dataset_id:
+        unique dataset id
+
+    """
+
     dataset_name: str
     dataset_id: UUID
 
 
 class DatasetListResponse(BaseModel):
+    """
+    Dataset List API response
+
+    Attributes:
+    ------------------
+    dataset_list:
+        list of dataset rows
+    meta:
+        information about the dataset list i.e. page, limit, total
+
+    """
+
     dataset_list: List[DatasetListRow]
     meta: Optional[Dict[str, Union[int, str]]]

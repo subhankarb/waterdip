@@ -26,7 +26,7 @@ from tests.testing_helpers import (
 class TestDatasetList:
     def test_should_return_dataset_list(self, test_client: TestClient):
         response = test_client.get(
-            f"/api/v1/list.datasets?model_version_id={MODEL_VERSION_ID_V1}"
+            f"/v1/list.datasets?model_version_id={MODEL_VERSION_ID_V1}"
             f"&limit=10&page=1&sort=created_at_asc"
         ).json()
 
@@ -39,7 +39,7 @@ class TestDatasetList:
         self, test_client: TestClient
     ):
         response = test_client.get(
-            f"/api/v1/list.datasets?model_version_id={MODEL_VERSION_ID_V1}"
+            f"/v1/list.datasets?model_version_id={MODEL_VERSION_ID_V1}"
             f"&limit=10&page=100&sort=created_at_asc"
         ).json()
 
@@ -50,7 +50,7 @@ class TestDatasetList:
 
     def test_should_return_limited_dataset(self, test_client: TestClient):
         response = test_client.get(
-            f"/api/v1/list.datasets?model_version_id={MODEL_VERSION_ID_V1}"
+            f"/v1/list.datasets?model_version_id={MODEL_VERSION_ID_V1}"
             f"&limit=1&page=1&sort=created_at_asc"
         ).json()
 
@@ -64,7 +64,7 @@ class TestDatasetList:
         self, test_client: TestClient
     ):
         response = test_client.get(
-            f"/api/v1/list.datasets?model_version_id={MODEL_VERSION_ID_V1}"
+            f"/v1/list.datasets?model_version_id={MODEL_VERSION_ID_V1}"
             f"&limit=1&page=1&sort=created_at_desc"
         ).json()
 
@@ -76,7 +76,7 @@ class TestDatasetList:
 
     def test_should_return_with_default_param(self, test_client: TestClient):
         response = test_client.get(
-            f"/api/v1/list.datasets?model_version_id={MODEL_VERSION_ID_V1}"
+            f"/v1/list.datasets?model_version_id={MODEL_VERSION_ID_V1}"
         ).json()
 
         dataset_list, meta = response["dataset_list"], response["meta"]
