@@ -102,7 +102,7 @@ If you do not have mongodb running make sure you have `Docker` installed and run
 
 ```bash
 # Create a mongodb docker container using mongo image
-$ docker container run --name waterdip --publish 27017:27017 -d mongo::5.0.0
+$ docker container run --name waterdip --publish 27017:27017 -d mongo:5.0.0
 
 # Get access into running mongo container bash
 $ docker container exec -it waterdip bash
