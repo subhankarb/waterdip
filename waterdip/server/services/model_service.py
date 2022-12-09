@@ -17,6 +17,7 @@ from datetime import datetime
 from typing import Dict, List, Optional
 
 from waterdip.server.apis.models.params import RequestPagination, RequestSort
+from typing import Union
 
 try:
     from typing import Literal
@@ -182,13 +183,22 @@ class ModelService:
             model_ids=[str(model.model_id) for model in list_models]
         )
 
+
+        def get_latest_version(model_id: str) -> Union[str,None]:
+            """
+             Get the latest version of a model
+                if the model has no versions, return None           
+            """
+            if str(model_id) in agg_model_versions:
+                return agg_model_versions[str(model_id)][0]
+            else:
+                return None
+
         model_rows = [
             ModelListRow(
                 model_id=model.model_id,
                 model_name=model.model_name,
-                model_version_id=agg_model_versions[str(model.model_id)][0]
-                if len(agg_model_versions[str(model.model_id)]) > 0
-                else None,
+                model_version_id=get_latest_version(model.model_id)
             )
             for model in list_models
         ]
