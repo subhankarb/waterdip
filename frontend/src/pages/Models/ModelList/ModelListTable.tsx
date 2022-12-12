@@ -11,7 +11,8 @@ import {
   Card,
   // Typography,
   Box,
-  CircularProgress
+  CircularProgress,
+  Stack
 } from '@material-ui/core';
 import { capitalize } from 'lodash';
 import { makeStyles } from '@material-ui/core/styles';
@@ -26,6 +27,13 @@ import { colors } from '../../../theme/colors';
 import { DialogAnimate } from '../../../components/animate';
 import { display } from '@material-ui/system';
 import { log } from 'console';
+import FileCopyIcon from '@material-ui/icons/FileCopy';
+import IconButton from '@material-ui/core/IconButton';
+import Button from '@material-ui/core/Button';
+import DialogActions from '@material-ui/core/DialogActions';
+import DialogContent from '@material-ui/core/DialogContent';
+import DialogContentText from '@material-ui/core/DialogContentText';
+import DialogTitle from '@material-ui/core/DialogTitle';
 
 interface ModelColumn {
   id: 'name' | 'date' | 'action' | 'alert';
@@ -156,16 +164,10 @@ const useStyles = makeStyles(() => ({
     lineHeight: '22px',
     color: colors.text
   },
-  createVersionDialogue: {
-    padding: '1.4rem',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center'
-  },
-  createDialogueHeading: {
-    fontSize: '1.2rem',
-    fontWeight: 500,
-    color: colors.text
+  modelid:{
+    fontWeight: 300,
+    fontSize: '12px',
+    color: colors.textLight
   }
 }));
 
@@ -275,8 +277,18 @@ const ModelListTable = () => {
     return (
       <>
         {boxDisplay === true ? (
-          <Box className={classes.createVersionDialogue}>
-            <div className={classes.createDialogueHeading}> Create version Id</div>
+          <Box >
+            <DialogTitle>{"No Versions Found"}</DialogTitle>
+            <DialogContent>
+              <DialogContentText>
+                Please create a new version for the selected model to continue.
+              </DialogContentText>
+            </DialogContent>
+            <DialogActions >
+              <Button onClick={() => setExpandForm(false)} color="primary">
+                Close
+              </Button>
+            </DialogActions>
           </Box>
         ) : null}
       </>
@@ -360,7 +372,20 @@ const ModelListTable = () => {
                       className={classes.tableRow}
                     >
                       <TableCell className={classes.tableCell} align="center">
-                        {row.model_name}
+                        <Stack direction='column'>
+                          <div>{row.model_name}</div>
+                          <Stack direction='row' justifyContent="space-around" alignItems="flex-end">
+                            <div className={classes.modelid}>{row.model_id}</div>
+                            <IconButton aria-label="Copy ModelID" onClick={
+                              (e) => {
+                                  e.stopPropagation();
+                                  navigator.clipboard.writeText(row.model_id);
+                                }
+                              }>
+                              <FileCopyIcon fontSize='small'/>
+                            </IconButton>
+                          </Stack>
+                        </Stack>
                       </TableCell>
                       <TableCell className={classes.tableCell} align="center">
                         {/* {`${formatDateTime(Date.parse(row.createdAt))}`} */}
