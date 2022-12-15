@@ -34,8 +34,9 @@ class RequestPagination:
 
     """
 
-    limit: int = Query(default=10, gte=0, le=1000, description="Response records limit")
-    page: int = Query(default=0, ge=0, le=10000, description="Record page")
+    limit: int = Query(default=10, ge=1, le=1000,
+                       description="Response records limit")
+    page: int = Query(default=1, ge=1, le=10000, description="Record page")
 
 
 class RequestSort(BaseModel):
