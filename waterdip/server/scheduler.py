@@ -12,7 +12,11 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
-__version__ = "0.1.0-beta"
+from redbird.repos import MongoRepo
+from rocketry import Rocketry
 
-from waterdip.server.app import app
-from waterdip.server.scheduler import scheduler
+from waterdip.server.db.mongodb import MongodbBackend
+
+mongo_repo = MongoRepo(client=MongodbBackend.get_instance().client)
+
+scheduler = Rocketry(config={"task_execution": "async"}, logger_repo=mongo_repo)

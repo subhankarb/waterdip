@@ -14,10 +14,9 @@
 
 import uuid
 from datetime import datetime
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Union
 
 from waterdip.server.apis.models.params import RequestPagination, RequestSort
-from typing import Union
 
 try:
     from typing import Literal
@@ -109,7 +108,6 @@ class ModelVersionService:
             model_version_id=model_version_id,
             environment="PRODUCTION",
         )
-        self._dataset_service.create_event_dataset(event_dataset)
 
         model_version_db = BaseModelVersionDB(
             model_id=model_id,
@@ -121,8 +119,10 @@ class ModelVersionService:
                 predictions=self._schema_conversion(version_schema, "predictions"),
             ),
         )
+        model_version = self._repository.register_model_version(model_version_db)
+        self._dataset_service.create_event_dataset(event_dataset)
 
-        return self._repository.register_model_version(model_version_db)
+        return model_version
 
     def agg_model_versions_per_model(
         self, model_ids: List[str]
@@ -165,6 +165,14 @@ class ModelService:
 
         return self._repository.register_model(model_db)
 
+    def find_by_id(self, model_id: uuid.UUID) -> Optional[ModelVersionDB]:
+        found_model_version = self._repository.find_by_id(model_id=model_id)
+
+        if not found_model_version:
+            raise EntityNotFoundError(name=str(model_id), type="Model")
+
+        return found_model_version
+
     def list_models(
         self,
         sort_request: Optional[RequestSort] = None,
@@ -183,11 +191,10 @@ class ModelService:
             model_ids=[str(model.model_id) for model in list_models]
         )
 
-
-        def get_latest_version(model_id: str) -> Union[str,None]:
+        def get_latest_version(model_id: str) -> Union[str, None]:
             """
-             Get the latest version of a model
-                if the model has no versions, return None           
+            Get the latest version of a model
+               if the model has no versions, return None
             """
             if str(model_id) in agg_model_versions:
                 return agg_model_versions[str(model_id)][0]
@@ -198,7 +205,7 @@ class ModelService:
             ModelListRow(
                 model_id=model.model_id,
                 model_name=model.model_name,
-                model_version_id=get_latest_version(model.model_id)
+                model_version_id=get_latest_version(model.model_id),
             )
             for model in list_models
         ]

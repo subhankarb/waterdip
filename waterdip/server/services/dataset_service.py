@@ -90,12 +90,26 @@ class DatasetService:
         return dataset_list, count_dataset
 
     def create_batch_dataset(self, dataset: ServiceBatchDataset) -> ServiceBatchDataset:
-        self._model_version_repository.find_by_id(dataset.model_version_id)
+        model_version = self._model_version_repository.find_by_id(
+            dataset.model_version_id
+        )
+
+        if model_version is None:
+            raise EntityNotFoundError(
+                name=str(dataset.model_version_id), type="Model Version"
+            )
 
         return self._repository.create_dataset(dataset=dataset)
 
     def create_event_dataset(self, dataset: ServiceEventDataset) -> ServiceEventDataset:
-        self._model_version_repository.find_by_id(dataset.model_version_id)
+        model_version = self._model_version_repository.find_by_id(
+            dataset.model_version_id
+        )
+
+        if model_version is None:
+            raise EntityNotFoundError(
+                name=str(dataset.model_version_id), type="Model Version"
+            )
 
         return self._repository.create_dataset(dataset=dataset)
 

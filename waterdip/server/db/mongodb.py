@@ -23,6 +23,7 @@ MONGO_COLLECTION_MODEL_VERSIONS = settings.mongo_collection_model_versions
 MONGO_COLLECTION_DATASETS = settings.mongo_collection_datasets
 MONGO_COLLECTION_BATCH_ROWS = settings.mongo_collection_batch_rows
 MONGO_COLLECTION_EVENT_ROWS = settings.mongo_collection_event_rows
+MONGO_COLLECTION_MONITORS = settings.mongo_collection_monitors
 
 
 class MongodbBackend:
@@ -36,8 +37,10 @@ class MongodbBackend:
             cls._INSTANCE = cls(
                 mongo_client=mongo_client, mongo_database=settings.mongo_database
             )
-            logger.info(f"connected to mongodb {mongo_client.server_info()}")
         return cls._INSTANCE
+
+    def init(self):
+        logger.info(f"connected to mongodb {self._client.server_info()}")
 
     def __init__(self, mongo_client: MongoClient, mongo_database: str):
         self._client = mongo_client

@@ -13,10 +13,10 @@
 #  limitations under the License.
 
 from datetime import datetime
-from typing import Dict, Optional, TypeVar
+from typing import Dict, Optional, TypeVar, Union
 from uuid import UUID
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, root_validator
 
 from waterdip.server.commons.models import ColumnDataType
 
@@ -33,6 +33,31 @@ class BaseModelDB(BaseModel):
 
 
 ModelDB = TypeVar("ModelDB", bound=BaseModelDB)
+
+
+class MovingTimeWindow(BaseModel):
+    skip_period: str = Field(description="", default="1d")
+    time_period: str = Field(description="15d", default="15d")
+    aggregation_period: str = Field(default="1d")
+
+
+class FixedTimeWindow(BaseModel):
+    start_time: datetime = Field(...)
+    end_time: datetime = Field(...)
+    aggregation_period: str = Field(default="1d")
+
+
+class ModelBaseline(BaseModel):
+    dataset_id: Optional[UUID] = Field(description="dataset id", default=None)
+    time_window: Optional[Union[MovingTimeWindow, FixedTimeWindow]] = Field(
+        default=MovingTimeWindow()
+    )
+
+    @root_validator
+    def any_of(cls, v):
+        if not any(v.values()):
+            raise ValueError("one of dataset_id or time_window must have a value")
+        return v
 
 
 class ModelVersionSchemaFieldDetails(BaseModel):
@@ -54,6 +79,9 @@ class BaseModelVersionDB(BaseModel):
     created_at: Optional[datetime] = None
     version_schema: ModelVersionSchemaInDB = Field(
         description="Schema for the model version"
+    )
+    baseline: ModelBaseline = Field(
+        default=ModelBaseline(time_window=MovingTimeWindow())
     )
 
     def dict(self, *args, **kwargs) -> "DictStrAny":

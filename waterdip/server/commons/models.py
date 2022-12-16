@@ -92,3 +92,25 @@ class ColumnMappingType(str, Enum):
     PREDICTION_SCORE = "PREDICTION_SCORE"
     ACTUAL = "ACTUAL"
     ACTUAL_SCORE = "ACTUAL_SCORE"
+
+
+class MonitorType(str, Enum):
+    DATA_QUALITY = "DATA_QUALITY"
+    PERFORMANCE = "PERFORMANCE"
+    DRIFT = "DRIFT"
+
+
+class DriftMetric(str, Enum):
+    PSI = "PSI"
+
+
+class DataQualityMetric(str, Enum):
+    MISSING_VALUE = "MISSING_VALUE"
+    EMPTY_VALUE = "EMPTY_VALUE"
+    NEW_VALUE = "NEW_VALUE"
+
+
+class PerformanceMetric(str, Enum):
+    PRECISION = "PRECISION"
+    RECALL = "RECALL"
+    F1 = "F1"

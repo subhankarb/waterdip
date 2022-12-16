@@ -16,7 +16,6 @@ import uuid
 
 import pytest
 
-from tests.testing_helpers import MODEL_VERSION_ID_V1
 from waterdip.server.commons.models import ColumnDataType
 from waterdip.server.db.models.models import (
     BaseModelDB,
@@ -24,11 +23,7 @@ from waterdip.server.db.models.models import (
     ModelVersionSchemaFieldDetails,
     ModelVersionSchemaInDB,
 )
-from waterdip.server.db.mongodb import (
-    MONGO_COLLECTION_MODEL_VERSIONS,
-    MONGO_COLLECTION_MODELS,
-    MongodbBackend,
-)
+from waterdip.server.db.mongodb import MONGO_COLLECTION_MODEL_VERSIONS, MongodbBackend
 from waterdip.server.db.repositories.model_repository import (
     ModelRepository,
     ModelVersionRepository,

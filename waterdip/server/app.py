@@ -46,8 +46,8 @@ def configure_database(app: FastAPI):
     @app.on_event("startup")
     async def configure_mongo():
         try:
-            print(settings.obfuscated_mongodb())
-            MongodbBackend.get_instance()
+            mongo_backend = MongodbBackend.get_instance()
+            mongo_backend.init()
 
         except BaseException as error:
             logger.error(
