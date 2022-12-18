@@ -5,8 +5,8 @@ We are using the famous iris dataset, that is present in the scikit learn librar
 
 - Import libraries and Download dataset
 
-```
-Import all the libraries:
+```python
+#Import all the libraries:
 
 import requests
 import uuid
@@ -14,7 +14,7 @@ from sklearn import datasets
 ```
 
 - Download the Iris dataset from sklearn
-```
+```python
 iris = datasets.load_iris()
 ```
 
@@ -24,7 +24,7 @@ iris = datasets.load_iris()
 - To register a new model for monitoring, register_model() function is used. It takes in the name of the model as parameter.
 - The function returns the model id of the new model.
 
-```
+```python
 def register_model(model_name):
     post_url = "http://0.0.0.0:5001/v1/model.register"
 
@@ -43,7 +43,7 @@ def register_model(model_name):
 - The function takes in model_id, data (for which the model is registered) as input and return model_version_id.
 - Version_schema takes the names and data types of features and well as target (predictions) variables. Datatype can be NUMERICAL, CATEGORICAL or BOOLEAN. (Iris has only numerical feature values thus NUMERIC is hardcoded)
 
-```
+```python
 def register_model_version(data, model_id):
     url = "http://0.0.0.0:5001/v1/model.version.register"
 
@@ -69,7 +69,7 @@ def register_model_version(data, model_id):
 - Data_dict: A dictionary that contains information about the dataset, I.e. model_version_id, and rows(events)
 
 Note: The structure of upload_dataset, I.e. names of the keys of this dictionary must not be changed. Once the data is uploaded, it cannot be appended, updated or modified.
-```
+```python
 
 def log_training_data(data, model_version_id):
     url = "http://0.0.0.0:5001/v1/log.dataset"
@@ -111,7 +111,7 @@ def log_training_data(data, model_version_id):
 After we have uploaded the training dataset, we must also send the actuals data so that we can monitor the performance.
 
 The following code  shows how to log events/actuals.
-```
+```python
 def log_event(data, model_version_id):
     url = "http://0.0.0.0:5001/v1/log.event"
 

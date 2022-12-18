@@ -1,21 +1,52 @@
 site_name: Waterdip Documentation
 site_url: https://waterdipAI.github.io/waterdip/
 repo_url: https://github.com/WaterdipAI/waterdip
+repo_name: waterdipAI/waterdip
 edit_uri: blob/main/docs/
 theme:
   name: material
+  logo: assets/logo_white.png
+  favicon: assets/favicon.png
   icon:
     repo: fontawesome/brands/github
   features:
-#    - navigation.indexes
     - navigation.expand
     - toc.follow
+  palette:
+    - scheme: default
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - scheme: slate
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+  font:
+    text: Roboto
+    code: Roboto Mono
 extra_css:
   - stylesheets/extra.css
+markdown_extensions:
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.superfences
 nav:
-  - Home: index.md
-  - Getting Started:
-    - Quick Start: getting_started/quick_start.md
+  - Welcome: index.md
+  - Introduction:
+    - Introduction to Waterdip: introduction/introduction.md
+    - Quick Start: introduction/quick_start.md
+  - Concepts:
+    - What is ML Observability: concepts/what_is_ml_observability.md
+    - Model & Versions: concepts/model _and_versions.md
+    - Monitor & Alerts: concepts/monitor_and_alerts.md
+  - Support:
+    - Contact: support/contact.md
 
 extra:
   generator: true
