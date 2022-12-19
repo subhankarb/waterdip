@@ -11,14 +11,14 @@
 #  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
-
-from uuid import UUID
+import uuid
 
 from fastapi import Depends
 from pydantic import Field
 
 from waterdip.server.commons.models import MonitorType
 from waterdip.server.db.models.monitors import (
+    BaseMonitorCondition,
     BaseMonitorDB,
     DataQualityBaseMonitorCondition,
     DriftBaseMonitorCondition,
@@ -91,15 +91,77 @@ class MonitorService:
         self.model_service.find_by_id(model_id=monitor_identification.model_id)
 
     def create_data_quality_monitor(
-        self, data_quality_monitor: ServiceDataQualityMonitor
-    ):
-        self._check_monitor_identification(data_quality_monitor.monitor_identification)
-        self._repository.insert_monitor(monitor=data_quality_monitor)
+        self,
+        monitor_name: str,
+        identification: MonitorIdentification,
+        condition: BaseMonitorCondition,
+    ) -> ServiceBaseMonitor:
 
-    def create_model_performance_monitor(self, perf_monitor: ServicePerformanceMonitor):
-        self._check_monitor_identification(perf_monitor.monitor_identification)
-        self._repository.insert_monitor(monitor=perf_monitor)
+        self._check_monitor_identification(identification)
 
-    def create_drift_monitor(self, drift_monitor: ServiceDriftMonitor):
-        self._check_monitor_identification(drift_monitor.monitor_identification)
-        self._repository.insert_monitor(monitor=drift_monitor)
+        monitor_id = uuid.uuid4()
+
+        service_quality_monitor = ServiceDataQualityMonitor(
+            monitor_id=monitor_id,
+            monitor_name=monitor_name,
+            monitor_identification=identification,
+            monitor_condition=DataQualityBaseMonitorCondition(
+                evaluation_metric=condition.evaluation_metric,
+                dimensions=condition.dimensions,
+                threshold=condition.threshold,
+                evaluation_window=condition.evaluation_window,
+                skip_period=condition.skip_period,
+            ),
+        )
+
+        return self._repository.insert_monitor(monitor=service_quality_monitor)
+
+    def create_model_performance_monitor(
+        self,
+        monitor_name: str,
+        identification: MonitorIdentification,
+        condition: BaseMonitorCondition,
+    ) -> ServiceBaseMonitor:
+        self._check_monitor_identification(identification)
+
+        monitor_id = uuid.uuid4()
+
+        service_perf_monitor = ServicePerformanceMonitor(
+            monitor_id=monitor_id,
+            monitor_name=monitor_name,
+            monitor_identification=identification,
+            monitor_condition=PerformanceBaseMonitorCondition(
+                evaluation_metric=condition.evaluation_metric,
+                threshold=condition.threshold,
+                evaluation_window=condition.evaluation_window,
+                skip_period=condition.skip_period,
+            ),
+        )
+
+        return self._repository.insert_monitor(monitor=service_perf_monitor)
+
+    def create_drift_monitor(
+        self,
+        monitor_name: str,
+        identification: MonitorIdentification,
+        condition: BaseMonitorCondition,
+    ) -> ServiceBaseMonitor:
+        self._check_monitor_identification(identification)
+
+        monitor_id = uuid.uuid4()
+
+        service_drift_monitor = ServiceDriftMonitor(
+            monitor_id=monitor_id,
+            monitor_name=monitor_name,
+            monitor_identification=identification,
+            monitor_condition=DriftBaseMonitorCondition(
+                evaluation_metric=condition.evaluation_metric,
+                dimensions=condition.dimensions,
+                threshold=condition.threshold,
+                baseline=condition.baseline,
+                evaluation_window=condition.evaluation_window,
+                skip_period=condition.skip_period,
+            ),
+        )
+
+        return self._repository.insert_monitor(monitor=service_drift_monitor)

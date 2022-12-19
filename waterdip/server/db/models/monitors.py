@@ -76,7 +76,7 @@ class BaseMonitorCondition(BaseModel):
 
     baseline: Optional[ModelBaseline] = Field(default=None)
     evaluation_window: Optional[str] = Field(
-        default="0", description="evaluation_window is the time window example: 1d, 2d"
+        default="1d", description="evaluation_window is the time window example: 1d, 2d"
     )
     skip_period: Optional[str] = Field(
         default="1d",

@@ -17,9 +17,9 @@ from pydantic import BaseModel
 from waterdip.server.commons.models import MonitorType
 from waterdip.server.db.models.monitors import (
     BaseMonitorCondition,
-    BaseMonitorDB,
     MonitorIdentification,
 )
+from waterdip.server.services.monitor_service import ServiceBaseMonitor
 
 
 class CreateMonitorRequest(BaseModel):
@@ -44,5 +44,5 @@ class CreateMonitorRequest(BaseModel):
     monitor_condition: BaseMonitorCondition
 
 
-class CreateMonitorResponse(BaseMonitorDB):
+class CreateMonitorResponse(ServiceBaseMonitor):
     pass

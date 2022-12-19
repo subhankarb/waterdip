@@ -74,13 +74,12 @@ class ModelRepository:
         return [BaseModelDB(**model) for model in result]
 
     def find_by_id(self, model_id: UUID) -> Optional[ModelDB]:
-        result = self._mongo.database[MONGO_COLLECTION_MODEL_VERSIONS].find_one(
+        result = self._mongo.database[MONGO_COLLECTION_MODELS].find_one(
             {"model_id": str(model_id)}
         )
 
         if not result:
             return None
-
         return BaseModelDB(**result)
 
     def count_models(self, filters: Dict) -> int:
