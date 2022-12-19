@@ -140,3 +140,44 @@ class TestModelVersionsRepository:
 
         response_version = model_repo.find_by_id(model_version_id=uuid.uuid4())
         assert response_version is None
+        
+
+    def test_should_return_all_versions_per_model_id(
+        self, mock_mongo_backend: MongodbBackend
+    ):
+        model_repo = ModelVersionRepository(mongodb=mock_mongo_backend)
+        # model_uuid, model_version_uuid, model_version_name = (
+        #     uuid.uuid4(),
+        #     uuid.uuid4(),
+        #     "v1",
+        # )
+        
+        model_id = str(uuid.uuid4())
+        model_versions = [
+            BaseModelVersionDB(
+                model_version_id=str(uuid.uuid4()),
+                model_version="model_version_name",
+                model_id=model_id,
+                version_schema=ModelVersionSchemaInDB(
+                    features={
+                        "f1": ModelVersionSchemaFieldDetails(
+                            data_type=ColumnDataType.NUMERIC
+                        )
+                    },
+                    predictions={
+                        "p1": ModelVersionSchemaFieldDetails(
+                            data_type=ColumnDataType.NUMERIC
+                        )
+                    },
+                ),
+            ).dict()
+            for _ in range(5
+        )]
+        
+        mock_mongo_backend.database[MONGO_COLLECTION_MODEL_VERSIONS].insert_many(
+  [         model for model in model_versions]
+        )
+
+        response_versions = model_repo.agg_model_versions_per_model(model_ids=[model_id])
+        assert len(response_versions[model_id]) == len(model_versions)
+        assert response_versions[model_id][0][1] == model_versions[0]["model_version"]

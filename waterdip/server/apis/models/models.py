@@ -13,7 +13,7 @@
 #  limitations under the License.
 from datetime import datetime
 from typing import Dict, List, Optional, Union
-from uuid import UUID
+from uuid import UUID, uuid4
 
 from pydantic import BaseModel
 
@@ -126,6 +126,7 @@ class ModelListRow(BaseModel):
     num_alert_perf: int = 0
     num_alert_data_behave: int = 0
     num_alert_data_integrity: int = 0
+    model_versions: Optional[Dict[UUID, str]] 
 
 
 class ModelListResponse(BaseModel):

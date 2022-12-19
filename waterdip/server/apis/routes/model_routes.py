@@ -24,6 +24,7 @@ from waterdip.server.apis.models.models import (
 from waterdip.server.apis.models.params import RequestPagination, RequestSort
 from waterdip.server.db.models.models import ModelVersionDB
 from waterdip.server.services.model_service import ModelService, ModelVersionService
+from typing import Optional
 
 router = APIRouter()
 
@@ -33,8 +34,10 @@ def model_list(
     pagination: RequestPagination = Depends(),
     sort: RequestSort = Depends(),
     service: ModelService = Depends(ModelService.get_instance),
+    get_all_versions_flag: Optional[bool] = False,
 ):
-    list_models = service.list_models(sort_request=sort, pagination=pagination)
+    list_models = service.list_models(sort_request=sort, pagination=pagination, 
+                                    get_all_versions_flag=get_all_versions_flag)
     response = ModelListResponse(
         model_list=list_models,
         meta={
