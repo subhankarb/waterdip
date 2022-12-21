@@ -17,7 +17,13 @@ from uuid import UUID
 import pytest
 from fastapi.testclient import TestClient
 
-from tests.testing_helpers import MODEL_ID, MongodbBackendTesting
+from tests.testing_helpers import (
+    MODEL_ID,
+    MODEL_VERSION_ID_V1,
+    MODEL_VERSION_ID_V1_NAME,
+    MODEL_VERSION_V1_SCHEMA,
+    MongodbBackendTesting,
+)
 from waterdip.server.db.mongodb import (
     MONGO_COLLECTION_MODEL_VERSIONS,
     MONGO_COLLECTION_MODELS,
@@ -74,3 +80,18 @@ class TestRegisterModelVersion:
         )
 
         assert len(list(result)) == 1
+
+
+@pytest.mark.usefixtures("test_client")
+class TestModelVersionInfo:
+    def test_should_return_model_version_info(self, test_client: TestClient):
+
+        response = test_client.get(
+            url=f"/v1/model.version.info?model_version_id={MODEL_VERSION_ID_V1}"
+        )
+        assert response.status_code == 200
+
+        response_data = response.json()
+        assert response_data["model_version"] == MODEL_VERSION_ID_V1_NAME
+        assert response_data["model_version_id"] == MODEL_VERSION_ID_V1
+        assert response_data["version_schema"] == MODEL_VERSION_V1_SCHEMA

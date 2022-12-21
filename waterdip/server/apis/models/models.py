@@ -18,6 +18,7 @@ from uuid import UUID, uuid4
 from pydantic import BaseModel
 
 from waterdip.server.commons.models import ColumnDataType, PredictionTaskType
+from waterdip.server.db.models.models import BaseModelVersionDB
 
 
 class RegisterModelRequest(BaseModel):
@@ -126,9 +127,13 @@ class ModelListRow(BaseModel):
     num_alert_perf: int = 0
     num_alert_data_behave: int = 0
     num_alert_data_integrity: int = 0
-    model_versions: Optional[Dict[UUID, str]] 
+    model_versions: Optional[Dict[UUID, str]]
 
 
 class ModelListResponse(BaseModel):
     model_list: List[ModelListRow]
     meta: Optional[Dict[str, Union[str, int]]]
+
+
+class ModelVersionInfoResponse(BaseModelVersionDB):
+    pass

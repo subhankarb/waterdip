@@ -11,11 +11,14 @@
 #  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
+from typing import Optional
+from uuid import UUID
 
 from fastapi import APIRouter, Body, Depends
 
 from waterdip.server.apis.models.models import (
     ModelListResponse,
+    ModelVersionInfoResponse,
     RegisterModelRequest,
     RegisterModelResponse,
     RegisterModelVersionRequest,
@@ -24,7 +27,6 @@ from waterdip.server.apis.models.models import (
 from waterdip.server.apis.models.params import RequestPagination, RequestSort
 from waterdip.server.db.models.models import ModelVersionDB
 from waterdip.server.services.model_service import ModelService, ModelVersionService
-from typing import Optional
 
 router = APIRouter()
 
@@ -36,8 +38,11 @@ def model_list(
     service: ModelService = Depends(ModelService.get_instance),
     get_all_versions_flag: Optional[bool] = False,
 ):
-    list_models = service.list_models(sort_request=sort, pagination=pagination, 
-                                    get_all_versions_flag=get_all_versions_flag)
+    list_models = service.list_models(
+        sort_request=sort,
+        pagination=pagination,
+        get_all_versions_flag=get_all_versions_flag,
+    )
     response = ModelListResponse(
         model_list=list_models,
         meta={
@@ -85,3 +90,15 @@ def register_model_version(
         model_version=registered_model_version.model_version,
         model_version_id=registered_model_version.model_version_id,
     )
+
+
+@router.get(
+    "/model.version.info",
+    response_model=ModelVersionInfoResponse,
+    name="model_version:info",
+)
+def model_version_info(
+    model_version_id: UUID,
+    service: ModelVersionService = Depends(ModelVersionService.get_instance),
+):
+    return service.find_by_id(model_version_id=model_version_id)

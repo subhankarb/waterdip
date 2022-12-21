@@ -23,6 +23,8 @@ try:
 except ImportError:
     from typing_extensions import Literal
 
+from uuid import UUID
+
 from fastapi import Depends
 
 from waterdip.server.apis.models.models import ModelListRow, ModelVersionSchema
@@ -40,8 +42,6 @@ from waterdip.server.db.repositories.model_repository import (
 )
 from waterdip.server.errors.base_errors import EntityNotFoundError
 from waterdip.server.services.dataset_service import DatasetService, ServiceEventDataset
-
-from uuid import UUID
 
 
 class ModelVersionService:
@@ -193,31 +193,29 @@ class ModelService:
         agg_model_versions = self._model_version_service.agg_model_versions_per_model(
             model_ids=[str(model.model_id) for model in list_models]
         )
-    
-        def get_all_versions(model_id: UUID) -> Union[None,List[UUID]]:
+
+        def get_all_versions(model_id: UUID) -> Union[None, List[UUID]]:
             """
-             Get all versions of a model
-                if the model has no versions or the version data is not requested, return None
+            Get all versions of a model
+               if the model has no versions or the version data is not requested, return None
             """
             if str(model_id) in agg_model_versions and get_all_versions_flag:
-                return [version for version in agg_model_versions[str(model_id)]]
+                return [UUID(version) for version in agg_model_versions[str(model_id)]]
             else:
                 return None
 
-
-
-        def get_latest_version(model_id: UUID) -> Union[UUID,None]:
+        def get_latest_version(model_id: UUID) -> Union[UUID, None]:
             """
-                Get the latest version of a model
-                if the model has no versions, return None           
+            Get the latest version of a model
+            if the model has no versions, return None
             """
             if str(model_id) in agg_model_versions:
                 """
-                agg_model_versions[str(model_id)] returns list of all model versions. 
-                Below, we query 0th index to get the latest version,and then 
+                agg_model_versions[str(model_id)] returns list of all model versions.
+                Below, we query 0th index to get the latest version,and then
                 again query 0th index to get its version id, which we want to return, hence [0][0]
                 """
-                return agg_model_versions[str(model_id)][0][0]
+                return UUID(agg_model_versions[str(model_id)][0][0])
             else:
                 return None
 
@@ -226,7 +224,7 @@ class ModelService:
                 model_id=model.model_id,
                 model_name=model.model_name,
                 model_version_id=get_latest_version(model.model_id),
-                model_versions=get_all_versions(model.model_id)
+                model_versions=get_all_versions(model.model_id),
             )
             for model in list_models
         ]

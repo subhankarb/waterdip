@@ -37,11 +37,13 @@ from waterdip.server.db.mongodb import (
 
 MODEL_ID = "de6af49c-e80b-4852-b8dd-3b8fdd7f98f8"
 MODEL_VERSION_ID_V1 = "1e195bf6-9a3f-4a33-b7b1-37a603aadf41"
+MODEL_VERSION_ID_V1_NAME = "v1"
 DATASET_EVENT_ID_V1 = "1e195bf6-7a1f-4a33-b7b1-37a603aadde1"
 DATASET_BATCH_ID_V1_1 = "1d195bf6-7a1f-4a33-b7b1-37a603aadd31"
 DATASET_BATCH_ID_V1_2 = "1d195bf6-7a1f-4a33-b7b1-37a603aadd32"
 
 MODEL_VERSION_ID_V2 = "2e195bf6-9a3f-4a33-b7b1-37a603aadf42"
+MODEL_VERSION_ID_V2_NAME = "v2"
 
 
 MODEL_VERSION_V1_SCHEMA = {
@@ -117,14 +119,14 @@ def setup_model_version_data(database):
     versions = [
         BaseModelVersionDB(
             model_version_id=UUID(MODEL_VERSION_ID_V1),
-            model_version="v1",
+            model_version=MODEL_VERSION_ID_V1_NAME,
             model_id=UUID(MODEL_ID),
             created_at=datetime(year=2022, month=11, day=17),
             version_schema=ModelVersionSchemaInDB(**MODEL_VERSION_V1_SCHEMA),
         ),
         BaseModelVersionDB(
             model_version_id=UUID(MODEL_VERSION_ID_V2),
-            model_version="v2",
+            model_version=MODEL_VERSION_ID_V2_NAME,
             model_id=UUID(MODEL_ID),
             created_at=datetime(year=2022, month=11, day=18),
             version_schema=ModelVersionSchemaInDB(**MODEL_VERSION_V2_SCHEMA),
