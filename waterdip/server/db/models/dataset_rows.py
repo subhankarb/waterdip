@@ -32,6 +32,8 @@ class DataColumn(BaseModel):
 class BaseDatasetBatchRowDB(BaseModel):
     row_id: UUID
     dataset_id: UUID
+    model_id: UUID
+    model_version_id: UUID
     columns: List[DataColumn]
     created_at: Optional[datetime]
     meta: Optional[Dict]
@@ -40,6 +42,8 @@ class BaseDatasetBatchRowDB(BaseModel):
         row = super().dict(*args, **kwargs)
         row["dataset_id"] = str(row["dataset_id"])
         row["row_id"] = str(row["row_id"])
+        row["model_id"] = str(row["model_id"])
+        row["model_version_id"] = str(row["model_version_id"])
         return row
 
 
@@ -59,6 +63,8 @@ class EventDataColumnDB(BaseModel):
 class BaseEventRowDB(BaseModel):
     row_id: UUID
     dataset_id: UUID
+    model_id: UUID
+    model_version_id: UUID
     event_id: Optional[str]
     columns: List[EventDataColumnDB]
     created_at: datetime
@@ -68,6 +74,8 @@ class BaseEventRowDB(BaseModel):
         row = super().dict(*args, **kwargs)
         row["row_id"] = str(row["row_id"])
         row["dataset_id"] = str(row["dataset_id"])
+        row["model_id"] = str(row["model_id"])
+        row["model_version_id"] = str(row["model_version_id"])
         return row
 
 

@@ -42,6 +42,7 @@ from waterdip.server.db.repositories.model_repository import (
 )
 from waterdip.server.errors.base_errors import EntityNotFoundError
 from waterdip.server.services.dataset_service import DatasetService, ServiceEventDataset
+from waterdip.server.services.row_service import EventDatasetRowService
 
 
 class ModelVersionService:
@@ -56,7 +57,8 @@ class ModelVersionService:
         dataset_service: DatasetService = Depends(DatasetService.get_instance),
     ):
         if not cls._INSTANCE:
-            cls._INSTANCE = cls(repository=repository, dataset_service=dataset_service)
+            cls._INSTANCE = cls(repository=repository,
+                                dataset_service=dataset_service)
         return cls._INSTANCE
 
     def __init__(
@@ -71,7 +73,8 @@ class ModelVersionService:
         )
 
         if not found_model_version:
-            raise EntityNotFoundError(name=str(model_version_id), type="Model Version")
+            raise EntityNotFoundError(
+                name=str(model_version_id), type="Model Version")
 
         return found_model_version
 
@@ -118,7 +121,8 @@ class ModelVersionService:
             created_at=datetime.utcnow(),
             version_schema=ModelVersionSchemaInDB(
                 features=self._schema_conversion(version_schema, "features"),
-                predictions=self._schema_conversion(version_schema, "predictions"),
+                predictions=self._schema_conversion(
+                    version_schema, "predictions"),
             ),
         )
         model_version = self._repository.register_model_version(model_version_db)
@@ -144,18 +148,23 @@ class ModelService:
         model_version_service: ModelVersionService = Depends(
             ModelVersionService.get_instance
         ),
+        row_service: EventDatasetRowService = Depends(
+            EventDatasetRowService.get_instance)
+
+
     ):
         if not cls._INSTANCE:
             cls._INSTANCE = cls(
-                repository=repository, model_version_service=model_version_service
+                repository=repository, model_version_service=model_version_service, row_service=row_service
             )
         return cls._INSTANCE
 
     def __init__(
-        self, repository: ModelRepository, model_version_service: ModelVersionService
+        self, repository: ModelRepository, model_version_service: ModelVersionService, row_service: EventDatasetRowService
     ):
         self._repository = repository
         self._model_version_service = model_version_service
+        self._row_service = row_service
 
     def register_model(self, model_name: str) -> ModelDB:
         generated_model_id = uuid.uuid4()
@@ -225,6 +234,10 @@ class ModelService:
                 model_name=model.model_name,
                 model_version_id=get_latest_version(model.model_id),
                 model_versions=get_all_versions(model.model_id),
+                total_predictions=self._row_service.count_prediction_by_model_id(
+                    str(model.model_id)),
+                last_prediction=self._row_service.find_last_prediction_date(
+                    str(model.model_id))
             )
             for model in list_models
         ]

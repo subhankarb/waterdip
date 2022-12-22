@@ -115,7 +115,7 @@ class BatchLoggingService:
             return _column
 
     def _log_row_to_batch_row_db_converter(
-        self, dataset_id: UUID, row: ServiceLogRow, schema: ModelVersionSchemaInDB
+        self, dataset_id: UUID, row: ServiceLogRow, schema: ModelVersionSchemaInDB, model_id: UUID, model_version_id: UUID
     ) -> ServiceDatasetBatchRow:
         converted_columns: List[DataColumn] = []
         all_columns = {
@@ -139,6 +139,8 @@ class BatchLoggingService:
                 )
 
         return ServiceDatasetBatchRow(
+            model_id=model_id,
+            model_version_id=model_version_id,
             row_id=uuid.uuid4(),
             dataset_id=dataset_id,
             columns=converted_columns,
@@ -164,7 +166,7 @@ class BatchLoggingService:
         self._dataset_service.create_batch_dataset(dataset=dataset)
         data_rows_in_db: List[DatasetBatchRowDB] = [
             self._log_row_to_batch_row_db_converter(
-                dataset_id=dataset_id, row=row, schema=model_version.version_schema
+                dataset_id=dataset_id, row=row, schema=model_version.version_schema, model_id=model_version.model_id, model_version_id=model_version_id
             )
             for row in rows
         ]
@@ -312,12 +314,15 @@ class EventLoggingService:
 
     def _convert_classification_event(
         self,
+        model_id: UUID,
+        model_version_id: UUID,
         dataset_id: UUID,
         event: ServiceLogEvent,
         timestamp: datetime,
         version_schema: ModelVersionSchemaInDB,
     ) -> ServiceClassificationEventRow:
-        converted_features = self._convert_features(event.features, version_schema)
+        converted_features = self._convert_features(
+            event.features, version_schema)
         converted_predictions, prediction_cf = self._convert_classification_predictions(
             event.predictions, version_schema
         )
@@ -333,6 +338,8 @@ class EventLoggingService:
             )
 
         return ServiceClassificationEventRow(
+            model_id=model_id,
+            model_version_id=model_version_id,
             event_id=event.event_id if event.event_id else str(uuid.uuid4()),
             row_id=uuid.uuid4(),
             dataset_id=dataset_id,
@@ -362,6 +369,8 @@ class EventLoggingService:
         events_row_db: List[ServiceClassificationEventRow] = []
         for event in events:
             event_db = self._convert_classification_event(
+                model_id=model_version.model_id,
+                model_version_id=model_version_id,
                 dataset_id=event_dataset.dataset_id,
                 event=event,
                 timestamp=log_timestamp if log_timestamp else datetime.utcnow(),

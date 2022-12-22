@@ -59,6 +59,20 @@ class EventDatasetRowRepository:
         )
         return created_rows.inserted_ids
 
+    def count_prediction_by_model_id(self, model_id: str):
+        return self._mongo.database[MONGO_COLLECTION_EVENT_ROWS].count_documents(
+            {"model_id": model_id}
+        )
+
+    def find_last_prediction_date(self, model_id: str):
+        last_row = self._mongo.database[MONGO_COLLECTION_EVENT_ROWS].find_one(
+            {
+                "model_id": model_id
+            },
+            sort=[("created_at", -1)]
+        )
+        return last_row["created_at"] if last_row else None
+
 
 class BatchDatasetRowRepository:
 
