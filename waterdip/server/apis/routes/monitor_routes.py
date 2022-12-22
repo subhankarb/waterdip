@@ -41,7 +41,7 @@ def create_monitor(
             identification=request.monitor_identification,
             condition=request.monitor_condition,
         )
-    elif monitor_type == MonitorType.PERFORMANCE:
+    elif monitor_type == MonitorType.MODEL_PERFORMANCE:
         return service.create_model_performance_monitor(
             monitor_name=request.monitor_name,
             identification=request.monitor_identification,

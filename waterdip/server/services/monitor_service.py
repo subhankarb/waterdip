@@ -12,6 +12,7 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 import uuid
+from uuid import UUID
 
 from fastapi import Depends
 from pydantic import Field
@@ -39,7 +40,7 @@ class ServiceDataQualityMonitor(ServiceBaseMonitor):
 
 
 class ServicePerformanceMonitor(ServiceBaseMonitor):
-    monitor_type: MonitorType = Field(default=MonitorType.PERFORMANCE, const=True)
+    monitor_type: MonitorType = Field(default=MonitorType.MODEL_PERFORMANCE, const=True)
     monitor_condition: PerformanceBaseMonitorCondition = Field(...)
 
 

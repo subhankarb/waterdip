@@ -95,10 +95,22 @@ class ColumnMappingType(str, Enum):
 
 
 class MonitorType(str, Enum):
-    DATA_QUALITY = "DATA_QUALITY"
-    PERFORMANCE = "PERFORMANCE"
-    DRIFT = "DRIFT"
+    """
+    Alert type of the dataset
 
+    Attributes:
+    ------------------
+    DATA_QUALITY:
+
+    DRIFT:
+
+    MODEL_PERFORMANCE:
+    
+    """
+
+    DATA_QUALITY = "DATA_QUALITY"
+    DRIFT = "DRIFT"
+    MODEL_PERFORMANCE = "MODEL_PERFORMANCE"
 
 class DriftMetric(str, Enum):
     PSI = "PSI"
@@ -114,3 +126,6 @@ class PerformanceMetric(str, Enum):
     PRECISION = "PRECISION"
     RECALL = "RECALL"
     F1 = "F1"
+
+
+

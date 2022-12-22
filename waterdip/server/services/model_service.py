@@ -40,9 +40,12 @@ from waterdip.server.db.repositories.model_repository import (
     ModelRepository,
     ModelVersionRepository,
 )
+
+
 from waterdip.server.errors.base_errors import EntityNotFoundError
 from waterdip.server.services.dataset_service import DatasetService, ServiceEventDataset
 from waterdip.server.services.row_service import EventDatasetRowService
+from waterdip.server.services.alert_service import AlertService
 
 
 class ModelVersionService:
@@ -149,22 +152,23 @@ class ModelService:
             ModelVersionService.get_instance
         ),
         row_service: EventDatasetRowService = Depends(
-            EventDatasetRowService.get_instance)
+            EventDatasetRowService.get_instance), alert_service: AlertService = Depends(AlertService.get_instance),
 
 
     ):
         if not cls._INSTANCE:
             cls._INSTANCE = cls(
-                repository=repository, model_version_service=model_version_service, row_service=row_service
+                repository=repository, model_version_service=model_version_service, row_service=row_service ,  alert_service=alert_service
             )
         return cls._INSTANCE
 
     def __init__(
-        self, repository: ModelRepository, model_version_service: ModelVersionService, row_service: EventDatasetRowService
+        self, repository: ModelRepository, model_version_service: ModelVersionService, row_service: EventDatasetRowService , alert_service: AlertService
     ):
         self._repository = repository
         self._model_version_service = model_version_service
         self._row_service = row_service
+        self._alert_service = alert_service
 
     def register_model(self, model_name: str) -> ModelDB:
         generated_model_id = uuid.uuid4()
@@ -213,7 +217,17 @@ class ModelService:
             else:
                 return None
 
-        def get_latest_version(model_id: UUID) -> Union[UUID, None]:
+
+
+
+
+        alerts = self._alert_service.get_alerts(
+            model_ids=[str(model.model_id) for model in list_models]
+        )
+
+
+        def get_latest_version(model_id: UUID) -> Union[UUID,None]:
+
             """
             Get the latest version of a model
             if the model has no versions, return None
@@ -237,7 +251,10 @@ class ModelService:
                 total_predictions=self._row_service.count_prediction_by_model_id(
                     str(model.model_id)),
                 last_prediction=self._row_service.find_last_prediction_date(
-                    str(model.model_id))
+                    str(model.model_id)),
+                num_alert_perf=alerts.get(str(model.model_id), {}).get("MODEL_PERFORMANCE", 0),
+                num_alert_data_behave=alerts.get(str(model.model_id), {}).get("DRIFT", 0),
+                num_alert_data_integrity=alerts.get(str(model.model_id), {}).get("DATA_QUALITY", 0)
             )
             for model in list_models
         ]

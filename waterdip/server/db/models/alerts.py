@@ -12,34 +12,38 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
-from typing import TypeVar
+from datetime import datetime
+from typing import Dict, Optional, TypeVar
 from uuid import UUID
 
 from pydantic import BaseModel, Field
 
 from waterdip.server.commons.models import MonitorType
 
-
 class AlertIdentification(BaseModel):
     model_version_id: UUID = Field(description="")
     model_id: UUID = Field(description="...")
 
-
 class BaseAlertDB(BaseModel):
-    alert_id: UUID = Field(...)
-    monitor_id: str = Field(...)
-    alert_identification: AlertIdentification = Field(...)
-    alert_type: MonitorType = Field(
-        description="Monitor types can be data_drift | prediction_drift"
-    )
+    model_id: UUID = Field(..., description="Unique id for the model")
+    alert_id: UUID = Field(..., description="Unique id for the alert")
+    monitor_id: UUID = Field(..., description="Unique id for the monitor")
+    monitor_type: MonitorType = Field(..., description="Type of the alert")
+    alert_identification: Optional[AlertIdentification] 
+    created_at: datetime
+    violation: Optional[str] = Field(default=None)
+
 
     def dict(self, *args, **kwargs) -> "DictStrAny":
         alert = super().dict(*args, **kwargs)
         alert["monitor_id"] = str(alert["monitor_id"])
-        alert["monitor_identification"]["model_version_id"] = str(
-            alert["monitor_identification"]["model_version_id"]
-        )
+        alert["model_id"] = str(alert["model_id"])
+        alert["alert_id"] = str(alert["alert_id"])
+        if alert["alert_identification"]:
+            alert["alert_identification"]["model_version_id"] = str(
+                alert["alert_identification"]["model_version_id"]
+            )
         return alert
 
-
 AlertDB = TypeVar("AlertDB", bound=BaseAlertDB)
+

@@ -31,6 +31,7 @@ class ServerSettings(BaseSettings):
     mongo_collection_batch_rows: str = "wd_dataset_batch_rows"
     mongo_collection_event_rows: str = "wd_dataset_event_rows"
     mongo_collection_monitors: str = "wd_monitors"
+    mongo_collection_alerts: str = "wd_alerts"
 
     docs_enabled: bool = True
 

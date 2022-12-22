@@ -25,7 +25,6 @@ from waterdip.server.services.monitor_service import ServiceBaseMonitor
 class CreateMonitorRequest(BaseModel):
     """
     Create monitor API request
-
     Attributes:
     ------------------
     monitor_name:

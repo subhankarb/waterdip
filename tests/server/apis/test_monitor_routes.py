@@ -59,7 +59,7 @@ class TestMonitorCreate:
 
         data = {
             "monitor_name": monitor_name,
-            "monitor_type": "PERFORMANCE",
+            "monitor_type": "MODEL_PERFORMANCE",
             "monitor_identification": {
                 "model_id": MODEL_ID,
                 "model_version_id": MODEL_VERSION_ID_V1,
