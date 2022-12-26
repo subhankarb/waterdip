@@ -40,7 +40,7 @@ class ServiceDataQualityMonitor(ServiceBaseMonitor):
 
 
 class ServicePerformanceMonitor(ServiceBaseMonitor):
-    monitor_type: MonitorType = Field(default=MonitorType.MODEL_PERFORMANCE, const=True)
+    monitor_type: MonitorType = Field(default=MonitorType.PERFORMANCE, const=True)
     monitor_condition: PerformanceBaseMonitorCondition = Field(...)
 
 

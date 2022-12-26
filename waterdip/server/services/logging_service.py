@@ -115,7 +115,12 @@ class BatchLoggingService:
             return _column
 
     def _log_row_to_batch_row_db_converter(
-        self, dataset_id: UUID, row: ServiceLogRow, schema: ModelVersionSchemaInDB, model_id: UUID, model_version_id: UUID
+        self,
+        dataset_id: UUID,
+        row: ServiceLogRow,
+        schema: ModelVersionSchemaInDB,
+        model_id: UUID,
+        model_version_id: UUID,
     ) -> ServiceDatasetBatchRow:
         converted_columns: List[DataColumn] = []
         all_columns = {
@@ -166,7 +171,11 @@ class BatchLoggingService:
         self._dataset_service.create_batch_dataset(dataset=dataset)
         data_rows_in_db: List[DatasetBatchRowDB] = [
             self._log_row_to_batch_row_db_converter(
-                dataset_id=dataset_id, row=row, schema=model_version.version_schema, model_id=model_version.model_id, model_version_id=model_version_id
+                dataset_id=dataset_id,
+                row=row,
+                schema=model_version.version_schema,
+                model_id=model_version.model_id,
+                model_version_id=model_version_id,
             )
             for row in rows
         ]
@@ -321,8 +330,7 @@ class EventLoggingService:
         timestamp: datetime,
         version_schema: ModelVersionSchemaInDB,
     ) -> ServiceClassificationEventRow:
-        converted_features = self._convert_features(
-            event.features, version_schema)
+        converted_features = self._convert_features(event.features, version_schema)
         converted_predictions, prediction_cf = self._convert_classification_predictions(
             event.predictions, version_schema
         )

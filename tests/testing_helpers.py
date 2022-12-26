@@ -18,12 +18,11 @@ from uuid import UUID
 from mongomock.database import Database
 from mongomock.mongo_client import MongoClient
 
-from waterdip.server.commons.models import ColumnDataType, DatasetType
-from waterdip.server.db.models.datasets import BaseColumnInfoDB, BaseDatasetDB
+from waterdip.server.commons.models import DatasetType
+from waterdip.server.db.models.datasets import BaseDatasetDB
 from waterdip.server.db.models.models import (
     BaseModelDB,
     BaseModelVersionDB,
-    ModelVersionSchemaFieldDetails,
     ModelVersionSchemaInDB,
 )
 from waterdip.server.db.mongodb import (

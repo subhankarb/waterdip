@@ -12,8 +12,9 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
-from typing import List, Union
 from datetime import datetime
+from typing import List, Union
+
 from fastapi import Depends
 
 from waterdip.server.db.models.dataset_rows import (
@@ -87,8 +88,7 @@ class EventDatasetRowService:
         return len(inserted_rows)
 
     def count_prediction_by_model_id(self, model_id: str) -> int:
-        total_predictions = self._repository.count_prediction_by_model_id(
-            model_id)
+        total_predictions = self._repository.count_prediction_by_model_id(model_id)
         return total_predictions
 
     def find_last_prediction_date(self, model_id: str) -> datetime:

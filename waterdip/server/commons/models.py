@@ -13,6 +13,9 @@
 #  limitations under the License.
 
 from enum import Enum
+from typing import List, Union
+
+from pydantic import BaseModel
 
 
 class PredictionTaskType(str, Enum):
@@ -96,21 +99,19 @@ class ColumnMappingType(str, Enum):
 
 class MonitorType(str, Enum):
     """
-    Alert type of the dataset
+    Monitor types of the model
 
     Attributes:
     ------------------
     DATA_QUALITY:
-
     DRIFT:
-
     MODEL_PERFORMANCE:
-    
     """
 
     DATA_QUALITY = "DATA_QUALITY"
     DRIFT = "DRIFT"
-    MODEL_PERFORMANCE = "MODEL_PERFORMANCE"
+    PERFORMANCE = "PERFORMANCE"
+
 
 class DriftMetric(str, Enum):
     PSI = "PSI"
@@ -128,4 +129,12 @@ class PerformanceMetric(str, Enum):
     F1 = "F1"
 
 
+class Histogram(BaseModel):
+    bins: List[str]
+    val: List[Union[float, int]]
 
+
+class DateHistogram(BaseModel):
+
+    date_bins: List[str]
+    val: List[Union[float, int]]

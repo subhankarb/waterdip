@@ -20,19 +20,20 @@ from pydantic import BaseModel, Field
 
 from waterdip.server.commons.models import MonitorType
 
+
 class AlertIdentification(BaseModel):
     model_version_id: UUID = Field(description="")
     model_id: UUID = Field(description="...")
+
 
 class BaseAlertDB(BaseModel):
     model_id: UUID = Field(..., description="Unique id for the model")
     alert_id: UUID = Field(..., description="Unique id for the alert")
     monitor_id: UUID = Field(..., description="Unique id for the monitor")
     monitor_type: MonitorType = Field(..., description="Type of the alert")
-    alert_identification: Optional[AlertIdentification] 
+    alert_identification: Optional[AlertIdentification]
     created_at: datetime
     violation: Optional[str] = Field(default=None)
-
 
     def dict(self, *args, **kwargs) -> "DictStrAny":
         alert = super().dict(*args, **kwargs)
@@ -45,5 +46,5 @@ class BaseAlertDB(BaseModel):
             )
         return alert
 
-AlertDB = TypeVar("AlertDB", bound=BaseAlertDB)
 
+AlertDB = TypeVar("AlertDB", bound=BaseAlertDB)

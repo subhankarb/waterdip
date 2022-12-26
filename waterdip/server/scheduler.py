@@ -15,8 +15,10 @@
 from redbird.repos import MongoRepo
 from rocketry import Rocketry
 
-from waterdip.server.db.mongodb import MongodbBackend
+from waterdip.server.commons.config import settings
 
-mongo_repo = MongoRepo(client=MongodbBackend.get_instance().client)
+mongo_repo = MongoRepo(
+    uri=settings.mongo_url, database=settings.mongo_database, collection="rocketry"
+)
 
 scheduler = Rocketry(config={"task_execution": "async"}, logger_repo=mongo_repo)

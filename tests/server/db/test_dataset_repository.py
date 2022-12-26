@@ -19,8 +19,7 @@ import pytest
 from waterdip.server.commons.models import DatasetType
 from waterdip.server.db.models.datasets import BaseDatasetDB
 from waterdip.server.db.mongodb import MongodbBackend
-from waterdip.server.db.repositories.dataset_repository import \
-    DatasetRepository
+from waterdip.server.db.repositories.dataset_repository import DatasetRepository
 
 
 @pytest.mark.usefixtures("mock_mongo_backend")

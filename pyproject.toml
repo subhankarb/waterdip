@@ -40,6 +40,7 @@ gunicorn = "^20.1.0"
 profile = "black"
 
 [tool.pytest.ini_options]
+env_override_existing_values = 1
 env_files = ['.env.test']
 
 [build-system]

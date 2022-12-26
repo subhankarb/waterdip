@@ -109,8 +109,8 @@ def setup_module():
     rows = []
     for i in range(0, len(data_rows)):
         row = BaseDatasetBatchRowDB(
-            model_id = uuid.uuid4(),
-            model_version_id = uuid.uuid4(),
+            model_id=uuid.uuid4(),
+            model_version_id=uuid.uuid4(),
             row_id=uuid.uuid4(),
             dataset_id=UUID(DATASET_BATCH_ID_V2_3),
             columns=[DataColumn(**column) for column in data_rows[i]],

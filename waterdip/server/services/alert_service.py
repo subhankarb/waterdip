@@ -11,7 +11,7 @@
 #  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
-from typing import List, Optional, TypeVar, Dict
+from typing import Dict, List, Optional, TypeVar
 from uuid import UUID
 
 from fastapi import Depends
@@ -20,9 +20,13 @@ from pydantic import Field
 from waterdip.server.apis.models.params import RequestPagination, RequestSort
 from waterdip.server.commons.models import DatasetType
 from waterdip.server.db.models.datasets import BaseDatasetDB, DatasetDB
+from waterdip.server.db.repositories.alert_repository import (
+    AlertDB,
+    AlertRepository,
+    BaseAlertDB,
+)
 from waterdip.server.db.repositories.dataset_repository import DatasetRepository
 from waterdip.server.db.repositories.model_repository import ModelVersionRepository
-from waterdip.server.db.repositories.alert_repository import AlertRepository, BaseAlertDB, AlertDB
 from waterdip.server.errors.base_errors import EntityNotFoundError
 
 
@@ -31,13 +35,10 @@ class AlertService:
 
     @classmethod
     def get_instance(
-        cls,
-        repository: AlertRepository = Depends(AlertRepository.get_instance)
+        cls, repository: AlertRepository = Depends(AlertRepository.get_instance)
     ):
         if not cls._INSTANCE:
-            cls._INSTANCE = cls(
-                repository=repository
-            )
+            cls._INSTANCE = cls(repository=repository)
         return cls._INSTANCE
 
     def __init__(
@@ -52,33 +53,24 @@ class AlertService:
     def get_alerts(self, model_ids: List[str]) -> Dict[str, Dict[str, int]]:
         _agg_alerts: Dict[str, Dict[str, int]] = dict()
         agg_pipeline = [
+            {"$match": {"model_id": {"$in": model_ids}}},
             {
-                '$match': {
-                    'model_id': {
-                        '$in': model_ids
-                    }
+                "$group": {
+                    "_id": {"model_id": "$model_id", "monitor_type": "$monitor_type"},
+                    "count": {"$sum": 1},
                 }
-            }, {
-                '$group': {
-                    '_id': {
-                        'model_id': '$model_id',
-                        'monitor_type': '$monitor_type'
-                    },
-                    'count': {
-                        '$sum': 1
-                    }
-                }
-            }, {
-                '$group': {
-                    '_id': '$_id.model_id',
-                    'alerts': {
-                        '$push': {
-                            'monitor_type': '$_id.monitor_type',
-                            'count': '$count'
+            },
+            {
+                "$group": {
+                    "_id": "$_id.model_id",
+                    "alerts": {
+                        "$push": {
+                            "monitor_type": "$_id.monitor_type",
+                            "count": "$count",
                         }
-                    }
+                    },
                 }
-            }
+            },
         ]
         for doc in self._repository.agg_alerts(agg_pipeline):
             model_id = doc["_id"]

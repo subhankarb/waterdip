@@ -66,10 +66,7 @@ class EventDatasetRowRepository:
 
     def find_last_prediction_date(self, model_id: str):
         last_row = self._mongo.database[MONGO_COLLECTION_EVENT_ROWS].find_one(
-            {
-                "model_id": model_id
-            },
-            sort=[("created_at", -1)]
+            {"model_id": model_id}, sort=[("created_at", -1)]
         )
         return last_row["created_at"] if last_row else None
 

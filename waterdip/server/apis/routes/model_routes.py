@@ -18,6 +18,7 @@ from fastapi import APIRouter, Body, Depends
 
 from waterdip.server.apis.models.models import (
     ModelListResponse,
+    ModelOverviewResponse,
     ModelVersionInfoResponse,
     RegisterModelRequest,
     RegisterModelResponse,
@@ -29,6 +30,13 @@ from waterdip.server.db.models.models import ModelVersionDB
 from waterdip.server.services.model_service import ModelService, ModelVersionService
 
 router = APIRouter()
+
+
+@router.get(
+    "/model.overview", response_model=ModelOverviewResponse, name="model:overview"
+)
+def model_overview():
+    pass
 
 
 @router.get("/list.models", response_model=ModelListResponse, name="list:models")

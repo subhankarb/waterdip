@@ -26,6 +26,7 @@ MONGO_COLLECTION_EVENT_ROWS = settings.mongo_collection_event_rows
 MONGO_COLLECTION_MONITORS = settings.mongo_collection_monitors
 MONGO_COLLECTION_ALERTS = settings.mongo_collection_alerts
 
+
 class MongodbBackend:
 
     _INSTANCE = None

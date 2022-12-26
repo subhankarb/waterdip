@@ -142,9 +142,11 @@ class ModelVersionRepository:
             model_id = doc["_id"]
             model_versions = []
             for version in doc["versions"]:
-                model_versions.append([
-                    version["model_version_id"],
-                    version["model_version"],
-                ])
+                model_versions.append(
+                    [
+                        version["model_version_id"],
+                        version["model_version"],
+                    ]
+                )
             agg_model_versions[model_id] = model_versions
         return agg_model_versions

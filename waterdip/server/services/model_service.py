@@ -40,12 +40,10 @@ from waterdip.server.db.repositories.model_repository import (
     ModelRepository,
     ModelVersionRepository,
 )
-
-
 from waterdip.server.errors.base_errors import EntityNotFoundError
+from waterdip.server.services.alert_service import AlertService
 from waterdip.server.services.dataset_service import DatasetService, ServiceEventDataset
 from waterdip.server.services.row_service import EventDatasetRowService
-from waterdip.server.services.alert_service import AlertService
 
 
 class ModelVersionService:
@@ -60,8 +58,7 @@ class ModelVersionService:
         dataset_service: DatasetService = Depends(DatasetService.get_instance),
     ):
         if not cls._INSTANCE:
-            cls._INSTANCE = cls(repository=repository,
-                                dataset_service=dataset_service)
+            cls._INSTANCE = cls(repository=repository, dataset_service=dataset_service)
         return cls._INSTANCE
 
     def __init__(
@@ -76,8 +73,7 @@ class ModelVersionService:
         )
 
         if not found_model_version:
-            raise EntityNotFoundError(
-                name=str(model_version_id), type="Model Version")
+            raise EntityNotFoundError(name=str(model_version_id), type="Model Version")
 
         return found_model_version
 
@@ -124,8 +120,7 @@ class ModelVersionService:
             created_at=datetime.utcnow(),
             version_schema=ModelVersionSchemaInDB(
                 features=self._schema_conversion(version_schema, "features"),
-                predictions=self._schema_conversion(
-                    version_schema, "predictions"),
+                predictions=self._schema_conversion(version_schema, "predictions"),
             ),
         )
         model_version = self._repository.register_model_version(model_version_db)
@@ -152,18 +147,25 @@ class ModelService:
             ModelVersionService.get_instance
         ),
         row_service: EventDatasetRowService = Depends(
-            EventDatasetRowService.get_instance), alert_service: AlertService = Depends(AlertService.get_instance),
-
-
+            EventDatasetRowService.get_instance
+        ),
+        alert_service: AlertService = Depends(AlertService.get_instance),
     ):
         if not cls._INSTANCE:
             cls._INSTANCE = cls(
-                repository=repository, model_version_service=model_version_service, row_service=row_service ,  alert_service=alert_service
+                repository=repository,
+                model_version_service=model_version_service,
+                row_service=row_service,
+                alert_service=alert_service,
             )
         return cls._INSTANCE
 
     def __init__(
-        self, repository: ModelRepository, model_version_service: ModelVersionService, row_service: EventDatasetRowService , alert_service: AlertService
+        self,
+        repository: ModelRepository,
+        model_version_service: ModelVersionService,
+        row_service: EventDatasetRowService,
+        alert_service: AlertService,
     ):
         self._repository = repository
         self._model_version_service = model_version_service
@@ -217,16 +219,11 @@ class ModelService:
             else:
                 return None
 
-
-
-
-
         alerts = self._alert_service.get_alerts(
             model_ids=[str(model.model_id) for model in list_models]
         )
 
-
-        def get_latest_version(model_id: UUID) -> Union[UUID,None]:
+        def get_latest_version(model_id: UUID) -> Union[UUID, None]:
 
             """
             Get the latest version of a model
@@ -249,12 +246,18 @@ class ModelService:
                 model_version_id=get_latest_version(model.model_id),
                 model_versions=get_all_versions(model.model_id),
                 total_predictions=self._row_service.count_prediction_by_model_id(
-                    str(model.model_id)),
+                    str(model.model_id)
+                ),
                 last_prediction=self._row_service.find_last_prediction_date(
-                    str(model.model_id)),
-                num_alert_perf=alerts.get(str(model.model_id), {}).get("MODEL_PERFORMANCE", 0),
-                num_alert_data_behave=alerts.get(str(model.model_id), {}).get("DRIFT", 0),
-                num_alert_data_integrity=alerts.get(str(model.model_id), {}).get("DATA_QUALITY", 0)
+                    str(model.model_id)
+                ),
+                num_alert_perf=alerts.get(str(model.model_id), {}).get(
+                    "MODEL_PERFORMANCE", 0
+                ),
+                num_alert_drift=alerts.get(str(model.model_id), {}).get("DRIFT", 0),
+                num_alert_data_quality=alerts.get(str(model.model_id), {}).get(
+                    "DATA_QUALITY", 0
+                ),
             )
             for model in list_models
         ]
@@ -263,3 +266,6 @@ class ModelService:
 
     def count_models(self) -> int:
         return self._repository.count_models(filters={})
+
+    def model_overview(self, model_id: UUID):
+        pass

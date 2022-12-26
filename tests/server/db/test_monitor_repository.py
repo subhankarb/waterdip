@@ -86,7 +86,7 @@ class TestMonitorRepository:
             monitor_name=monitor_name,
             monitor_identification=self.monitor_identification,
             monitor_condition=perf_condition,
-            monitor_type=MonitorType.MODEL_PERFORMANCE,
+            monitor_type=MonitorType.PERFORMANCE,
         )
         res = monitor_repo.insert_monitor(perf_monitor)
 

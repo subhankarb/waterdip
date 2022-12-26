@@ -17,24 +17,15 @@ from uuid import UUID
 
 from fastapi import Depends
 
-from waterdip.server.db.models.alerts import (
-    BaseAlertDB,
-    AlertDB
-)
-
-
-from waterdip.server.db.models.models import (
-    BaseModelVersionDB,
-    ModelDB,
-    ModelVersionDB
-)
-
+from waterdip.server.db.models.alerts import AlertDB, BaseAlertDB
+from waterdip.server.db.models.models import BaseModelVersionDB, ModelDB, ModelVersionDB
 from waterdip.server.db.mongodb import (
     MONGO_COLLECTION_ALERTS,
     MONGO_COLLECTION_MODEL_VERSIONS,
     MONGO_COLLECTION_MODELS,
     MongodbBackend,
 )
+
 
 class AlertRepository:
     _INSTANCE = None
@@ -67,9 +58,7 @@ class AlertRepository:
         )
         return total
 
-    def agg_alerts(
-        self,agg_pipeline: List[Dict]
-    ) -> Dict[str,Dict[str,int]]:
+    def agg_alerts(self, agg_pipeline: List[Dict]):
         return self._mongo.database[MONGO_COLLECTION_ALERTS].aggregate(
             pipeline=agg_pipeline
         )

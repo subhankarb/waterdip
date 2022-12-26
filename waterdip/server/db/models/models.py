@@ -20,6 +20,7 @@ from pydantic import BaseModel, Field, root_validator
 
 from waterdip.server.commons.models import ColumnDataType
 
+
 class BaseModelDB(BaseModel):
     model_id: UUID
     model_name: str
@@ -32,6 +33,7 @@ class BaseModelDB(BaseModel):
 
 
 ModelDB = TypeVar("ModelDB", bound=BaseModelDB)
+
 
 class MovingTimeWindow(BaseModel):
     skip_period: str = Field(description="", default="1d")
@@ -56,6 +58,7 @@ class ModelBaseline(BaseModel):
         if not any(v.values()):
             raise ValueError("one of dataset_id or time_window must have a value")
         return v
+
 
 class ModelVersionSchemaFieldDetails(BaseModel):
     data_type: ColumnDataType
