@@ -80,6 +80,9 @@ class TestRegisterModelVersion:
         )
 
         assert len(list(result)) == 1
+        collection.delete_one(
+            filter={"model_id": MODEL_ID, "model_version": model_version}
+        )
 
 
 @pytest.mark.usefixtures("test_client")
@@ -95,3 +98,16 @@ class TestModelVersionInfo:
         assert response_data["model_version"] == MODEL_VERSION_ID_V1_NAME
         assert response_data["model_version_id"] == MODEL_VERSION_ID_V1
         assert response_data["version_schema"] == MODEL_VERSION_V1_SCHEMA
+
+
+@pytest.mark.usefixtures("test_client")
+class TestModelInfo:
+    def test_should_return_model_info(self, test_client: TestClient):
+
+        response = test_client.get(url=f"/v1/model.info?model_id={MODEL_ID}")
+        assert response.status_code == 200
+
+        response_data = response.json()
+        assert response_data["model_id"] == MODEL_ID
+
+        assert len(response_data["model_versions"]) == 2

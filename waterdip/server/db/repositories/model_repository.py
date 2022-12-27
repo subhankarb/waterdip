@@ -15,6 +15,7 @@
 from typing import Dict, List, Optional
 from uuid import UUID
 
+import pymongo
 from fastapi import Depends
 
 from waterdip.server.db.models.models import (
@@ -114,7 +115,7 @@ class ModelVersionRepository:
 
         return BaseModelVersionDB(**created_model)
 
-    def find_by_id(self, model_version_id: UUID) -> Optional[BaseModelVersionDB]:
+    def find_by_id(self, model_version_id: UUID) -> Optional[ModelVersionDB]:
         result = self._mongo.database[MONGO_COLLECTION_MODEL_VERSIONS].find_one(
             {"model_version_id": str(model_version_id)}
         )
@@ -123,6 +124,15 @@ class ModelVersionRepository:
             return None
 
         return BaseModelVersionDB(**result)
+
+    def find_versions(self, version_filters: Dict) -> List[ModelVersionDB]:
+        versions = (
+            self._mongo.database[MONGO_COLLECTION_MODEL_VERSIONS]
+            .find(version_filters)
+            .sort([("created_at", pymongo.DESCENDING)])
+        )
+
+        return [BaseModelVersionDB(**version) for version in versions]
 
     def agg_model_versions_per_model(
         self, model_ids: List[str], top_n=1

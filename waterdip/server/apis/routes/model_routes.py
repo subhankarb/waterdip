@@ -17,6 +17,7 @@ from uuid import UUID
 from fastapi import APIRouter, Body, Depends
 
 from waterdip.server.apis.models.models import (
+    ModelInfoResponse,
     ModelListResponse,
     ModelOverviewResponse,
     ModelVersionInfoResponse,
@@ -26,7 +27,7 @@ from waterdip.server.apis.models.models import (
     RegisterModelVersionResponse,
 )
 from waterdip.server.apis.models.params import RequestPagination, RequestSort
-from waterdip.server.db.models.models import ModelVersionDB
+from waterdip.server.db.models.models import ModelDB, ModelVersionDB
 from waterdip.server.services.model_service import ModelService, ModelVersionService
 
 router = APIRouter()
@@ -37,6 +38,21 @@ router = APIRouter()
 )
 def model_overview():
     pass
+
+
+@router.get("/model.info", response_model=ModelInfoResponse, name="model:info")
+def model_info(
+    model_id: UUID,
+    model_service: ModelService = Depends(ModelService.get_instance),
+    model_version_service: ModelVersionService = Depends(
+        ModelVersionService.get_instance
+    ),
+):
+    model: ModelDB = model_service.find_by_id(model_id=model_id)
+    versions = model_version_service.find_all_versions_for_model(model_id=model_id)
+    return ModelInfoResponse(
+        model_id=model.model_id, model_name=model.model_name, model_versions=versions
+    )
 
 
 @router.get("/list.models", response_model=ModelListResponse, name="list:models")

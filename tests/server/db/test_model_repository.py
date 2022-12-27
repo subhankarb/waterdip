@@ -16,6 +16,7 @@ import uuid
 
 import pytest
 
+from tests.testing_helpers import MODEL_ID
 from waterdip.server.commons.models import ColumnDataType
 from waterdip.server.db.models.models import (
     BaseModelDB,
@@ -145,16 +146,11 @@ class TestModelVersionsRepository:
         self, mock_mongo_backend: MongodbBackend
     ):
         model_repo = ModelVersionRepository(mongodb=mock_mongo_backend)
-        # model_uuid, model_version_uuid, model_version_name = (
-        #     uuid.uuid4(),
-        #     uuid.uuid4(),
-        #     "v1",
-        # )
 
-        model_id = str(uuid.uuid4())
+        model_id = uuid.uuid4()
         model_versions = [
             BaseModelVersionDB(
-                model_version_id=str(uuid.uuid4()),
+                model_version_id=uuid.uuid4(),
                 model_version="model_version_name",
                 model_id=model_id,
                 version_schema=ModelVersionSchemaInDB(
@@ -178,7 +174,9 @@ class TestModelVersionsRepository:
         )
 
         response_versions = model_repo.agg_model_versions_per_model(
-            model_ids=[model_id]
+            model_ids=[str(model_id)]
         )
-        assert len(response_versions[model_id]) == len(model_versions)
-        assert response_versions[model_id][0][1] == model_versions[0]["model_version"]
+        assert len(response_versions[str(model_id)]) == len(model_versions)
+        assert (
+            response_versions[str(model_id)][0][1] == model_versions[0]["model_version"]
+        )

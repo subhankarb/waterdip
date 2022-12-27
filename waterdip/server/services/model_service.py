@@ -135,6 +135,19 @@ class ModelVersionService:
             model_ids=model_ids, top_n=1
         )
 
+    def find_all_versions_for_model(self, model_id: UUID) -> List[ModelVersionDB]:
+        """
+        Returns all associated model versions of the provided model
+
+        Parameters:
+            model_id(UUID): model unique ID
+
+        Returns:
+            List[ModelVersionDB]: list of all model versions associated with the model ID
+        """
+        filters = {"model_id": str(model_id)}
+        return self._repository.find_versions(version_filters=filters)
+
 
 class ModelService:
     _INSTANCE: "ModelService" = None
@@ -182,13 +195,13 @@ class ModelService:
 
         return self._repository.register_model(model_db)
 
-    def find_by_id(self, model_id: uuid.UUID) -> Optional[ModelVersionDB]:
-        found_model_version = self._repository.find_by_id(model_id=model_id)
+    def find_by_id(self, model_id: uuid.UUID) -> Optional[ModelDB]:
+        found_model = self._repository.find_by_id(model_id=model_id)
 
-        if not found_model_version:
+        if not found_model:
             raise EntityNotFoundError(name=str(model_id), type="Model")
 
-        return found_model_version
+        return found_model
 
     def list_models(
         self,

@@ -286,3 +286,22 @@ class ModelOverviewResponse(BaseModel):
     model_prediction_hist: ModelPredictionHistogram
     model_alert_overview: ModelOverviewAlerts
     model_alert_list: List[ModelOverviewAlertList]
+
+
+class ModelInfoResponse(BaseModel):
+    """
+    Schema of Model info response
+
+    Attributes:
+    ------------------
+    model_id:
+        Model ID
+    model_name:
+        model name
+    model_versions:
+        list of all model versions associated with this model
+    """
+
+    model_id: UUID
+    model_name: str
+    model_versions: List[ModelVersionInfoResponse]
