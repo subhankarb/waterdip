@@ -95,9 +95,11 @@ class TestModelVersionInfo:
         assert response.status_code == 200
 
         response_data = response.json()
-        assert response_data["model_version"] == MODEL_VERSION_ID_V1_NAME
-        assert response_data["model_version_id"] == MODEL_VERSION_ID_V1
-        assert response_data["version_schema"] == MODEL_VERSION_V1_SCHEMA
+        model_version = response_data["model_version"]
+
+        assert model_version["model_version"] == MODEL_VERSION_ID_V1_NAME
+        assert model_version["model_version_id"] == MODEL_VERSION_ID_V1
+        assert model_version["version_schema"] == MODEL_VERSION_V1_SCHEMA
 
 
 @pytest.mark.usefixtures("test_client")

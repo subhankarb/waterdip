@@ -11,7 +11,7 @@
 #  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
-from typing import Optional
+from typing import List, Optional
 from uuid import UUID
 
 from fastapi import APIRouter, Body, Depends
@@ -27,6 +27,7 @@ from waterdip.server.apis.models.models import (
     RegisterModelVersionResponse,
 )
 from waterdip.server.apis.models.params import RequestPagination, RequestSort
+from waterdip.server.db.models.datasets import DatasetDB
 from waterdip.server.db.models.models import ModelDB, ModelVersionDB
 from waterdip.server.services.model_service import ModelService, ModelVersionService
 
@@ -125,4 +126,13 @@ def model_version_info(
     model_version_id: UUID,
     service: ModelVersionService = Depends(ModelVersionService.get_instance),
 ):
-    return service.find_by_id(model_version_id=model_version_id)
+    model_version: ModelVersionDB = service.find_by_id(
+        model_version_id=model_version_id
+    )
+    associated_datasets: List[DatasetDB] = service.get_all_datasets(
+        model_version_id=model_version_id
+    )
+
+    return ModelVersionInfoResponse(
+        model_version=model_version, datasets=associated_datasets
+    )

@@ -17,6 +17,7 @@ from datetime import datetime
 from typing import Dict, List, Optional, Union
 
 from waterdip.server.apis.models.params import RequestPagination, RequestSort
+from waterdip.server.db.models.datasets import DatasetDB
 
 try:
     from typing import Literal
@@ -76,6 +77,12 @@ class ModelVersionService:
             raise EntityNotFoundError(name=str(model_version_id), type="Model Version")
 
         return found_model_version
+
+    def get_all_datasets(self, model_version_id: uuid.UUID) -> List[DatasetDB]:
+        list_dataset: tuple[List[DatasetDB], int] = self._dataset_service.list_dataset(
+            model_version_id=model_version_id
+        )
+        return list_dataset[0]
 
     @staticmethod
     def _schema_conversion(

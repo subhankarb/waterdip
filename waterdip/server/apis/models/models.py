@@ -23,6 +23,7 @@ from waterdip.server.commons.models import (
     MonitorType,
     PredictionTaskType,
 )
+from waterdip.server.db.models.datasets import DatasetDB
 from waterdip.server.db.models.models import BaseModelVersionDB
 
 
@@ -165,8 +166,9 @@ class ModelListResponse(BaseModel):
     meta: Optional[Dict[str, Union[str, int]]]
 
 
-class ModelVersionInfoResponse(BaseModelVersionDB):
-    pass
+class ModelVersionInfoResponse(BaseModel):
+    model_version: BaseModelVersionDB
+    datasets: List[DatasetDB]
 
 
 class ModelOverviewPredictions(BaseModel):
@@ -294,4 +296,4 @@ class ModelInfoResponse(BaseModel):
 
     model_id: UUID
     model_name: str
-    model_versions: List[ModelVersionInfoResponse]
+    model_versions: List[BaseModelVersionDB]
