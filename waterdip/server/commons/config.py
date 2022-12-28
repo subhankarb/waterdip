@@ -34,6 +34,7 @@ class ServerSettings(BaseSettings):
     mongo_collection_alerts: str = "wd_alerts"
 
     docs_enabled: bool = True
+    is_testing: str = "false"
 
     cors_origins: List[str] = ["*"]
 
@@ -55,6 +56,7 @@ class ServerSettings(BaseSettings):
             },
             "docs_enabled": {"env": ["DOCS_ENABLED", f"{env_prefix}DOCS_ENABLED"]},
             "cors_origins": {"env": ["CORS_ORIGINS", f"{env_prefix}CORS_ORIGINS"]},
+            "is_testing": {"env": ["IS_TESTING", f"{env_prefix}IS_TESTING"]},
         }
 
 

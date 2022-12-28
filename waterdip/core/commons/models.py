@@ -12,25 +12,20 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
-from abc import ABC, abstractmethod
-from typing import Any, Dict, List
+from datetime import datetime
 
-from pymongo.collection import Collection
+from pydantic import BaseModel
 
 
-class MongoMetric(ABC):
-    def __init__(self, collection: Collection):
-        self._collection = collection
+class TimeRange(BaseModel):
+    """
+    Attributes:
+    ------------------
+    start_time:
+        start time of the time range
+    model_version:
+        end time of the time range
+    """
 
-    @property
-    @abstractmethod
-    def metric_name(self) -> str:
-        pass
-
-    @abstractmethod
-    def aggregation_result(self, **kwargs) -> Dict[str, Any]:
-        pass
-
-    @abstractmethod
-    def _aggregation_query(self, *args, **kwargs) -> List[Dict[str, Any]]:
-        pass
+    start_time: datetime
+    end_time: datetime

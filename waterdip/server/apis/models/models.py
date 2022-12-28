@@ -19,6 +19,7 @@ from pydantic import BaseModel
 
 from waterdip.server.commons.models import (
     ColumnDataType,
+    DateHistogram,
     MonitorType,
     PredictionTaskType,
 )
@@ -192,17 +193,6 @@ class ModelOverviewPredictions(BaseModel):
     pred_trend_data: List[int]
     pred_average: int
     pred_average_window_days: int
-
-
-class Histogram(BaseModel):
-    bins: List[str]
-    val: List[Union[float, int]]
-
-
-class DateHistogram(BaseModel):
-
-    date_bins: List[datetime]
-    val: List[Union[float, int]]
 
 
 class ModelPredictionHistogram(BaseModel):

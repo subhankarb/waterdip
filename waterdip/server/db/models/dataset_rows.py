@@ -52,11 +52,10 @@ DatasetBatchRowDB = TypeVar("DatasetBatchRowDB", bound=BaseDatasetBatchRowDB)
 
 class EventDataColumnDB(BaseModel):
     name: str
-    value: Optional[Union[str, int, float]]
     value_numeric: Optional[Union[int, float]]
     value_categorical: Optional[str]
-    column_data_type: ColumnDataType  # Column Type Categorical or Numerical
-    column_mapping_type: ColumnMappingType
+    data_type: ColumnDataType  # Column Type Categorical or Numerical
+    mapping_type: ColumnMappingType
     column_list_index: Optional[int]
 
 

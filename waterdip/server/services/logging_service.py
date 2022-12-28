@@ -225,16 +225,16 @@ class EventLoggingService:
             _column = EventDataColumnDB(
                 name=column_name,
                 value_categorical=str(column_value),
-                column_data_type=field_schema.data_type,
-                column_mapping_type=column_mapping_type,
+                data_type=field_schema.data_type,
+                mapping_type=column_mapping_type,
             )
             return _column
         elif field_schema.data_type == ColumnDataType.NUMERIC:
             _column = EventDataColumnDB(
                 name=column_name,
                 value_numeric=float(column_value),
-                column_data_type=field_schema.data_type,
-                column_mapping_type=column_mapping_type,
+                data_type=field_schema.data_type,
+                mapping_type=column_mapping_type,
             )
             return _column
 

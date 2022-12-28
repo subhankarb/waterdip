@@ -13,6 +13,7 @@
 #  limitations under the License.
 
 from dataclasses import dataclass
+from datetime import datetime, timedelta
 from typing import Optional
 
 import pymongo
@@ -36,6 +37,28 @@ class RequestPagination:
 
     limit: int = Query(default=10, ge=1, le=1000, description="Response records limit")
     page: int = Query(default=1, ge=1, le=10000, description="Record page")
+
+
+@dataclass
+class TimeRangeParam:
+    """
+    Query time range params
+
+    Attributes:
+    ------------------
+    start_time:
+        start time of the time range, default current day - 7 days
+    page:
+        End time of the time range
+    """
+
+    start_time: datetime = Query(
+        default=datetime.utcnow() - timedelta(days=7),
+        description="Start time of the time range",
+    )
+    end_time: datetime = Query(
+        default=datetime.utcnow(), description="End time of the time range"
+    )
 
 
 class RequestSort(BaseModel):

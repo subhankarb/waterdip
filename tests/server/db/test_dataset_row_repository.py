@@ -48,11 +48,10 @@ class TestEventDatasetRowRepository:
                 columns=[
                     EventDataColumnDB(
                         name="column_name",
-                        value="column_value",
                         value_numeric=1,
                         value_categorical="column_value",
-                        column_data_type=ColumnDataType.CATEGORICAL,
-                        column_mapping_type=ColumnMappingType.FEATURE,
+                        data_type=ColumnDataType.CATEGORICAL,
+                        mapping_type=ColumnMappingType.FEATURE,
                         column_list_index=1,
                     )
                 ],
@@ -79,11 +78,10 @@ class TestEventDatasetRowRepository:
                 columns=[
                     EventDataColumnDB(
                         name="column_name",
-                        value="column_value",
                         value_numeric=1,
                         value_categorical="column_value",
-                        column_data_type=ColumnDataType.CATEGORICAL,
-                        column_mapping_type=ColumnMappingType.PREDICTION,
+                        data_type=ColumnDataType.CATEGORICAL,
+                        mapping_type=ColumnMappingType.PREDICTION,
                         column_list_index=1,
                     )
                 ],
@@ -111,11 +109,10 @@ class TestEventDatasetRowRepository:
                 columns=[
                     EventDataColumnDB(
                         name="column_name",
-                        value="column_value",
                         value_numeric=1,
                         value_categorical="column_value",
-                        column_data_type=ColumnDataType.CATEGORICAL,
-                        column_mapping_type=ColumnMappingType.PREDICTION,
+                        data_type=ColumnDataType.CATEGORICAL,
+                        mapping_type=ColumnMappingType.PREDICTION,
                         column_list_index=1,
                     )
                 ],

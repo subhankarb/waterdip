@@ -124,3 +124,12 @@ class DatasetService:
             raise EntityNotFoundError(name=str(model_version_id), type="Event Dataset")
 
         return dataset_list[0]
+
+    def find_dataset_by_id(self, dataset_id: UUID) -> DatasetDB:
+        filters = {"dataset_id": str(dataset_id)}
+        dataset_list: List[DatasetDB] = self._repository.find_datasets(filters=filters)
+
+        if len(dataset_list) == 0:
+            raise EntityNotFoundError(name=str(dataset_id), type="Dataset")
+
+        return dataset_list[0]

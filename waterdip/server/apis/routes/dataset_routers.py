@@ -40,7 +40,6 @@ def get_dataset_list(
     list_dataset: tuple[List[DatasetDB], int] = service.list_dataset(
         model_version_id=model_version_id, pagination=pagination, sort_request=sort
     )
-    print(list_dataset)
     response = DatasetListResponse(
         dataset_list=[
             DatasetListRow(

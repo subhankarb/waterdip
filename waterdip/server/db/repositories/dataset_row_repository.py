@@ -26,9 +26,10 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 #
-from typing import List
+from typing import Dict, List
 
 from fastapi import Depends
+from pymongo.collection import Collection
 
 from waterdip.server.db.models.dataset_rows import BaseDatasetBatchRowDB, BaseEventRowDB
 from waterdip.server.db.mongodb import (
@@ -53,6 +54,10 @@ class EventDatasetRowRepository:
     def __init__(self, mongodb: MongodbBackend):
         self._mongo = mongodb
 
+    @property
+    def collection(self) -> Collection:
+        return self._mongo.database[MONGO_COLLECTION_EVENT_ROWS]
+
     def inset_rows(self, rows: List[BaseEventRowDB]):
         created_rows = self._mongo.database[MONGO_COLLECTION_EVENT_ROWS].insert_many(
             [row.dict() for row in rows]
@@ -70,6 +75,11 @@ class EventDatasetRowRepository:
         )
         return last_row["created_at"] if last_row else None
 
+    def agg_events(self, agg_pipeline: List[Dict]):
+        return self._mongo.database[MONGO_COLLECTION_EVENT_ROWS].aggregate(
+            pipeline=agg_pipeline
+        )
+
 
 class BatchDatasetRowRepository:
 
@@ -86,6 +96,10 @@ class BatchDatasetRowRepository:
     def __init__(self, mongodb: MongodbBackend):
         self._mongo = mongodb
 
+    @property
+    def collection(self) -> Collection:
+        return self._mongo.database[MONGO_COLLECTION_BATCH_ROWS]
+
     def inset_row(self, row: BaseDatasetBatchRowDB):
         created_row = self._mongo.database[MONGO_COLLECTION_BATCH_ROWS].insert_one(
             row.dict()
@@ -97,3 +111,8 @@ class BatchDatasetRowRepository:
             [row.dict() for row in rows]
         )
         return created_rows.inserted_ids
+
+    def agg_rows(self, agg_pipeline: List[Dict]):
+        return self._mongo.database[MONGO_COLLECTION_BATCH_ROWS].aggregate(
+            pipeline=agg_pipeline
+        )

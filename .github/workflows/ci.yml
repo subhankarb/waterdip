@@ -65,3 +65,5 @@ jobs:
         run: |
           source .venv/bin/activate
           pytest -p no:warnings ./tests/*
+        env:
+          WD_IS_TESTING: true
