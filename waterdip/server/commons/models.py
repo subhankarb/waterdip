@@ -12,9 +12,10 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
+from datetime import datetime
 from enum import Enum
 from typing import List, Union
-
+from datetime import datetime
 from pydantic import BaseModel
 
 
@@ -135,6 +136,5 @@ class Histogram(BaseModel):
 
 
 class DateHistogram(BaseModel):
-
-    date_bins: List[str]
+    date_bins: List[datetime]
     val: List[Union[float, int]]

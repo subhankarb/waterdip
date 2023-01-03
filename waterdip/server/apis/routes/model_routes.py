@@ -37,8 +37,11 @@ router = APIRouter()
 @router.get(
     "/model.overview", response_model=ModelOverviewResponse, name="model:overview"
 )
-def model_overview():
-    pass
+def model_overview(
+    model_id: UUID,
+    model_service: ModelService = Depends(ModelService.get_instance),
+):
+    return model_service.model_overview(model_id=model_id)
 
 
 @router.get("/model.info", response_model=ModelInfoResponse, name="model:info")

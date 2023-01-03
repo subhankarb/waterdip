@@ -210,7 +210,7 @@ class ModelPredictionHistogram(BaseModel):
     """
 
     predictions: DateHistogram
-    predictions_versions: Dict[str, DateHistogram]
+    predictions_versions: List[Dict[str, DateHistogram]]
 
 
 class ModelOverviewAlerts(BaseModel):
@@ -249,7 +249,7 @@ class ModelOverviewAlertList(BaseModel):
     """
 
     alert_id: UUID
-    monitor_name: str
+    monitor_name: Optional[str]
     monitor_type: MonitorType
     created_at: datetime
 

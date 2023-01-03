@@ -17,6 +17,7 @@ from uuid import UUID
 
 from fastapi import Depends
 
+from waterdip.server.apis.models.models import ModelOverviewAlertList
 from waterdip.server.db.models.alerts import AlertDB, BaseAlertDB
 from waterdip.server.db.models.models import BaseModelVersionDB, ModelDB, ModelVersionDB
 from waterdip.server.db.mongodb import (
@@ -53,12 +54,17 @@ class AlertRepository:
         return BaseAlertDB(**created_alert)
 
     def count_alerts(self, filters: Dict) -> int:
-        total = self._mongo.database[MONGO_COLLECTION_ALERTS].count_documents(
-            filter=filters
-        )
-        return total
+        return self._mongo.database[MONGO_COLLECTION_ALERTS].count_documents(filters)
 
     def agg_alerts(self, agg_pipeline: List[Dict]):
         return self._mongo.database[MONGO_COLLECTION_ALERTS].aggregate(
             pipeline=agg_pipeline
+        )
+
+    def find_alerts(self, model_id: str, limit: int) -> List[AlertDB]:
+        return (
+            self._mongo.database[MONGO_COLLECTION_ALERTS]
+            .find({"model_id": model_id})
+            .sort("created_at", -1)
+            .limit(limit)
         )

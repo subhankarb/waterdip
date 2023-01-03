@@ -28,7 +28,14 @@ from uuid import UUID
 
 from fastapi import Depends
 
-from waterdip.server.apis.models.models import ModelListRow, ModelVersionSchema
+from waterdip.server.apis.models.models import (
+    ModelListRow,
+    ModelOverviewAlerts,
+    ModelOverviewPredictions,
+    ModelOverviewResponse,
+    ModelPredictionHistogram,
+    ModelVersionSchema,
+)
 from waterdip.server.db.models.models import (
     BaseModelDB,
     BaseModelVersionDB,
@@ -288,4 +295,38 @@ class ModelService:
         return self._repository.count_models(filters={})
 
     def model_overview(self, model_id: UUID):
-        pass
+        model_id = str(model_id)
+
+        prediction_average = self._row_service.prediction_average(model_id)
+        week_prediction_stats = self._row_service.week_prediction_stats(model_id)
+        prediction_histogram = self._row_service.prediction_histogram(model_id)
+        prediction_histogram_version = self._row_service.prediction_histogram_version(
+            model_id
+        )
+
+        alerts_count = self._alert_service.count_alert_by_filter(
+            {"model_id": str(model_id)}
+        )
+        alert_week_stats = self._alert_service.alert_week_stats(model_id)
+        latest_alerts = self._alert_service.find_alerts(model_id)
+
+        return ModelOverviewResponse(
+            model_id=model_id,
+            model_prediction_overview=ModelOverviewPredictions(
+                pred_yesterday=week_prediction_stats["pred_yesterday"],
+                pred_percentage_change=week_prediction_stats["pred_percentage_change"],
+                pred_trend_data=week_prediction_stats["pred_trend_data"],
+                pred_average=prediction_average["pred_average"],
+                pred_average_window_days=prediction_average["pred_average_window_days"],
+            ),
+            model_alert_overview=ModelOverviewAlerts(
+                alerts_count=alerts_count,
+                alert_trend_data=alert_week_stats["alert_trend_data"],
+                alert_percentage_change=alert_week_stats["alert_percentage_change"],
+            ),
+            model_alert_list=latest_alerts,
+            model_prediction_hist=ModelPredictionHistogram(
+                predictions=prediction_histogram,
+                predictions_versions=prediction_histogram_version,
+            ),
+        )

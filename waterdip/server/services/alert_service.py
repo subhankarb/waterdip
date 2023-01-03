@@ -11,14 +11,24 @@
 #  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
+from collections import OrderedDict
+from datetime import date, datetime, timedelta
 from typing import Dict, List, Optional, TypeVar
 from uuid import UUID
+from collections import OrderedDict
 
+from dateutil.parser import parse
+
+from dateutil.parser import parse
 from fastapi import Depends
 from pydantic import Field
 
+from waterdip.server.apis.models.models import (
+    ModelOverviewAlertList,
+    ModelOverviewAlerts,
+)
 from waterdip.server.apis.models.params import RequestPagination, RequestSort
-from waterdip.server.commons.models import DatasetType
+from waterdip.server.commons.models import DatasetType, MonitorType
 from waterdip.server.db.models.datasets import BaseDatasetDB, DatasetDB
 from waterdip.server.db.repositories.alert_repository import (
     AlertDB,
@@ -83,3 +93,88 @@ class AlertService:
                 d[alert["monitor_type"]] = alert["count"]
             _agg_alerts[model_id] = d
         return _agg_alerts
+
+    def count_alert_by_filter(self, filters: Dict) -> int:
+        return self._repository.count_alerts(filters)
+
+    def alert_week_stats(self, model_id):
+        alerts_days = 7
+        today_date = datetime.combine(date.today(), datetime.min.time())
+
+        agg_alert_count_week_pipeline = [
+            {
+                "$match": {
+                    "model_id": str(model_id),
+                    "created_at": {
+                        "$gte": datetime.utcnow() - timedelta(days=alerts_days),
+                        "$lt": today_date,
+                    },
+                }
+            },
+            {
+                "$project": {
+                    "year": {"$year": "$created_at"},
+                    "month": {"$month": "$created_at"},
+                    "day": {"$dayOfMonth": "$created_at"},
+                }
+            },
+            {
+                "$group": {
+                    "_id": {"year": "$year", "month": "$month", "day": "$day"},
+                    "count": {"$sum": 1},
+                }
+            },
+        ]
+        week_stats = self._repository.agg_alerts(agg_alert_count_week_pipeline)
+        day_vs_count = dict()
+        for i in week_stats:
+            day_vs_count[
+                datetime(i["_id"]["year"], i["_id"]["month"], i["_id"]["day"]).strftime(
+                    "%Y-%m-%d"
+                )
+            ] = i["count"]
+        available_days = 0
+        for i in range(7):
+            current = (datetime.utcnow() - timedelta(days=7) + timedelta(i)).strftime(
+                "%Y-%m-%d"
+            )
+            if current not in day_vs_count.keys():
+                day_vs_count[current] = 0
+            else:
+                available_days += 1
+        day_vs_count = OrderedDict(
+            sorted(day_vs_count.items(), key=lambda x: parse(x[0]))
+        )
+        week_alerts_average = sum(day_vs_count.values()) / 7 if available_days else 0
+        today_alert_count = self.today_alert_count(model_id)
+        alert_percentage_change = int(
+            ((today_alert_count - week_alerts_average) / week_alerts_average) * 100
+        )
+
+        return {
+            "alert_trend_data": list(day_vs_count.values()),
+            "alert_percentage_change": alert_percentage_change,
+        }
+
+    def find_alerts(self, model_id: str, limit: int = 5) -> List[AlertDB]:
+        return [
+            ModelOverviewAlertList(
+                alert_id=alert["alert_id"],
+                monitor_type=MonitorType(alert["monitor_type"]),
+                created_at=alert["created_at"],
+            )
+            for alert in self._repository.find_alerts(model_id, limit)
+        ]
+
+    def today_alert_count(self, model_id: str) -> int:
+        today_date = datetime.combine(date.today(), datetime.min.time())
+        today_alerts_count_filter = {
+            "model_id": str(model_id),
+            "created_at": {
+                "$gte": today_date,
+                "$lte": datetime.utcnow(),
+            },
+        }
+
+        today_alert_count = self._repository.count_alerts(today_alerts_count_filter)
+        return today_alert_count

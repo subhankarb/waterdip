@@ -12,20 +12,7 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
-#   Copyright 2022-present, the Waterdip Labs Pvt. Ltd.
-#
-#   Licensed under the Apache License, Version 2.0 (the "License");
-#   you may not use this file except in compliance with the License.
-#   You may obtain a copy of the License at
-#
-#       http://www.apache.org/licenses/LICENSE-2.0
-#
-#   Unless required by applicable law or agreed to in writing, software
-#   distributed under the License is distributed on an "AS IS" BASIS,
-#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-#   See the License for the specific language governing permissions and
-#   limitations under the License.
-#
+from datetime import date, datetime
 from typing import Dict, List
 
 from fastapi import Depends
@@ -75,9 +62,20 @@ class EventDatasetRowRepository:
         )
         return last_row["created_at"] if last_row else None
 
-    def agg_events(self, agg_pipeline: List[Dict]):
+    def find_first_prediction_date(self, model_id: str) -> datetime:
+        first_pred = self._mongo.database[MONGO_COLLECTION_EVENT_ROWS].find_one(
+            {"model_id": model_id}, sort=[("created_at", 1)]
+        )
+        return first_pred["created_at"]
+
+    def agg_prediction(self, agg_prediction_pipeline: list):
         return self._mongo.database[MONGO_COLLECTION_EVENT_ROWS].aggregate(
-            pipeline=agg_pipeline
+            pipeline=agg_prediction_pipeline
+        )
+
+    def prediction_count(self, filter: Dict):
+        return self._mongo.database[MONGO_COLLECTION_EVENT_ROWS].count_documents(
+            filter=filter
         )
 
 

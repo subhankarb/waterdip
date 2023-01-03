@@ -11,8 +11,8 @@
 #  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
-import datetime
 import uuid
+from datetime import date, datetime, timedelta
 from typing import List
 
 import pytest
@@ -55,7 +55,7 @@ class TestEventDatasetRowRepository:
                         column_list_index=1,
                     )
                 ],
-                created_at=datetime.datetime.now(),
+                created_at=datetime.utcnow(),
                 meta={"meta_key": "meta_value"},
             )
             for _ in range(10)
@@ -85,7 +85,7 @@ class TestEventDatasetRowRepository:
                         column_list_index=1,
                     )
                 ],
-                created_at=datetime.datetime.now(),
+                created_at=datetime.utcnow(),
                 meta={"meta_key": "meta_value"},
             )
             for _ in range(10)
@@ -98,7 +98,7 @@ class TestEventDatasetRowRepository:
         event_repo = EventDatasetRowRepository(mongodb=mock_mongo_backend)
         mongo_db = mock_mongo_backend.database[MONGO_COLLECTION_EVENT_ROWS]
         model_id = uuid.uuid4()
-        created_at = datetime.datetime(2022, 12, 16, 18, 17, 43, 470000)
+        created_at = datetime(2022, 12, 16, 18, 17, 43, 470000)
         rows = [
             BaseEventRowDB(
                 row_id=uuid.uuid4(),
@@ -126,3 +126,77 @@ class TestEventDatasetRowRepository:
             model_id=str(model_id)
         )
         assert last_prediction_date == rows[-1].created_at
+
+    def test_should_return_today_prediction_count(
+        self, mock_mongo_backend: MongodbBackend
+    ):
+        event_repo = EventDatasetRowRepository(mongodb=mock_mongo_backend)
+        mongo_db = mock_mongo_backend.database[MONGO_COLLECTION_EVENT_ROWS]
+        model_id = uuid.uuid4()
+        rows = [
+            BaseEventRowDB(
+                row_id=uuid.uuid4(),
+                dataset_id=uuid.uuid4(),
+                model_id=model_id,
+                model_version_id=uuid.uuid4(),
+                event_id="event_id",
+                columns=[
+                    EventDataColumnDB(
+                        name="column_name",
+                        value="column_value",
+                        value_numeric=1,
+                        value_categorical="column_value",
+                        data_type=ColumnDataType.CATEGORICAL,
+                        mapping_type=ColumnMappingType.FEATURE,
+                        column_list_index=1,
+                    )
+                ],
+                created_at=datetime.utcnow(),
+                meta={"meta_key": "meta_value"},
+            )
+            for _ in range(10)
+        ]
+        mongo_db.insert_many([row.dict() for row in rows])
+
+        today = datetime.combine(date.today(), datetime.min.time())
+        count = event_repo.prediction_count(
+            filter={"model_id": str(model_id), "created_at": {"$gte": today}}
+        )
+        assert count == len(rows)
+
+    def test_should_return_window_prediction_count(
+        self, mock_mongo_backend: MongodbBackend
+    ):
+        event_repo = EventDatasetRowRepository(mongodb=mock_mongo_backend)
+        mongo_db = mock_mongo_backend.database[MONGO_COLLECTION_EVENT_ROWS]
+        model_id = uuid.uuid4()
+        rows = [
+            BaseEventRowDB(
+                row_id=uuid.uuid4(),
+                dataset_id=uuid.uuid4(),
+                model_id=model_id,
+                model_version_id=uuid.uuid4(),
+                event_id="event_id",
+                columns=[
+                    EventDataColumnDB(
+                        name="column_name",
+                        value="column_value",
+                        value_numeric=1,
+                        value_categorical="column_value",
+                        data_type=ColumnDataType.CATEGORICAL,
+                        mapping_type=ColumnMappingType.FEATURE,
+                        column_list_index=1,
+                    )
+                ],
+                created_at=datetime.utcnow() - timedelta(days=5),
+            )
+            for _ in range(10)
+        ]
+        mongo_db.insert_many([row.dict() for row in rows])
+        count = event_repo.prediction_count(
+            filter={
+                "model_id": str(model_id),
+                "created_at": {"$gte": datetime.utcnow() - timedelta(days=7)},
+            }
+        )
+        assert count == len(rows)

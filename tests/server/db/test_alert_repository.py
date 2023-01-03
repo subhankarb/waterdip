@@ -45,7 +45,7 @@ class TestAlertRepository:
                 alert_id=uuid.uuid4(),
                 monitor_id=uuid.uuid4(),
                 model_version="model_version_1",
-                created_at=datetime.datetime.now(),
+                created_at=datetime.datetime.utcnow(),
             ),
             BaseAlertDB(
                 monitor_type=MonitorType.PERFORMANCE,
@@ -53,7 +53,7 @@ class TestAlertRepository:
                 alert_id=uuid.uuid4(),
                 monitor_id=uuid.uuid4(),
                 model_version="model_version_1",
-                created_at=datetime.datetime.now(),
+                created_at=datetime.datetime.utcnow(),
             ),
             BaseAlertDB(
                 monitor_type=MonitorType.DATA_QUALITY,
@@ -61,7 +61,7 @@ class TestAlertRepository:
                 alert_id=uuid.uuid4(),
                 monitor_id=uuid.uuid4(),
                 model_version="model_version_1",
-                created_at=datetime.datetime.now(),
+                created_at=datetime.datetime.utcnow(),
             ),
             BaseAlertDB(
                 monitor_type=MonitorType.DRIFT,
@@ -69,7 +69,7 @@ class TestAlertRepository:
                 alert_id=uuid.uuid4(),
                 monitor_id=uuid.uuid4(),
                 model_version="model_version_1",
-                created_at=datetime.datetime.now(),
+                created_at=datetime.datetime.utcnow(),
             ),
             BaseAlertDB(
                 monitor_type=MonitorType.DRIFT,
@@ -77,7 +77,7 @@ class TestAlertRepository:
                 alert_id=uuid.uuid4(),
                 monitor_id=uuid.uuid4(),
                 model_version="model_version_2",
-                created_at=datetime.datetime.now(),
+                created_at=datetime.datetime.utcnow(),
             ),
             BaseAlertDB(
                 monitor_type=MonitorType.DATA_QUALITY,
@@ -85,7 +85,7 @@ class TestAlertRepository:
                 alert_id=uuid.uuid4(),
                 monitor_id=uuid.uuid4(),
                 model_version="model_version_2",
-                created_at=datetime.datetime.now(),
+                created_at=datetime.datetime.utcnow(),
             ),
         ]
         cls.mock_mongo_backend.database[MONGO_COLLECTION_ALERTS].insert_many(
