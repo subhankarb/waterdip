@@ -18,7 +18,7 @@ from typing import List
 import pytest
 from fastapi import Depends
 
-from waterdip.server.commons.models import ColumnDataType, ColumnMappingType
+from waterdip.core.commons.models import ColumnDataType, ColumnMappingType
 from waterdip.server.db.models.dataset_rows import (
     BaseDatasetBatchRowDB,
     BaseEventRowDB,

@@ -17,8 +17,8 @@ from uuid import UUID
 from fastapi import Depends
 from pydantic import Field
 
+from waterdip.core.commons.models import DatasetType
 from waterdip.server.apis.models.params import RequestPagination, RequestSort
-from waterdip.server.commons.models import DatasetType
 from waterdip.server.db.models.datasets import BaseDatasetDB, DatasetDB
 from waterdip.server.db.repositories.dataset_repository import DatasetRepository
 from waterdip.server.db.repositories.model_repository import ModelVersionRepository

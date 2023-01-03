@@ -18,7 +18,7 @@ from uuid import UUID
 
 from pydantic import BaseModel, Field, root_validator
 
-from waterdip.server.commons.models import ColumnDataType
+from waterdip.core.commons.models import ColumnDataType
 
 
 class BaseModelDB(BaseModel):
@@ -36,18 +36,57 @@ ModelDB = TypeVar("ModelDB", bound=BaseModelDB)
 
 
 class MovingTimeWindow(BaseModel):
-    skip_period: str = Field(description="", default="1d")
-    time_period: str = Field(description="15d", default="15d")
+    """
+    Fixed time window.
+
+    Attributes:
+    ------------------
+    skip_period:
+       how many days from current day the window starts
+    time_period:
+       time in days for the moving time window
+    aggregation_period:
+       agg period for the time window. Default is 1 day
+    """
+
+    skip_period: str = Field(default="1d")
+    time_period: str = Field(default="15d")
     aggregation_period: str = Field(default="1d")
 
 
 class FixedTimeWindow(BaseModel):
+    """
+    Fixed time window.
+    Attributes:
+    ------------------
+    start_time:
+        start time of the time window
+    end_time:
+        end time of the time window
+    aggregation_period:
+        agg period for the time window. Default is 1 day
+    """
+
     start_time: datetime = Field(...)
     end_time: datetime = Field(...)
     aggregation_period: str = Field(default="1d")
 
 
 class ModelBaseline(BaseModel):
+    """
+    Model baseline.
+    Model baseline can either be a batch dataset or a time window.
+    Any one of it is mandatory
+
+    Attributes:
+    ------------------
+    dataset_id:
+        batch dataset attached to the version id
+    time_window:
+        time window for the baseline. Time window can be either FixedTimeWindow or MovingTimeWindow
+
+    """
+
     dataset_id: Optional[UUID] = Field(description="dataset id", default=None)
     time_window: Optional[Union[MovingTimeWindow, FixedTimeWindow]] = Field(
         default=MovingTimeWindow()
@@ -61,11 +100,36 @@ class ModelBaseline(BaseModel):
 
 
 class ModelVersionSchemaFieldDetails(BaseModel):
+    """
+    ModelVersionSchemaFieldDetails entity for schema of Model Version
+
+    Attributes:
+    ------------------
+    data_type:
+        Data type of the column
+    list_index: int[Optional]:
+        index number of the column if multiple prediction columns are present
+        This will be used to link between prediction & prediction score, Actual and Actual Score columns
+    """
+
     data_type: ColumnDataType
-    list_index: Optional[int]
+    list_index: Optional[
+        int
+    ]  # Can be used to link between prediction and prediction score columns
 
 
 class ModelVersionSchemaInDB(BaseModel):
+    """
+    Model schema for the model version
+
+    Attributes:
+    ------------------
+    features:
+        schema for the feature columns
+    predictions:
+        schema for the prediction columns
+    """
+
     features: Dict[str, ModelVersionSchemaFieldDetails]
     predictions: Dict[str, ModelVersionSchemaFieldDetails]
 

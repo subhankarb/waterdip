@@ -14,13 +14,11 @@
 
 import datetime
 import uuid
-from typing import Dict, List
-from unittest import mock
 
 import pytest
 
 from tests.testing_helpers import MongodbBackendTesting
-from waterdip.server.commons.models import MonitorType
+from waterdip.core.commons.models import MonitorType
 from waterdip.server.db.models.alerts import AlertDB, BaseAlertDB
 from waterdip.server.db.mongodb import (
     MONGO_COLLECTION_ALERTS,

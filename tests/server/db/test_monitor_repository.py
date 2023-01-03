@@ -17,22 +17,21 @@ import uuid
 import pytest
 
 from tests.testing_helpers import MongodbBackendTesting
-from waterdip.server.commons.models import (
+from waterdip.core.commons.models import (
     DataQualityMetric,
     DriftMetric,
     MonitorType,
     PerformanceMetric,
 )
-from waterdip.server.db.models.models import ModelBaseline
-from waterdip.server.db.models.monitors import (
-    BaseMonitorDB,
+from waterdip.core.monitors.models import (
     DataQualityBaseMonitorCondition,
     DriftBaseMonitorCondition,
     MonitorDimensions,
-    MonitorIdentification,
     MonitorThreshold,
     PerformanceBaseMonitorCondition,
 )
+from waterdip.server.db.models.models import ModelBaseline
+from waterdip.server.db.models.monitors import BaseMonitorDB, MonitorIdentification
 from waterdip.server.db.mongodb import MONGO_COLLECTION_MONITORS
 from waterdip.server.db.repositories.monitor_repository import MonitorRepository
 

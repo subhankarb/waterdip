@@ -14,11 +14,11 @@
 
 from fastapi import APIRouter, Body, Depends
 
+from waterdip.core.commons.models import MonitorType
 from waterdip.server.apis.models.monitors import (
     CreateMonitorRequest,
     CreateMonitorResponse,
 )
-from waterdip.server.commons.models import MonitorType
 from waterdip.server.services.monitor_service import MonitorService
 
 router = APIRouter()

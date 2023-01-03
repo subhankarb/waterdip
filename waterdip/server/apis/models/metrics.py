@@ -16,7 +16,7 @@ from typing import List, Optional
 
 from pydantic import BaseModel
 
-from waterdip.server.commons.models import Histogram
+from waterdip.core.commons.models import Histogram
 
 
 class NumericColumnStats(BaseModel):

@@ -16,8 +16,7 @@ import uuid
 
 import pytest
 
-from tests.testing_helpers import MODEL_ID
-from waterdip.server.commons.models import ColumnDataType
+from waterdip.core.commons.models import ColumnDataType
 from waterdip.server.db.models.models import (
     BaseModelDB,
     BaseModelVersionDB,

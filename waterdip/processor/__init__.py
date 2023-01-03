@@ -11,14 +11,3 @@
 #  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
-
-from redbird.repos import MongoRepo
-from rocketry import Rocketry
-
-from waterdip.server.commons.config import settings
-
-mongo_repo = MongoRepo(
-    uri=settings.mongo_url, database=settings.mongo_database, collection="rocketry"
-)
-
-scheduler = Rocketry(config={"task_execution": "async"}, logger_repo=mongo_repo)

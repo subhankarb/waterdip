@@ -1,6 +1,7 @@
 version: "3"
 
 services:
+
   wd-mongodb:
     image: mongo:5.0
     container_name: wd-mongodb
@@ -19,6 +20,20 @@ services:
     networks:
       - waterdip
 
+  wd-redis:
+    image: "redis:alpine"
+    command: redis-server
+    container_name: wd-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis:/var/lib/redis
+      - redisconfig:/usr/local/etc/redis/redis.conf
+    environment:
+      - REDIS_REPLICATION_MODE=master
+    networks:
+      - waterdip
+
   wd-backend:
     image: waterdip/wd-server
     build:
@@ -33,6 +48,22 @@ services:
       - waterdip
     depends_on:
       - wd-mongodb
+      - wd-redis
+
+  wd-processor:
+    image: waterdip/wd-server
+    command: celery --app=waterdip.celery_app worker --beat --loglevel=info
+    build:
+      context: .
+      dockerfile: ./docker/backend.Dockerfile
+    environment:
+      - WD_MONGODB_URL=mongodb://dbuser:dbpass@wd-mongodb:27017/waterdip
+      - WD_MONGODB_DATABASE=waterdip
+      - WD_REDIS_URL=redis://wd-redis:6379
+    depends_on:
+      - wd-redis
+    networks:
+      - waterdip
 
   wd-frontend:
     image: waterdip/wd-frontend
@@ -52,6 +83,8 @@ volumes:
   # default dir on Ubuntu: /var/lib/docker/volumes
   mongodb:
   mongoconfig:
+  redis:
+  redisconfig:
 
 networks:
   waterdip:

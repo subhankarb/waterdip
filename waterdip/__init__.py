@@ -14,5 +14,5 @@
 
 __version__ = "0.1.0-beta"
 
+from waterdip.processor.app import celery_app
 from waterdip.server.app import app
-from waterdip.server.scheduler import scheduler

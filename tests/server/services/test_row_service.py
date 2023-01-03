@@ -20,11 +20,9 @@ import pytest
 from pydantic import ValidationError
 
 from tests.testing_helpers import MongodbBackendTesting
-from waterdip.server.apis.models.models import DateHistogram
-from waterdip.server.commons.models import ColumnDataType, ColumnMappingType
+from waterdip.core.commons.models import ColumnDataType, ColumnMappingType
 from waterdip.server.db.models.dataset_rows import BaseEventRowDB, EventDataColumnDB
 from waterdip.server.db.mongodb import MONGO_COLLECTION_EVENT_ROWS
-from waterdip.server.db.repositories.dataset_repository import DatasetRepository
 from waterdip.server.db.repositories.dataset_row_repository import (
     EventDatasetRowRepository,
 )

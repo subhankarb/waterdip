@@ -28,7 +28,7 @@ from tests.testing_helper_metrics_data import (
     metrics_batch_data_rows,
     metrics_event_rows,
 )
-from waterdip.server.commons.models import DatasetType
+from waterdip.core.commons.models import DatasetType
 from waterdip.server.db.models.dataset_rows import (
     BaseDatasetBatchRowDB,
     BaseEventRowDB,

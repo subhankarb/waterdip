@@ -17,7 +17,7 @@ from uuid import UUID
 
 from pydantic import BaseModel
 
-from waterdip.server.commons.models import (
+from waterdip.core.commons.models import (
     ColumnDataType,
     DateHistogram,
     MonitorType,

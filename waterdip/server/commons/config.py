@@ -24,6 +24,7 @@ class ServerSettings(BaseSettings):
     """
 
     mongo_url: str = "mongodb://dbuser:dbpass@127.0.0.1:27017/"
+    redis_url: str = "redis://127.0.0.1:6379"
     mongo_database: str = "waterdip"
     mongo_collection_models: str = "wd_models"
     mongo_collection_model_versions: str = "wd_model_versions"
@@ -51,6 +52,7 @@ class ServerSettings(BaseSettings):
         env_prefix = "WD_"
         fields = {
             "mongo_url": {"env": ["MONGODB_URL", f"{env_prefix}MONGODB_URL"]},
+            "redis_url": {"env": ["REDIS_URL", f"{env_prefix}REDIS_URL"]},
             "mongo_database": {
                 "env": ["MONGODB_DATABASE", f"{env_prefix}MONGODB_DATABASE"]
             },

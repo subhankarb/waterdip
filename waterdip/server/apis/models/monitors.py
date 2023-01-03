@@ -14,7 +14,7 @@
 
 from pydantic import BaseModel
 
-from waterdip.server.commons.models import MonitorType
+from waterdip.core.commons.models import MonitorType
 from waterdip.server.db.models.monitors import (
     BaseMonitorCondition,
     MonitorIdentification,

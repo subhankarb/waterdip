@@ -11,33 +11,21 @@
 #  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
+
 from collections import OrderedDict
 from datetime import date, datetime, timedelta
-from typing import Dict, List, Optional, TypeVar
-from uuid import UUID
-from collections import OrderedDict
-
-from dateutil.parser import parse
+from typing import Dict, List
 
 from dateutil.parser import parse
 from fastapi import Depends
-from pydantic import Field
 
-from waterdip.server.apis.models.models import (
-    ModelOverviewAlertList,
-    ModelOverviewAlerts,
-)
-from waterdip.server.apis.models.params import RequestPagination, RequestSort
-from waterdip.server.commons.models import DatasetType, MonitorType
-from waterdip.server.db.models.datasets import BaseDatasetDB, DatasetDB
+from waterdip.core.commons.models import MonitorType
+from waterdip.server.apis.models.models import ModelOverviewAlertList
 from waterdip.server.db.repositories.alert_repository import (
     AlertDB,
     AlertRepository,
     BaseAlertDB,
 )
-from waterdip.server.db.repositories.dataset_repository import DatasetRepository
-from waterdip.server.db.repositories.model_repository import ModelVersionRepository
-from waterdip.server.errors.base_errors import EntityNotFoundError
 
 
 class AlertService:
@@ -156,7 +144,9 @@ class AlertService:
             "alert_percentage_change": alert_percentage_change,
         }
 
-    def find_alerts(self, model_id: str, limit: int = 5) -> List[AlertDB]:
+    def find_alerts(
+        self, model_id: str, limit: int = 5
+    ) -> List[ModelOverviewAlertList]:
         return [
             ModelOverviewAlertList(
                 alert_id=alert["alert_id"],

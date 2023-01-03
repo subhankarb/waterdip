@@ -18,7 +18,7 @@ from uuid import UUID
 
 from pydantic import BaseModel
 
-from waterdip.server.commons.models import ColumnDataType, ColumnMappingType
+from waterdip.core.commons.models import ColumnDataType, ColumnMappingType
 
 
 class DataColumn(BaseModel):

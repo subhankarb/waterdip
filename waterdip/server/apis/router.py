@@ -19,6 +19,7 @@ from waterdip.server.apis.routes.logging_routes import router as logging_routes
 from waterdip.server.apis.routes.metrics_routes import router as metrics_routes
 from waterdip.server.apis.routes.model_routes import router as model_routes
 from waterdip.server.apis.routes.monitor_routes import router as monitor_routes
+from waterdip.server.apis.routes.task_routes import router as task_routes
 
 api_router = APIRouter()
 
@@ -27,3 +28,4 @@ api_router.include_router(logging_routes, tags=["logging"], prefix="/v1")
 api_router.include_router(model_routes, tags=["models"], prefix="/v1")
 api_router.include_router(monitor_routes, tags=["monitors"], prefix="/v1")
 api_router.include_router(metrics_routes, tags=["metrics"], prefix="/v1")
+api_router.include_router(task_routes, tags=["tasks"], prefix="/v1")

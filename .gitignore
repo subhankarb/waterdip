@@ -120,3 +120,5 @@ processor/runnotebook.ipynb
 
 # OSX
 .DS_Store
+*.db
+.redis*

@@ -17,14 +17,16 @@ from uuid import UUID
 from fastapi import Depends
 from pydantic import Field
 
-from waterdip.server.commons.models import MonitorType
+from waterdip.core.commons.models import MonitorType
+from waterdip.core.monitors.models import (
+    DataQualityBaseMonitorCondition,
+    DriftBaseMonitorCondition,
+    PerformanceBaseMonitorCondition,
+)
 from waterdip.server.db.models.monitors import (
     BaseMonitorCondition,
     BaseMonitorDB,
-    DataQualityBaseMonitorCondition,
-    DriftBaseMonitorCondition,
     MonitorIdentification,
-    PerformanceBaseMonitorCondition,
 )
 from waterdip.server.db.repositories.monitor_repository import MonitorRepository
 from waterdip.server.services.model_service import ModelService, ModelVersionService

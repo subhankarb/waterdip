@@ -18,7 +18,7 @@ from uuid import UUID
 
 from pydantic import BaseModel, Field
 
-from waterdip.server.commons.models import MonitorType
+from waterdip.core.commons.models import MonitorType
 
 
 class AlertIdentification(BaseModel):
@@ -43,6 +43,9 @@ class BaseAlertDB(BaseModel):
         if alert["alert_identification"]:
             alert["alert_identification"]["model_version_id"] = str(
                 alert["alert_identification"]["model_version_id"]
+            )
+            alert["alert_identification"]["model_id"] = str(
+                alert["alert_identification"]["model_id"]
             )
         return alert
 

@@ -96,6 +96,11 @@ class ModelVersionService:
         version_schema: ModelVersionSchema,
         schema_type: Literal["features", "predictions"] = "features",
     ):
+        """
+        Converts API provided model schema to DB compatible data structure.
+        In case of predictions, it generates index value for the prediction column.
+        This index value would be useful for linking prediction value and prediction score in different list
+        """
         schema, index = {}, 0
         schema_value_dict = (
             version_schema.features
@@ -103,10 +108,13 @@ class ModelVersionService:
             else version_schema.predictions
         )
         for k, v in schema_value_dict.items():
-            schema[k] = ModelVersionSchemaFieldDetails(
-                data_type=v.value, list_index=index
-            )
-            index = index + 1
+            if schema_type == "features":
+                schema[k] = ModelVersionSchemaFieldDetails(data_type=v.value)
+            elif schema_type == "predictions":
+                schema[k] = ModelVersionSchemaFieldDetails(
+                    data_type=v.value, list_index=index
+                )
+                index = index + 1
         return schema
 
     def register_model_version(

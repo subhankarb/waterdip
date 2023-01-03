@@ -17,8 +17,8 @@ import uuid
 import pytest
 from pydantic import ValidationError
 
+from waterdip.core.commons.models import DatasetType
 from waterdip.server.apis.models.params import RequestSort
-from waterdip.server.commons.models import DatasetType
 from waterdip.server.db.models.datasets import BaseDatasetDB
 from waterdip.server.db.mongodb import MongodbBackend
 from waterdip.server.db.repositories.dataset_repository import DatasetRepository

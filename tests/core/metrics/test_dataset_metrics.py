@@ -22,7 +22,7 @@ from tests.testing_helpers import (
     MODEL_VERSION_ID_V2,
     MongodbBackendTesting,
 )
-from waterdip.core.commons.models import TimeRange
+from waterdip.core.commons.models import DatasetType, TimeRange
 from waterdip.core.metrics.data_metrics import (
     CardinalityCategorical,
     CategoricalCountHistogram,
@@ -30,7 +30,6 @@ from waterdip.core.metrics.data_metrics import (
     NumericBasicMetrics,
     NumericCountHistogram,
 )
-from waterdip.server.commons.models import DatasetType
 from waterdip.server.db.models.dataset_rows import (
     BaseDatasetBatchRowDB,
     BaseEventRowDB,
@@ -337,7 +336,10 @@ class TestNumericBasicMetrics:
 
 
 class TestNumericCountHistogram:
-    def test_asd(self, mocker):
+    def test_should_return_numeric_count_histogram(self, mocker):
+        """
+        Doing a patch here as MongoMock does not support $bucketAuto
+        """
         mocker.patch(
             "waterdip.core.metrics.data_metrics.NumericCountHistogram.aggregation_result",
             return_value={"f3": {"bins": ["0", "2"], "count": [1.0, 1.0]}},

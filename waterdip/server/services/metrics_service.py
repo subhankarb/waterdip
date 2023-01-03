@@ -17,7 +17,12 @@ from uuid import UUID
 
 from fastapi import Depends
 
-from waterdip.core.commons.models import TimeRange
+from waterdip.core.commons.models import (
+    ColumnDataType,
+    DatasetType,
+    Histogram,
+    TimeRange,
+)
 from waterdip.core.metrics.data_metrics import (
     CardinalityCategorical,
     CategoricalCountHistogram,
@@ -31,7 +36,6 @@ from waterdip.server.apis.models.metrics import (
     NumericColumnStats,
 )
 from waterdip.server.commons.config import settings
-from waterdip.server.commons.models import ColumnDataType, DatasetType, Histogram
 from waterdip.server.db.models.models import ModelVersionSchemaInDB
 from waterdip.server.db.repositories.dataset_row_repository import (
     BatchDatasetRowRepository,
