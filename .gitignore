@@ -111,7 +111,7 @@ venv.bak/
 db-data/
 node_modules/
 .serverless/
-
+package-lock.json
 processor/runnotebook.ipynb
 
 
