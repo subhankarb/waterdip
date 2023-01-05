@@ -12,9 +12,11 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
-from abc import ABC
-from typing import Dict, List
+from abc import ABC, abstractmethod
+from datetime import datetime, timedelta
+from typing import Any, Dict, List
 
+from waterdip.core.commons.models import TimeRange
 from waterdip.core.metrics.data_metrics import CountEmptyHistogram, DataMetrics
 from waterdip.core.monitors.evaluators.base import MonitorEvaluator
 from waterdip.core.monitors.models import DataQualityBaseMonitorCondition
@@ -47,6 +49,19 @@ class DataQualityMonitorEvaluator(MonitorEvaluator, ABC):
                 return True
         return False
 
+    def _get_evaluation_window_timerange(self) -> TimeRange:
+        evaluation_window = self.monitor_condition.evaluation_window
+        no_of_days, day_unit = evaluation_window[:-1], evaluation_window[-1]
+
+        return TimeRange(
+            start_time=datetime.utcnow() - timedelta(days=int(no_of_days)),
+            end_time=datetime.utcnow(),
+        )
+
+    @abstractmethod
+    def _get_metrics(self, **kwargs) -> Dict[str, Any]:
+        pass
+
 
 class EmptyValueEvaluator(DataQualityMonitorEvaluator):
     """ """
@@ -58,9 +73,12 @@ class EmptyValueEvaluator(DataQualityMonitorEvaluator):
     ):
         super().__init__(monitor_condition, metric)
 
-    def evaluate(self, **kwargs) -> List[Dict]:
+    def _get_metrics(self, **kwargs) -> Dict[str, Any]:
+        evaluation_window = self._get_evaluation_window_timerange()
+        return self.metric.aggregation_result(time_range=evaluation_window)
 
-        empties = self.metric.aggregation_result()
+    def evaluate(self, **kwargs) -> List[Dict]:
+        empties = self._get_metrics()
         violations: List[Dict] = []
         for col in self._get_columns():
             empty = empties.get(col)

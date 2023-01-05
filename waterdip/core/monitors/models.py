@@ -84,14 +84,11 @@ class BaseMonitorCondition(BaseModel):
 
     @validator("evaluation_window", allow_reuse=True)
     def evaluation_window_validator(cls, value):
-        if value == "0":
-            return value
-        else:
-            cls.day_validator(value)
+        cls.day_validator(value)
         return value
 
     @validator("skip_period", allow_reuse=True)
-    def evaluation_window_validator(cls, value):
+    def skip_period_validator(cls, value):
         cls.day_validator(value)
         return value
 
