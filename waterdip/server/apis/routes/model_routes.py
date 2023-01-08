@@ -91,7 +91,9 @@ def register_model(
     ),
     service: ModelService = Depends(ModelService.get_instance),
 ):
-    registered_model = service.register_model(request.model_name)
+    registered_model = service.register_model(
+        model_name=request.model_name, model_id=request.model_id
+    )
 
     return RegisterModelResponse(
         model_id=registered_model.model_id, model_name=registered_model.model_name

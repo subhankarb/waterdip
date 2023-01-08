@@ -38,6 +38,7 @@ class RegisterModelRequest(BaseModel):
     """
 
     model_name: str
+    model_id: Optional[UUID] = None
 
 
 class RegisterModelResponse(BaseModel):

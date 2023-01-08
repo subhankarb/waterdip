@@ -207,8 +207,10 @@ class ModelService:
         self._row_service = row_service
         self._alert_service = alert_service
 
-    def register_model(self, model_name: str) -> ModelDB:
-        generated_model_id = uuid.uuid4()
+    def register_model(
+        self, model_name: str, model_id: Optional[UUID] = None
+    ) -> ModelDB:
+        generated_model_id = uuid.uuid4() if model_id is None else model_id
         model_db = BaseModelDB(
             model_id=generated_model_id,
             model_name=model_name,
