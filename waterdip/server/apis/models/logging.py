@@ -75,4 +75,4 @@ class EventLogRequest:
 
     model_version_id: UUID
     events: List[EventLogRowReq]
-    timestamp: Optional[datetime]
+    timestamp: Optional[datetime] = None

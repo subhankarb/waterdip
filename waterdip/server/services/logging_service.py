@@ -440,7 +440,7 @@ class EventLoggingService:
         self,
         model_version_id: UUID,
         events: List[ServiceLogEvent],
-        log_timestamp: datetime = None,
+        log_timestamp: Optional[datetime] = None,
     ) -> int:
 
         model_version: BaseModelVersionDB = self._model_version_service.find_by_id(
