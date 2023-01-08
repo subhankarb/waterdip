@@ -353,7 +353,6 @@ class EventLoggingService:
         """
         converted_columns: List[EventDataColumnDB] = []
         actual_cf: List = [None] * len(version_schema.predictions.keys())
-        is_match = None
 
         for actual_name, actual_data in actuals.items():
             schema_details: ModelVersionSchemaFieldDetails = (
@@ -403,7 +402,7 @@ class EventLoggingService:
                 actual_cf,
                 is_match,
             ) = self._convert_classification_actuals(
-                event.predictions, version_schema, prediction_cf
+                event.actuals, version_schema, prediction_cf
             )
 
         return ServiceClassificationEventRow(
