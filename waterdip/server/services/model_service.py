@@ -252,7 +252,10 @@ class ModelService:
                if the model has no versions or the version data is not requested, return None
             """
             if str(model_id) in agg_model_versions and get_all_versions_flag:
-                return [UUID(version) for version in agg_model_versions[str(model_id)]]
+                return [
+                    {version_name: version_id}
+                    for version_id, version_name in agg_model_versions[str(model_id)]
+                ]
             else:
                 return None
 
@@ -280,6 +283,7 @@ class ModelService:
             ModelListRow(
                 model_id=model.model_id,
                 model_name=model.model_name,
+                created_at=model.created_at,
                 model_version_id=get_latest_version(model.model_id),
                 model_versions=get_all_versions(model.model_id),
                 total_predictions=self._row_service.count_prediction_by_model_id(

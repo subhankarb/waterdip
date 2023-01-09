@@ -135,9 +135,15 @@ class AlertService:
         )
         week_alerts_average = sum(day_vs_count.values()) / 7 if available_days else 0
         today_alert_count = self.today_alert_count(model_id)
-        alert_percentage_change = int(
-            ((today_alert_count - week_alerts_average) / week_alerts_average) * 100
-        )
+        if week_alerts_average == 0:
+            """
+            If week_alerts_average is 0, then we can't calculate the percentage change as it is not defined, hence we are setting it to zero.
+            """
+            alert_percentage_change = 0
+        else:
+            alert_percentage_change = int(
+                ((today_alert_count - week_alerts_average) / week_alerts_average) * 100
+            )
 
         return {
             "alert_trend_data": list(day_vs_count.values()),

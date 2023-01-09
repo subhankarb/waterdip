@@ -100,14 +100,29 @@ class EventDatasetRowService:
     def prediction_average(self, model_id: str) -> Dict:
         days = 30
         start_date = self._repository.find_first_prediction_date(str(model_id))
+        if start_date is None:
+            """
+            No predictions have been made!
+            """
+            return {
+                "pred_average": 0,
+                "pred_average_window_days": 0,
+            }
         window = datetime.utcnow() - start_date
-
         window_date = datetime.utcnow() - timedelta(days=window.days)
         if window.days > days:
             window_date = datetime.utcnow() - days
         window_prediction_count = self._repository.prediction_count(
             filter={"model_id": str(model_id), "created_at": {"$gte": window_date}}
         )
+        if not window.days:
+            """
+            Model has been created today!
+            """
+            return {
+                "pred_average": window_prediction_count,
+                "pred_average_window_days": 1,
+            }
         return {
             "pred_average": int(window_prediction_count / window.days),
             "pred_average_window_days": window.days,
@@ -154,13 +169,19 @@ class EventDatasetRowService:
 
         yesterday_prediction_count = pre_trend[-1] if available_days != 0 else 0
         week_prediction_average = sum(count) / 7 if available_days != 0 else 0
-        pred_percentage_change = int(
-            (
-                (today_predicition_count - week_prediction_average)
-                / week_prediction_average
+        if week_prediction_average == 0:
+            """
+            Percentage change when there is no prediction in the last 7 days is not defined.
+            """
+            pred_percentage_change = 0
+        else:
+            pred_percentage_change = int(
+                (
+                    (today_predicition_count - week_prediction_average)
+                    / week_prediction_average
+                )
+                * 100
             )
-            * 100
-        )
 
         return {
             "pred_yesterday": yesterday_prediction_count,

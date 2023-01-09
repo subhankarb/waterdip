@@ -147,19 +147,19 @@ class ModelListRow(BaseModel):
     num_alert_data_quality:
         Total number of data quality alerts across all versions
     model_versions:
-        all model versions with their name and id
+        all model versions with their name and id in {version_name: version_id} format
     """
 
     model_id: UUID
     model_name: str
-    model_version_id: Optional[str]
+    model_version_id: Optional[UUID]
     created_at: Optional[datetime]
     total_predictions: int = 0
     last_prediction: Optional[datetime]
     num_alert_perf: int = 0
     num_alert_drift: int = 0
     num_alert_data_quality: int = 0
-    model_versions: Optional[Dict[UUID, str]]
+    model_versions: Optional[List[Dict[str, UUID]]]
 
 
 class ModelListResponse(BaseModel):

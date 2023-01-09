@@ -66,7 +66,7 @@ class EventDatasetRowRepository:
         first_pred = self._mongo.database[MONGO_COLLECTION_EVENT_ROWS].find_one(
             {"model_id": model_id}, sort=[("created_at", 1)]
         )
-        return first_pred["created_at"]
+        return first_pred["created_at"] if first_pred else None
 
     def agg_prediction(self, agg_prediction_pipeline: list):
         return self._mongo.database[MONGO_COLLECTION_EVENT_ROWS].aggregate(
