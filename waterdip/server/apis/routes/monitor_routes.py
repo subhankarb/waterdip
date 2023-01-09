@@ -12,6 +12,8 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
+from uuid import UUID
+
 from fastapi import APIRouter, Body, Depends
 
 from waterdip.core.commons.models import MonitorType
@@ -53,3 +55,11 @@ def create_monitor(
             identification=request.monitor_identification,
             condition=request.monitor_condition,
         )
+
+
+@router.delete("/monitor.delete", name="monitor:delete")
+def delete_monitor(
+    monitor_id: UUID = Body(..., description="the monitor id"),
+    service: MonitorService = Depends(MonitorService.get_instance),
+):
+    return service.delete_monitor(monitor_id)

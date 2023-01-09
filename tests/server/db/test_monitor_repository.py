@@ -123,3 +123,29 @@ class TestMonitorRepository:
 
         assert created_monitor_version_in_db["monitor_name"] == monitor_name
         assert res.monitor_name == monitor_name
+
+    def test_should_delete_monitor(self, mock_mongo_backend: MongodbBackendTesting):
+        monitor_repo = MonitorRepository(mongodb=mock_mongo_backend)
+
+        monitor_id, monitor_name = uuid.uuid4(), "drift_monitor"
+        drift_monitor = BaseMonitorDB(
+            monitor_id=monitor_id,
+            monitor_name=monitor_name,
+            monitor_identification=self.monitor_identification,
+            monitor_condition=DriftBaseMonitorCondition(
+                threshold=self.monitor_threshold,
+                evaluation_metric=DriftMetric.PSI,
+                dimensions=MonitorDimensions(features=["f1"]),
+                baseline=ModelBaseline(),
+            ),
+            monitor_type=MonitorType.DRIFT,
+        )
+        monitor_repo.insert_monitor(drift_monitor)
+
+        monitor_repo.delete_monitor(monitor_id)
+
+        created_monitor_version_in_db = mock_mongo_backend.database[
+            MONGO_COLLECTION_MONITORS
+        ].find_one(filter={"monitor_id": str(monitor_id)})
+
+        assert created_monitor_version_in_db is None

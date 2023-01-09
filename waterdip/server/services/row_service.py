@@ -143,9 +143,9 @@ class EventDatasetRowService:
         available_days = 0
         pre_trend = []
         for i in range(0, prediction_days):
-            current = (datetime.utcnow() - timedelta(days=prediction_days - i)).strftime(
-                "%Y-%m-%d"
-            )
+            current = (
+                datetime.utcnow() - timedelta(days=prediction_days - i)
+            ).strftime("%Y-%m-%d")
             if current not in day:
                 pre_trend.append(0)
             else:

@@ -63,3 +63,9 @@ class MonitorRepository:
             monitors = monitors.sort(sort)
 
         return [BaseMonitorDB(**monitor) for monitor in monitors]
+
+    def delete_monitor(self, monitor_id: UUID) -> None:
+        self._mongo.database[MONGO_COLLECTION_MONITORS].delete_one(
+            {"monitor_id": str(monitor_id)}
+        )
+        return None

@@ -168,3 +168,6 @@ class MonitorService:
         )
 
         return self._repository.insert_monitor(monitor=service_drift_monitor)
+
+    def delete_monitor(self, monitor_id: UUID):
+        return self._repository.delete_monitor(monitor_id=str(monitor_id))
