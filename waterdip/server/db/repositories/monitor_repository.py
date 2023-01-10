@@ -46,9 +46,15 @@ class MonitorRepository:
 
         return BaseMonitorDB(**created_monitor)
 
+    def count_monitors(self, filters: Dict) -> int:
+        total = self._mongo.database[MONGO_COLLECTION_MONITORS].count_documents(
+            filter=filters
+        )
+        return total
+
     def find_monitors(
         self,
-        filters: Dict,
+        filters: Dict = {},
         sort: List = None,
         skip: int = 0,
         limit: int = 10,

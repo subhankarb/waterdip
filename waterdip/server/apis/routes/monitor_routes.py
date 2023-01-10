@@ -12,6 +12,7 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
+from typing import Dict, Optional
 from uuid import UUID
 
 from fastapi import APIRouter, Body, Depends
@@ -20,7 +21,9 @@ from waterdip.core.commons.models import MonitorType
 from waterdip.server.apis.models.monitors import (
     CreateMonitorRequest,
     CreateMonitorResponse,
+    MonitorListResponse,
 )
+from waterdip.server.apis.models.params import RequestPagination, RequestSort
 from waterdip.server.services.monitor_service import MonitorService
 
 router = APIRouter()
@@ -63,3 +66,26 @@ def delete_monitor(
     service: MonitorService = Depends(MonitorService.get_instance),
 ):
     return service.delete_monitor(monitor_id)
+@router.get("/list.monitors", response_model=MonitorListResponse, name="list:monitor")
+def list_monitor(
+    pagination: RequestPagination = Depends(),
+    sort: RequestSort = Depends(),
+    service: MonitorService = Depends(MonitorService.get_instance),
+    model_id: Optional[UUID] = None,
+    model_version_id: Optional[UUID] = None,
+):
+    list_monitors = service.list_monitors(
+        sort_request=sort,
+        pagination=pagination,
+        model_id=model_id,
+        model_version_id=model_version_id,
+    )
+    response = MonitorListResponse(
+        monitor_list=list_monitors,
+        meta={
+            "page": pagination.page,
+            "limit": pagination.limit,
+            "total": service.count_monitors(),
+        },
+    )
+    return response

@@ -12,6 +12,7 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 import uuid
+from typing import Dict, Optional
 from uuid import UUID
 
 from fastapi import Depends
@@ -23,6 +24,7 @@ from waterdip.core.monitors.models import (
     DriftBaseMonitorCondition,
     PerformanceBaseMonitorCondition,
 )
+from waterdip.server.apis.models.params import RequestPagination, RequestSort
 from waterdip.server.db.models.monitors import (
     BaseMonitorCondition,
     BaseMonitorDB,
@@ -171,3 +173,27 @@ class MonitorService:
 
     def delete_monitor(self, monitor_id: UUID):
         return self._repository.delete_monitor(monitor_id=str(monitor_id))
+    def list_monitors(
+        self,
+        sort_request: Optional[RequestSort] = None,
+        pagination: Optional[RequestPagination] = None,
+        model_id: Optional[UUID] = None,
+        model_version_id: Optional[UUID] = None,
+    ) -> list[BaseMonitorDB]:
+        filters = {}
+        if model_id:
+            filters["monitor_identification.model_id"] = str(model_id)
+        if model_version_id:
+            filters["monitor_identification.model_version_id"] = str(model_version_id)
+
+        return self._repository.find_monitors(
+            filters=filters,
+            sort=[(sort_request.get_sort_field, sort_request.get_sort_order)]
+            if sort_request and sort_request.sort
+            else [("created_at", -1)],
+            skip=(pagination.page - 1) * pagination.limit if pagination else 0,
+            limit=pagination.limit if pagination else 10,
+        )
+
+    def count_monitors(self) -> int:
+        return self._repository.count_monitors(filters={})

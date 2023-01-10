@@ -12,9 +12,13 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
+from typing import Dict, List, Optional, Union
+from uuid import UUID
+
 from pydantic import BaseModel
 
 from waterdip.core.commons.models import MonitorType
+from waterdip.core.monitors.models import MonitorCondition
 from waterdip.server.db.models.monitors import (
     BaseMonitorCondition,
     MonitorIdentification,
@@ -45,3 +49,33 @@ class CreateMonitorRequest(BaseModel):
 
 class CreateMonitorResponse(ServiceBaseMonitor):
     pass
+
+
+class MonitorListRow(BaseModel):
+    """
+    Monitor list row
+    Attributes:
+    ------------------
+    monitor_id:
+        id of the monitor
+    monitor_name:
+        name of the monitor
+    monitor_type:
+        monitor types
+    monitor_identification:
+        identification
+    monitor_condition:
+        conditions
+
+    """
+
+    monitor_id: UUID
+    monitor_name: str
+    monitor_type: MonitorType
+    monitor_identification: MonitorIdentification
+    monitor_condition: MonitorCondition
+
+
+class MonitorListResponse(BaseModel):
+    monitor_list: List[MonitorListRow]
+    meta: Optional[Dict[str, Union[str, int]]]

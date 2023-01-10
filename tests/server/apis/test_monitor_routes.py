@@ -12,6 +12,8 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
+from uuid import uuid4
+
 import pytest
 from fastapi.testclient import TestClient
 
@@ -125,3 +127,40 @@ class TestMonitorCreate:
 
         assert len(list(result)) == 1
         collection.delete_one(filter={"monitor_name": monitor_name})
+
+    def test_should_return_monitors_list(self, test_client: TestClient):
+        monitor_name = "test_model_list_monitor"
+
+        data = {
+            "monitor_id": str(uuid4()),
+            "monitor_name": monitor_name,
+            "monitor_type": "DRIFT",
+            "monitor_identification": {
+                "model_id": MODEL_ID,
+                "model_version_id": MODEL_VERSION_ID_V1,
+            },
+            "monitor_condition": {
+                "evaluation_metric": "PSI",
+                "dimensions": {"features": ["f1"]},
+                "threshold": {"threshold": "lt", "value": 0.5},
+                "baseline": {
+                    "time_window": {
+                        "aggregation_period": "1d",
+                        "skip_period": "1d",
+                        "time_period": "15d",
+                    }
+                },
+                "evaluation_window": "3d",
+            },
+        }
+        collection = MongodbBackendTesting.get_instance().database[
+            MONGO_COLLECTION_MONITORS
+        ]
+        collection.insert_one(data)
+
+        response = test_client.get(url="/v1/list.monitors")
+        response_data = response.json()
+
+        assert response.status_code == 200
+        assert response_data["monitor_list"][0]["monitor_name"] == monitor_name
+        assert len(list(response_data["monitor_list"])) == 1

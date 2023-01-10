@@ -233,7 +233,7 @@ class ModelService:
         pagination: Optional[RequestPagination] = None,
         get_all_versions_flag: Optional[bool] = False,
     ) -> List[ModelListRow]:
-        list_models: [ModelDB] = self._repository.find_models(
+        list_models: List[ModelDB] = self._repository.find_models(
             filters={},
             sort=[(sort_request.get_sort_field, sort_request.get_sort_order)]
             if sort_request and sort_request.sort
