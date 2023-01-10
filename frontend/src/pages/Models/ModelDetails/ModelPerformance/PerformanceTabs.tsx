@@ -32,7 +32,6 @@ type Props = {
 export default function TabsPerformance({ onChange, currentTab }: Props) {
   const classes = useStyles();
   const [value, setValue] = React.useState(currentTab);
-  console.log(colors.tableHeadBack);
 
   const handleChange = (event: React.ChangeEvent<{}>, newValue: string) => {
     setValue(newValue);

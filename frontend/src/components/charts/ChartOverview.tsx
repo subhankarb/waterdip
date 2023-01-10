@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import ReactApexChart from 'react-apexcharts';
+import ApexCharts from 'apexcharts';
 import { ApexOptions } from 'apexcharts';
 import { colors } from '../../theme/colors';
 
 type Props = {
-  state: { T1: boolean; T2: boolean };
+  state: any;
   data: any;
 };
 const ChartLine = ({ state, data }: Props) => {
@@ -12,18 +13,12 @@ const ChartLine = ({ state, data }: Props) => {
     {
       name: 'hist',
       type: 'column',
-      data: data.predictions ? data.predictions : []
+      data: data.predictions.val ? data.predictions.val : [],
     },
-    {
-      name: 'T1',
-      type: 'line',
-      data: data.predictions_target_class.pred_1 ? data.predictions_target_class.pred_1 : []
-    },
-    {
-      name: 'T2',
-      type: 'line',
-      data: data.predictions_target_class.pred_2 ? data.predictions_target_class.pred_2 : []
-    }
+    ...data.predictions_versions.map((item: any) => {
+      const id = Object.keys(item)[0];
+      return { name: id, type: 'line', show: false, data: item[id].val };
+    })
   ]);
   const option: ApexOptions = {
     chart: {
@@ -50,17 +45,17 @@ const ChartLine = ({ state, data }: Props) => {
     colors: [colors.graphLight, colors.graphA, colors.graphB],
 
     fill: {
-      // opacity: [0.5, 1, 1]
-      // gradient: {
-      //   inverseColors: false,
-      //   shade: 'light',
-      //   type: 'vertical',
-      //   opacityFrom: 0.85,
-      //   opacityTo: 0.55,
-      //   stops: [0, 100, 100, 100]
-      // }
+      opacity: [1, 1, 1],
+      gradient: {
+        inverseColors: false,
+        shade: 'light',
+        type: 'vertical',
+        opacityFrom: 0.85,
+        opacityTo: 0.55,
+        stops: [0, 100, 100, 100]
+      }
     },
-    labels: data.time_buckets ? data.time_buckets : [],
+    labels: data.predictions.date_bins ? data.predictions.date_bins : [],
     xaxis: {
       type: 'datetime'
     },
@@ -78,13 +73,14 @@ const ChartLine = ({ state, data }: Props) => {
     }
   };
   useEffect(() => {
-    for (const [key, value] of Object.entries(state)) {
-      if (value == false) {
-        ApexCharts.exec('overview', 'hideSeries', `${key}`);
+    const updatedSeries = series.map(s => {
+      const id = s.name;
+      if (state[0][id] === false) {
+          ApexCharts.exec('overview', 'hideSeries', `${id}`);
       } else {
-        ApexCharts.exec('overview', 'showSeries', `${key}`);
+          ApexCharts.exec('overview', 'showSeries', `${id}`);
       }
-    }
+    });
   }, [state]);
   return (
     <>

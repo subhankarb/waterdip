@@ -14,7 +14,7 @@ const useStyles = makeStyles({
     paddingBottom: '.6rem'
   },
   cardheading: {
-    fontSize: '.8rem',
+    fontSize: '.9rem',
     fontWeight: 500,
     display: 'flex',
     alignItems: 'center',

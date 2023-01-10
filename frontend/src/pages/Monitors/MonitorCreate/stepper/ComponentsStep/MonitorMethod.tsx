@@ -99,14 +99,14 @@ const MonitorMethod = ({ monitorType }: Props) => {
   const [dataset, setDataset] = useState('');
   const [timePeriod, setTimePeriod] = useState('');
 
-  const { data, isLoading } = useGetDatasets({
-    query: '',
-    page: 1,
-    limit: 10,
-    sort: 'name_asc',
-    model_id: ''
-  });
-  const datasetList = data?.dataset_list || [];
+  // const { data, isLoading } = useGetDatasets({
+  //   query: '',
+  //   page: 1,
+  //   limit: 10,
+  //   sort: 'name_asc',
+  //   model_id: ''
+  // });
+  // const datasetList = data?.dataset_list || [];
 
   useEffect(() => {
     formikProps.setFieldValue('monitor_type', monitorType);
@@ -198,11 +198,11 @@ const MonitorMethod = ({ monitorType }: Props) => {
                 setDataset(e.target.value as string);
               }}
             >
-              {datasetList.map((item: any) => (
+              {/* {datasetList.map((item: any) => (
                 <MenuItem value={item.dataset_id} key={item.dataset_id}>
                   {item.dataset_name}
                 </MenuItem>
-              ))}
+              ))} */}
             </Select>
           }
         </div>

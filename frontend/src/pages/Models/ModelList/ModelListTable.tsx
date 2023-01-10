@@ -69,8 +69,8 @@ const sub_MODEL_COLUMNS: subModelColumn[] = [
   { id: 'totalPrediction', label: 'Total prediction', minWidth: 50, subSpan: 1, align: 'center' },
   { id: 'lastPrediction', label: 'Last Prediction', minWidth: 50, subSpan: 1, align: 'center' },
   { id: 'performance', label: 'Model Performance', minWidth: 50, subSpan: 1, align: 'center' },
-  { id: 'behavior', label: 'Data Behavior', minWidth: 50, subSpan: 1, align: 'center' },
-  { id: 'integrity', label: 'Data Integrity', minWidth: 50, subSpan: 1, align: 'center' }
+  { id: 'behavior', label: 'Data Drift', minWidth: 50, subSpan: 1, align: 'center' },
+  { id: 'integrity', label: 'Data Quality', minWidth: 50, subSpan: 1, align: 'center' }
 ];
 const useStyles = makeStyles(() => ({
   card: {
@@ -189,11 +189,12 @@ const ModelListTable = () => {
     query: searchName,
     page: page + 1,
     limit: rowsPerPage,
+    get_all_versions_flag: true,
     sort:
       columnName === 'name'
         ? orderDirection.name === 'asc'
-          ? 'name_asc'
-          : 'name_desc'
+          ? 'model_name_asc'
+          : 'model_name_desc'
         : orderDirection.created === 'asc'
         ? 'created_at_asc'
         : 'created_at_desc'
@@ -209,8 +210,8 @@ const ModelListTable = () => {
       `${BASE_URL}/v1/list.models?query=${searchName}&page=${page + 1}&limit=${rowsPerPage}&sort=${
         columnName === 'name'
           ? orderDirection.name === 'asc'
-            ? 'name_asc'
-            : 'name_desc'
+            ? 'model_name_asc'
+            : 'model_name_desc'
           : orderDirection.created === 'asc'
           ? 'created_at_asc'
           : 'created_at_desc'
@@ -223,10 +224,9 @@ const ModelListTable = () => {
       .catch((err) => {
         console.log(err);
       });
-  }, [ignored]);
-  console.log(items);
+  }, [page, rowsPerPage, ignored, orderDirection]);
   const ItemLists = items?.model_list || [];
-  const meta = items?.meta || { page: 0, total: 0, limit: 10, sort: 'name_asc' };
+  const meta = items?.meta || { page: 0, total: 0, limit: 10, sort: 'model_name_asc' };
 
   const classes = useStyles();
 
@@ -234,10 +234,9 @@ const ModelListTable = () => {
     setPage(newPage);
   };
   const dat = new Date();
-  console.log(dat);
 
   const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setRowsPerPage(+event.target.value);
+    setRowsPerPage(Number(event.target.value));
     setPage(page);
   };
 
@@ -393,24 +392,24 @@ const ModelListTable = () => {
                         {formattedDate(row.created_at)}
                       </TableCell>
                       <TableCell className={classes.tableCell} align="center">
-                        {capitalize(row.total_pradictions)}
+                        {capitalize(row.total_predictions)}
                       </TableCell>
                       <TableCell className={classes.tableCell} align="center">
                         {/* {`${formatDateTime(row.lastPrediction)}`} */}
-                        {formattedDate(row.last_predictions)}
+                        {formattedDate(row.last_prediction)}
                       </TableCell>
                       <TableCell className={classes.tableCell} align="center">
                         {capitalize(row.num_alert_perf)}
                       </TableCell>
                       <TableCell className={classes.tableCell} align="center">
-                        {capitalize(row.num_alert_data_behave)}
+                        {capitalize(row.num_alert_drift)}
                       </TableCell>
                       <TableCell
                         className={classes.tableCell}
                         align="center"
                         sx={{ borderRightWidth: '0px', borderRightColor: colors.white }}
                       >
-                        {capitalize(row.num_alert_data_integrity)}
+                        {capitalize(row.num_alert_data_quality)}
                       </TableCell>
                     </TableRow>
                   ))}

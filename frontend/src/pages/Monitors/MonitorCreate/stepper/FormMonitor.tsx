@@ -14,23 +14,26 @@ export default {
     },
     monitor_condition: {
       evaluation_window: '',
-      evaluation_metric: {},
+      evaluation_metric: '',
       dimensions: {
         features: [],
         predictions: []
       },
       threshold: {
-        gt: number,
-        lt: number
+        threshold: '',
+        value: number
       },
-      actions: [{}],
+      actions: {
+        monitor_name: '',
+        severity: ''
+      },
       logicEvaluations: {}
     },
     monitor_identification: {
-      model: {},
-      environment: ''
+      model_id: '',
+      model_version_id: ''
     },
-    monitor_name: '',
+    
     monitor_domain: '',
     monitor_schedule: '',
     monitor_type: ''

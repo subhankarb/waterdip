@@ -31,11 +31,11 @@ export default function HeaderBreadcrumbs({
           background: '#fff',
           zIndex: 1,
           position: 'fixed',
-          height: '3.75rem'
+          height: 'auto'
         }}
       >
-        <Grid container spacing={2} sx={{ height: '80px' }}>
-          <Grid item xs={6} sx={{ height: '60px' }}>
+        <Grid container spacing={2} justifyContent='space-between' sx={{ height: 'auto' }}>
+          <Grid item xs={12} sm={6} sx={{ height: '60px' }}>
             <Box sx={{ display: 'flex', marginLeft: '20px', height: '60px', alignItems: 'center' }}>
               {links.map((data) => (
                 <>
@@ -83,10 +83,13 @@ export default function HeaderBreadcrumbs({
               </div>
             </Box>
           </Grid>
-          <Grid item xs={3} sx={{ height: '60px' }} />
-          <Grid item xs={3} sx={{ height: '60px' }}>
-            <Box sx={{ display: 'flex', height: '60px' }}>{action && <Box>{action}</Box>}</Box>
-          </Grid>
+          {/* <Grid item xs={3} sx={{ height: '60px' }} /> */}
+          {action && 
+            <Grid item xs={12} sm={6} lg={4} sx={{ height: '60px' }}>
+              <Box sx={{ display: 'flex', marginLeft: '20px', height: '60px'}}>{action && <Box>{action}</Box>}</Box>
+            </Grid>
+          }
+          
         </Grid>
 
         <Box sx={{ mt: 2 }}>

@@ -17,52 +17,65 @@ interface ApiModelInfo {
   description: string;
 }
 
-interface GetModelInfoResponse {
+interface ModelPredictionOverview {
+  pred_yesterday: number;
+  pred_percentage_change: number;
+  pred_trend_data: Array<number>;
+  pred_average: number;
+  pred_average_window_days: number;
+}
+
+interface Predictions{
+  date_bins: Array<string>;
+  val: Array<number>;
+}
+interface ModelPredictionHist{
+  predictions: Predictions;
+  predictions_versions: any;
+}
+
+interface ModelAlertOverview {
+  alerts_count: number;
+  alert_percentage_change: number;
+  alert_trend_data: Array<number>;
+}
+
+interface ModelAlertList {
+  alert_id: string;
+  monitor_name: string;
+  monitor_type: string;
+  created_at: string;
+}
+interface GetModelOverviewResponse {
   model_id: string;
-  model_details: ApiModelInfo;
-  model_alerts: any;
-  model_prediction_graph: any;
-  model_predictions: any;
+  model_prediction_overview: ModelPredictionOverview;
+  model_prediction_hist: ModelPredictionHist;
+  model_alert_overview: ModelAlertOverview;
+  model_alert_list: Array<ModelAlertList>;
 }
 
 type ModelInfoQuery = UseQueryResult<any, unknown>;
 
-interface UseModelInfo {
-  (params: GetModelInfoParams): ModelInfoQuery;
+interface UseModelOverview {
+  id: string;
 }
 
-export const useModelInfo: UseModelInfo = (params) => {
-  return useQuery(['model.info', params], queryModels, {
+export const useModelOverview  = (params: UseModelOverview) => {
+  return useQuery(['model.overview', params], queryModels, {
     refetchOnWindowFocus: false
   });
 
   async function queryModels() {
     const apiParams = {
-      start_date: params.start_date,
-      end_date: params.end_date
+      model_id: params.id
     };
-    const response = await axios.get<GetModelInfoResponse>(
-      `${GET_MODEL_Overview_API}/${params.id}`,
+    const response = await axios.get<GetModelOverviewResponse>(
+      GET_MODEL_Overview_API,
       {
         params: apiParams
       }
     );
-    const {
-      model_id,
-      model_details: { model_name, model_type, description, data_type }
-    } = response.data;
-
-    const modelInfo: any = {
-      id: model_id,
-      name: model_name,
-      modelType: model_type,
-      dataType: data_type,
-      description
-    };
-
-    return {
-      ...response,
-      modelInfo
-    };
+    return response;
+    
   }
 };

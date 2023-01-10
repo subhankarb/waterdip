@@ -230,8 +230,6 @@ const MonitorListTable = () => {
     (state: { modelMonitorState: ModelMonitorState }) => state.modelMonitorState
   );
 
-  console.log('modelID', modelID);
-
   const handleChangePage = (_event: unknown, newPage: number) => {
     setPage(newPage);
   };

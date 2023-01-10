@@ -7,6 +7,7 @@ import { ModelListRow, ModelPredictions, data_type, ModelListMeta } from '../../
 interface ApiModelList {
   model_id: string;
   model_version_id: string;
+  model_versions: string[];
   model_name: string;
   org_id: string;
   description: string;
@@ -26,6 +27,7 @@ interface GetModelsParams {
   limit: number;
   sort: string;
   query: string;
+  get_all_versions_flag: boolean;
 }
 
 interface GetModelsResponse {
@@ -58,11 +60,11 @@ export const usePaginatedModels: UsePaginatedModels = (params) => {
   async function queryModels() {
     const response = await axios.get<GetModelsResponse>(GET_MODELS_API, { params });
     const { model_list, meta } = response.data;
-    console.log(model_list);
     const modelList = model_list.map(
       (model: ApiModelList): ModelListRow => ({
         id: model.model_id,
         version_id: model.model_version_id,
+        versions: model.model_versions,
         name: model.model_name,
         dataType: model.data_type,
         // orgId: model.org_id,

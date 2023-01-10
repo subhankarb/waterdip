@@ -11,7 +11,7 @@ import { PATH_PAGE, PATH_DASHBOARD } from '../../../routes/paths';
 import ModelPerformance from './ModelPerformance/ModelPerformance';
 import ModelDrift from './ModelDrift/ModelDrift';
 import ModelDataProfile from './ModelDataProfile/ModelDataProfile';
-import { useModelInfo } from '../../../api/models/GetModelOverview';
+import { useModelInfo } from '../../../api/models/GetModelInfo';
 import HeaderBreadcrumbs from '../../../components/HeaderBreadcrumbs';
 import ModelConfiguration from './ModelConfig/ModelConfig';
 import ModelMonitors from './ModelMonitors/ModelMonitors';
@@ -97,19 +97,13 @@ export default function ModelDetails() {
   const { modelId, tabName } = useParams();
 
   const { data } = useModelInfo({ id: modelId });
-  const model_name = data?.modelInfo?.name;
+  const model_name = "Sample TBC";
 
   const handleOnChange = (value: string) => {
     setCurrentTab(value);
     navigate(
       `${PATH_DASHBOARD.general.models}/${modelId}/${value}?version_id=${query.get('version_id')}`
     );
-    // navigate(
-    //   {
-    //   pathname:`${PATH_DASHBOARD.general.models}/${modelId}/overview`,
-    //   search: `versionId:${versionId}`
-    // }
-    //   );
   };
 
   useEffect(() => {
@@ -120,11 +114,6 @@ export default function ModelDetails() {
 
   const headerBody = (isDesktop: boolean) => (
     <>
-      {/* <HeaderBreadcrumbs */}
-      {/*  heading={`${model_name || ''}`} */}
-      {/*  links={[{ name: 'Models', href: PATH_DASHBOARD.general.models }, { name: 'Model Details' }]} */}
-      {/* /> */}
-
       <Box sx={{ width: '100%', height: '54px', borderBottom: '0.5px solid #90A0B7' }}>
         <Tabs
           value={currentTab}
@@ -141,7 +130,6 @@ export default function ModelDetails() {
               disableRipple
               key={tab.value}
               label={capitalCase(tab.value)}
-              // icon={tab.icon}
               value={tab.value}
               disabled={tab.isDisabled}
               sx={{
@@ -184,7 +172,6 @@ export default function ModelDetails() {
       </Container>
 
       <Container maxWidth={false} style={{ marginTop: '30px' }}>
-        <MHidden width="lgUp">{headerBody(false)}</MHidden>
         <Box sx={{ mb: 1 }} />
         {MODEL_TABS.map((tab) => (
           <TabPanel value={currentTab} index={tab.value} key={tab.value}>

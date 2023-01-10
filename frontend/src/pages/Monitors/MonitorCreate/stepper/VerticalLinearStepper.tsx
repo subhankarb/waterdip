@@ -7,14 +7,13 @@ import { useSnackbar } from 'notistack';
 import { makeStyles } from '@material-ui/core/styles';
 import { colors } from '../../../../theme/colors';
 import { Grid } from '@material-ui/core';
-import validationSchema from './validationSchema';
-import MonitorMethod from './ComponentsStep/MonitorMethod';
 import MonitorCondition from './ComponentsStep/MonitorCondition';
 import MonitorAction from './ComponentsStep/MonitorAction';
 import formInitialValues from './FormInitialValues';
 import FormMonitor from './FormMonitor';
 import { PATH_DASHBOARD } from '../../../../routes/paths';
-import { MonitorCreate } from '../../../../api/monitors/createMonitor';
+import { useMonitorCreate } from '../../../../api/monitors/createMonitor';
+import MonitorReview from './ComponentsStep/MonitorReview';
 
 const useStyles = makeStyles(() => ({
   container: {
@@ -47,27 +46,28 @@ const useStyles = makeStyles(() => ({
   }
 }));
 
-const steps = ['Monitor method', 'Monitor Condition', 'Action'];
+const steps = ['Monitor Condition', 'Action', 'Review'];
 const { formId, formField } = FormMonitor;
 
-function _renderStepContent(step: number, monitorType: any) {
+function _renderStepContent(step: number, monitorType: any, model_id: any, model_version_id: any) {
   switch (step) {
     case 0:
       return (
         <>
-          <MonitorMethod monitorType={monitorType} />
+          <MonitorCondition monitorType={monitorType} model_id={model_id} model_version_id={model_version_id}/>
+          {/* <MonitorMethod monitorType={monitorType} /> */}
         </>
       );
     case 1:
       return (
         <>
-          <MonitorCondition />
+          <MonitorAction />
         </>
       );
     case 2:
       return (
         <>
-          <MonitorAction />
+          <MonitorReview monitorType={monitorType}/>
         </>
       );
     default:
@@ -76,26 +76,40 @@ function _renderStepContent(step: number, monitorType: any) {
 }
 type Props = {
   monitorType: any;
+  model_id: any,
+  model_version_id: any
 };
-export default function VerticalLinearStepper({ monitorType }: Props) {
+export default function VerticalLinearStepper({ monitorType, model_id, model_version_id }: Props) {
   const classes = useStyles();
   const [activeStep, setActiveStep] = useState(0);
   const isLastStep = activeStep === steps.length - 1;
-  const currentValidationSchema = validationSchema[activeStep];
+  // const currentValidationSchema = validationSchema[activeStep];
 
   const navigate = useNavigate();
   const { enqueueSnackbar } = useSnackbar();
-  const mutation = MonitorCreate();
+  const mutation = useMonitorCreate();
 
   async function _submitForm(values: any, actions: any) {
     try {
-      // window.alert(Finalvalues);
-      window.alert(JSON.stringify(values));
-      mutation.mutate(values, {
+      const value = {
+        "monitor_name": values.actions.monitor_name,
+        "monitor_type": values.monitor_type === 'Data Quality' ? 'DATA_QUALITY' : values.monitor_type === 'Drift'? 'DRIFT' : 'PERFORMANCE',
+        "monitor_identification": {
+          "model_id": values.monitor_identification.model_id,
+          "model_version_id": values.monitor_identification.model_version_id,
+        },
+        "monitor_condition": {
+        "evaluation_metric": values.monitor_condition.evaluation_metric,
+        ...(values.monitor_type!== "Model Performance") && {"dimensions": values.monitor_condition.dimensions},
+        "threshold": {
+          "threshold" : values.monitor_condition.threshold.threshold == "Lesser" ? "lt" : "gt",
+          "value" : values.monitor_condition.threshold.value
+        },
+        "evaluation_window": values.monitor_condition.evaluation_window,
+      },
+      }
+      mutation.mutate(value, {
         onSuccess: () => {
-          // queryClient.invalidateQueries('models');
-          actions.resetForm();
-          actions.setSubmitting(false);
           enqueueSnackbar('Monitor created successfully!', { variant: 'success' });
           navigate(PATH_DASHBOARD.general.monitors);
         }
@@ -146,7 +160,7 @@ export default function VerticalLinearStepper({ monitorType }: Props) {
             ) : (
               <Formik
                 initialValues={formInitialValues}
-                validationSchema={currentValidationSchema}
+                // validationSchema={currentValidationSchema}
                 onSubmit={_handleSubmit}
               >
                 {({ isSubmitting }) => (
@@ -159,7 +173,7 @@ export default function VerticalLinearStepper({ monitorType }: Props) {
                       height: '100%'
                     }}
                   >
-                    {_renderStepContent(activeStep, monitorType)}
+                    {_renderStepContent(activeStep, monitorType, model_id, model_version_id)}
                     <div style={{ marginTop: 'auto' }}>
                       <div
                         style={{
@@ -180,7 +194,7 @@ export default function VerticalLinearStepper({ monitorType }: Props) {
                             borderRadius: '4px'
                           }}
                         >
-                          {isLastStep ? 'Create Monitor' : 'Next'}
+                          {isLastStep ? 'Add Monitor' : 'Next'}
                         </Button>
                         {isSubmitting && <CircularProgress size={24} />}
                       </div>

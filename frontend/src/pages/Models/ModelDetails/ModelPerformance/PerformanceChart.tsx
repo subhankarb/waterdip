@@ -58,7 +58,6 @@ const PerformanceChart = ({ dataValue, tabValue }: Props) => {
       }
     }
   };
-  console.log(dataValue);
   return (
     <div>
       <ReactApexChart options={option} series={series} type="bar" height={270} />

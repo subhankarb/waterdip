@@ -7,7 +7,8 @@ const GlobalStyles = withStyles((theme) => ({
     '*': {
       margin: 0,
       padding: 0,
-      boxSizing: 'border-box'
+      boxSizing: 'border-box',
+      fontFamily: 'Poppins !important'
     },
     html: {
       width: '100%',
@@ -19,7 +20,6 @@ const GlobalStyles = withStyles((theme) => ({
       width: '100%',
       height: '100%',
       backgroundColor: '#F5F6F8 !important',
-      fontFamily: 'Poppins !important'
     },
     '#root': {
       width: '100%',

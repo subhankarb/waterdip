@@ -22,11 +22,12 @@ import {
 } from '@material-ui/core/styles';
 import { useParams } from 'react-router-dom';
 import { Icon } from '@iconify/react';
-import { useModelInfo } from '../../../../api/models/GetModelOverview';
+import { useModelOverview } from '../../../../api/models/GetModelOverview';
 import LoadingScreen from '../../../../components/LoadingScreen';
 import ChartLine from '../../../../components/charts/ChartOverview';
+import { formatDateTime } from '../../../../utils/date';
 import ChartSparkline from '../../../../components/charts/ChartSparkline';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { CardHeading, Heading } from '../../../../components/Heading';
 
 import { useSelector } from '../../../../redux/store';
@@ -57,7 +58,7 @@ const StyledMenu = styled((props: MenuProps) => (
   '& .MuiPaper-root': {
     background: colors.white,
     borderRadius: '4px',
-    width: '172px',
+    width: 'auto',
     // height: '120px',
     '& .MuiMenu-list': {
       padding: '4px 0'
@@ -88,18 +89,19 @@ const IconWrapperStyle = styled('div')(({ theme }) => ({
 
 const useStyles = makeStyles(() => ({
   smallBox: {
-    height: '160px',
+    height: 'auto',
+    minHeight: '200px',
     background: colors.white,
     boxShadow: '0px 0.5px 1.75px rgba(0, 0, 0, 0.039), 0px 1.85px 6.25px rgba(0, 0, 0, 0.19)',
     borderRadius: '4px',
-    marginRight: '20px'
+    marginRight: '20px',
   },
 
   BoxSubHeading: {
     fontFamily: 'Poppins',
     fontStyle: 'normal',
     fontWeight: 400,
-    fontSize: '.7rem',
+    fontSize: '.8rem',
     lineHeight: '15px',
     color: colors.text,
     marginTop: '6px'
@@ -108,7 +110,7 @@ const useStyles = makeStyles(() => ({
     fontFamily: 'Poppins',
     fontStyle: 'normal',
     fontWeight: 300,
-    fontSize: '.7rem',
+    fontSize: '.8rem',
     color: colors.textLight,
     marginTop: '6px'
   },
@@ -205,28 +207,28 @@ const ModelOverview = () => {
   const { fromDate, toDate } = useSelector(
     (state: { dateRangeFilter: DateRangeFilterState }) => state.dateRangeFilter
   );
-  // console.log("fromDate")
-  // console.log(fromDate ? fromDate.toISOString() : fromDate)
-  // console.log(toDate ? toDate.toISOString() : toDate)
 
-  const { data, isLoading } = useModelInfo({ id: modelId, start_date: fromDate, end_date: toDate });
-  const modelInfo = data?.modelInfo;
+  const { data, isLoading } = useModelOverview({ id: modelId });
+  const modelInfo = {
+    numberOfVersions: 5,
+    latestVersion: 'V3',
+    createTime: '22 Dec 2022',
+  }
   const classes = useStyles();
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
-  const PERCENT1 = data?.data.model_alerts.alert_percentage_change;
-  const PERCENT2 = data?.data.model_alerts.alert_percentage_change;
-  const [state, setState] = React.useState({
-    T1: false,
-    T2: false
-  });
+  const [state, setState] = useState([]);
+  useEffect(() => {
+    if (data) {
+      setState(
+        data.data.model_prediction_hist.predictions_versions.map((item: any) => {
+          const id = Object.keys(item)[0];
+          return { [id]: false };
+        })
+      );
+    }
+  }, [data]);
 
-  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setState({
-      ...state,
-      [event.target.name]: event.target.checked
-    });
-  };
 
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
@@ -236,55 +238,50 @@ const ModelOverview = () => {
     setAnchorEl(null);
   };
 
-  if (isLoading)
+  if (isLoading && data?.data)
     return (
       <Box sx={{ height: 'calc(100vh - 150px)' }}>
         <LoadingScreen />
       </Box>
     );
-
+  const PERCENT1 = data?.data?.model_alert_overview.alert_percentage_change;
+  const PERCENT2 = data?.data?.model_alert_overview.alert_percentage_change;
   return (
     <>
       <Grid container sx={{ flexGrow: 1 }}>
-        <Grid item container xs={12} sx={{ maxWidth: '90%', alignItems: 'stretch' }}>
-          <Grid item xs={3}>
+        <Grid item container spacing={3} xs={12} sx={{ maxWidth: '90%', alignItems: 'stretch' }}>
+          <Grid item xs={12} sm={6} md={6} lg={3}>
             <Box sx={{ p: 3 }} className={classes.smallBox}>
               <CardHeading heading="Model details" />
               <Grid item container xs={12}>
                 <Grid item xs={6}>
-                  <div className={classes.BoxSubHeading}>Name</div>
+                  <div className={classes.BoxSubHeading}># of versions</div>
                 </Grid>
                 <Grid item xs={6}>
-                  <div className={classes.modelDetailDiv}>{modelInfo?.name}</div>
+                  <div className={classes.modelDetailDiv}>{modelInfo?.numberOfVersions}</div>
                 </Grid>
                 <Grid item xs={6}>
-                  <div className={classes.BoxSubHeading}>Model Type</div>
+                  <div className={classes.BoxSubHeading}>Latest Version</div>
                 </Grid>
                 <Grid item xs={6}>
-                  <div className={classes.modelDetailDiv}>{modelInfo?.modelType}</div>
+                  <div className={classes.modelDetailDiv}>{modelInfo?.latestVersion}</div>
                 </Grid>
                 <Grid item xs={6}>
-                  <div className={classes.BoxSubHeading}>Data Type</div>
+                  <div className={classes.BoxSubHeading}>Created Time</div>
                 </Grid>
                 <Grid item xs={6}>
-                  <div className={classes.modelDetailDiv}>{modelInfo?.dataType}</div>
-                </Grid>
-                <Grid item xs={6}>
-                  <div className={classes.BoxSubHeading}>Description</div>
-                </Grid>
-                <Grid item xs={6}>
-                  <div className={classes.modelDetailDiv}>{modelInfo?.description}</div>
+                  <div className={classes.modelDetailDiv}>{modelInfo?.createTime}</div>
                 </Grid>
               </Grid>
             </Box>
           </Grid>
-          <Grid item xs={3}>
+          <Grid item xs={12} sm={6} md={6} lg={3}>
             <Box sx={{ p: 3 }} className={classes.smallBox}>
               <CardHeading heading="Today's Prediction" />
               <Grid item container xs={12}>
                 <Grid item xs={6}>
                   <div className={classes.divNumber}>
-                    {data?.data.model_predictions.pred_yesterday}
+                    {data?.data.model_prediction_overview.pred_yesterday}
                   </div>
                   <div>
                     <Stack
@@ -296,58 +293,61 @@ const ModelOverview = () => {
                         mt: 0.5,
                         fontSize: '.8rem',
                         fontWeight: 500,
-                        color: `${PERCENT2 > 0 ? colors.success : colors.error}`
+                        color: `${PERCENT2 && PERCENT2 > 0 ? colors.success : colors.error}`
                       }}
                     >
                       <IconWrapperStyle
                         sx={{
-                          ...(PERCENT1 < 0
+                          ...(PERCENT1 && PERCENT1 < 0
                             ? {
-                                color: 'error.main',
-                                bgcolor: alpha(theme.palette.error.main, 0.16)
-                              }
+                              color: 'error.main',
+                              bgcolor: alpha(theme.palette.error.main, 0.16)
+                            }
                             : {
-                                color: 'success.main',
-                                bgcolor: alpha(theme.palette.success.main, 0.16)
-                              }),
+                              color: 'success.main',
+                              bgcolor: alpha(theme.palette.success.main, 0.16)
+                            }),
                           mr: 1
                         }}
                       >
                         <Icon
                           width={16}
                           height={16}
-                          icon={PERCENT1 >= 0 ? trendingUpFill : trendingDownFill}
+                          icon={PERCENT1 && PERCENT1 >= 0 ? trendingUpFill : trendingDownFill}
                         />
                       </IconWrapperStyle>
-                      {data?.data.model_predictions.pred_yesterday_percentage_change}%
+                      {data?.data.model_prediction_overview.pred_percentage_change}%
                     </Stack>
                   </div>
                 </Grid>
                 <Grid item xs={6}>
-                  <ChartSparkline
-                    colors={`${PERCENT1 >= 0 ? colors.success : colors.error}`}
-                    data={data?.data.model_predictions.pred_trend_data}
-                  />
+                  {data &&
+                    <ChartSparkline
+                      colors={`${PERCENT1 && PERCENT1 >= 0 ? colors.success : colors.error}`}
+                      data={data?.data.model_prediction_overview.pred_trend_data}
+                    />
+                  }
+
                 </Grid>
               </Grid>
             </Box>
           </Grid>
-          <Grid item xs={3}>
+          <Grid item xs={12} sm={6} md={6} lg={3}>
             <Box sx={{ p: 3 }} className={classes.smallBox}>
               <CardHeading heading="Average Prediction" subtitle="Average Prediction" />
 
-              <div className={classes.divNumber}>{data?.data.model_predictions.pred_average}</div>
+              <div className={classes.divNumber}>{data?.data.model_prediction_overview.pred_average}</div>
               <Box sx={{ color: colors.textLight, fontSize: '.7rem', mt: 1, fontWeight: 500 }}>
-                Last {data?.data.model_predictions.pred_average_window_days} days
+                Last {data?.data.model_prediction_overview.pred_average_window_days} days
               </Box>
             </Box>
           </Grid>
-          <Grid item xs={3}>
+          <Grid item xs={12} sm={6} md={6} lg={3}>
             <Box sx={{ p: 3 }} className={classes.smallBox}>
               <CardHeading heading="No. of alerts trends" subtitle="No. of alerts trends" />
               <Grid item container xs={12}>
                 <Grid item xs={6}>
-                  <div className={classes.divNumber}>{data?.data.model_alerts.alerts_count}</div>
+                  <div className={classes.divNumber}>{data?.data.model_alert_overview.alerts_count}</div>
                   <div>
                     <Stack
                       direction="row"
@@ -358,45 +358,48 @@ const ModelOverview = () => {
                         mt: 0.5,
                         fontSize: '.8rem',
                         fontWeight: 500,
-                        color: `${PERCENT2 < 0 ? colors.success : colors.error}`
+                        color: `${PERCENT2 && PERCENT2 < 0 ? colors.success : colors.error}`
                       }}
                     >
                       <IconWrapperStyle
                         sx={{
-                          ...(PERCENT2 >= 0
+                          ...(PERCENT2 && PERCENT2 >= 0
                             ? {
-                                color: 'error.main',
-                                bgcolor: alpha(theme.palette.error.main, 0.16)
-                              }
+                              color: 'error.main',
+                              bgcolor: alpha(theme.palette.error.main, 0.16)
+                            }
                             : {
-                                color: 'success.main',
-                                bgcolor: alpha(theme.palette.success.main, 0.16)
-                              }),
+                              color: 'success.main',
+                              bgcolor: alpha(theme.palette.success.main, 0.16)
+                            }),
                           mr: 1
                         }}
                       >
                         <Icon
                           width={16}
                           height={16}
-                          icon={PERCENT2 >= 0 ? trendingUpFill : trendingDownFill}
+                          icon={PERCENT2 && PERCENT2 >= 0 ? trendingUpFill : trendingDownFill}
                         />
                       </IconWrapperStyle>
-                      {data?.data.model_alerts.alert_percentage_change}%
+                      {data?.data.model_alert_overview.alert_percentage_change}%
                     </Stack>
                   </div>
                 </Grid>
                 <Grid item xs={6}>
-                  <ChartSparkline
-                    colors={`${PERCENT2 < 0 ? colors.success : colors.error}`}
-                    data={data?.data.model_alerts.alert_trend_data}
-                  />
+                  {data &&
+                    <ChartSparkline
+                      colors={`${PERCENT2 && PERCENT2 < 0 ? colors.success : colors.error}`}
+                      data={data?.data.model_alert_overview.alert_trend_data}
+                    />
+                  }
+
                 </Grid>
               </Grid>
             </Box>
           </Grid>
         </Grid>
-        <Grid item container xs={12}>
-          <Grid item xs={8}>
+        <Grid item container spacing={3} xs={12} sx={{ maxWidth: '90%' }}>
+          <Grid item xs={12} sm={12} md={12} lg={8} >
             <Box
               sx={{
                 p: 3,
@@ -409,11 +412,11 @@ const ModelOverview = () => {
                 marginBottom: '30px'
               }}
             >
-              <Grid item container xs={12}>
-                <Grid item xs={10}>
+              <Grid item container justifyContent="space-between" xs={12}>
+                <Grid item>
                   <Heading heading="PREDICTION VOLUME" subtitle="prediction volume" />
                 </Grid>
-                <Grid item xs={2}>
+                <Grid item>
                   <div>
                     <Button
                       aria-controls={open ? 'demo-customized-menu' : undefined}
@@ -450,38 +453,47 @@ const ModelOverview = () => {
                       open={open}
                       onClose={handleClose}
                     >
-                      <MenuItem disableRipple className={classes.MenuText}>
-                        <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                          <FiberManualRecordIcon
-                            sx={{ color: colors.graphA, marginRight: '.4rem' }}
-                          />
-                          T1
-                        </Box>
-                        <Switch checked={state.T1} onChange={handleChange} name="T1" size="small" />
-                      </MenuItem>
-                      <MenuItem disableRipple className={classes.MenuText}>
-                        <Box>
-                          <FiberManualRecordIcon
-                            sx={{ color: colors.graphB, marginRight: '.4rem' }}
-                          />
-                          T2
-                        </Box>
-                        <Switch checked={state.T2} onChange={handleChange} name="T2" size="small" />
-                      </MenuItem>
+                      {state.map((item, index) => (
+                        <MenuItem disableRipple className={classes.MenuText}>
+                          <Box>
+                            <FiberManualRecordIcon
+                              sx={{ color: colors.graphB, marginRight: '.4rem' }}
+                            />
+                            {Object.keys(item)[0]}
+                          </Box>
+                          <Switch value={item[Object.keys(item)[0]]} checked={item[Object.keys(item)[0]]} 
+                          onChange={() => setState((prevItems: any) =>
+                              prevItems.map((prevItem: any) => {
+                                if (prevItem === item) {
+                                  return { [Object.keys(prevItem)[0]]: !prevItem[Object.keys(prevItem)[0]] };
+                                }
+        
+                                return prevItem;
+                              })
+                            )} 
+                          name={Object.keys(item)[0]} size="small" />
+                        </MenuItem>
+                      ))}
+
+                      
                     </StyledMenu>
                   </div>
                 </Grid>
               </Grid>
-              <ChartLine
-                state={state}
-                data={data.data.model_prediction_graph ? data.data.model_prediction_graph : {}}
-              />
+              { data && state.length > 0 ? (
+                <ChartLine
+                  state={state}
+                  data={data.data.model_prediction_hist}
+                />
+                ) : null}
+
             </Box>
           </Grid>
-          <Grid item xs={4}>
+          <Grid item xs={12} sm={12} md={12} lg={4} >
             <Box
               sx={{
                 p: 3,
+                height: '360px',
                 background: colors.white,
                 boxShadow:
                   '0px 0.5px 1.75px rgba(0, 0, 0, 0.039), 0px 1.85px 6.25px rgba(0, 0, 0, 0.19)',
@@ -511,7 +523,7 @@ const ModelOverview = () => {
                       </TableRow>
                     </TableHead>
                     <TableBody>
-                      {data.data.model_alerts.alerts_list.map((rowData: any) => (
+                      {data && data.data.model_alert_list.map((rowData: any) => (
                         <TableRow key={rowData.monitor_name}>
                           <TableCell className={classes.tableCell} align="center">
                             {rowData.monitor_name}
@@ -520,9 +532,9 @@ const ModelOverview = () => {
                             {rowData.monitor_type}
                           </TableCell>
                           <TableCell className={classes.tableCell} align="center">
-                            {/* {formatDateTime(rowData.time)} */}
+                            {formatDateTime(rowData.time)}
                             {formattedDate(rowData.time)}
-                            {/*{rowData.time}*/}
+                            {rowData.time}
                           </TableCell>
                         </TableRow>
                       ))}

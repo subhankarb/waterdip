@@ -8,13 +8,8 @@ interface ApiDatasetList {
   dataset_id: string;
   dataset_name: string;
 }
-
 interface GetDatasetParams {
-  page: number;
-  limit: number;
-  sort: string;
-  query: string;
-  model_id: string;
+  version_id: string;
 }
 
 interface GetDatasetResponse {
@@ -33,34 +28,22 @@ interface ResultData {
   request?: any;
 }
 
-type DatasetQuery = UseQueryResult<ResultData>;
+export const useGetDatasets = (params : GetDatasetParams) => {
 
-interface DatasetsType {
-  (params: GetDatasetParams): DatasetQuery;
-}
-
-export const useGetDatasets: DatasetsType = (params) => {
+  async function queryDataset() {
+    const apiParams = {
+      model_version_id: params.version_id
+    };
+    const response = await axios.get<GetDatasetResponse>(
+      GET_DATASETS_API,
+       { 
+         params: apiParams
+       }
+    );
+    return response;
+  }
   return useQuery(['models', params], queryDataset, {
     refetchOnWindowFocus: false
   });
 
-  async function queryDataset() {
-    const response = await axios.get<GetDatasetResponse>(GET_DATASETS_API, { params });
-
-    const { dataset_list, meta } = response.data;
-
-    const datasetListMeta: DatasetListMeta = {
-      page: meta?.page || 1,
-      limit: meta?.limit || 10,
-      total: meta?.total || 0,
-      sort: meta?.sort || 'name_asc',
-      query: meta?.query || '',
-      model_id: meta?.model_id
-    };
-
-    return {
-      dataset_list,
-      meta: datasetListMeta
-    };
-  }
 };

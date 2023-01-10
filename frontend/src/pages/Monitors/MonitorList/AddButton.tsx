@@ -20,7 +20,7 @@ const useStyles = makeStyles(() => ({
   }
 }));
 
-const DialogBox = () => {
+const DialogBox = (props: any) => {
   const classes = useStyles();
   const [boxDisplay, setBoxDisplay] = useState(true);
 
@@ -28,7 +28,7 @@ const DialogBox = () => {
     <>
       {boxDisplay === true ? (
         <>
-          <MonitorAddDialog />
+          <MonitorAddDialog close={props.close}/>
         </>
       ) : null}
     </>
@@ -48,7 +48,7 @@ const AddButton = () => {
         Create Monitor
       </Button>
       <DialogAnimate maxWidth="sm" open={expandForm} onClose={() => setExpandForm(false)}>
-        <DialogBox />
+        <DialogBox close={() => setExpandForm(false)}/>
       </DialogAnimate>
     </Box>
   );

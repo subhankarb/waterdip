@@ -16,6 +16,7 @@ export type ModelTasksStat = {
 export interface Model {
   id: string;
   version_id: string;
+  versions: string[];
   name: string;
   dataType: data_type;
   description: string;
@@ -35,6 +36,7 @@ export type ModelListRow = Omit<Model, 'features'>;
 
 export interface ExportListRow {
   model_id: string;
+  versions: string[];
   id: string;
   type: string;
   status: string;

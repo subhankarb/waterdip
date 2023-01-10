@@ -21,20 +21,4 @@ export const UseModelCreate = async (newModel: NewModel) => {
   };
 
   return { ...response, modelCreateResponse };
-  // const createModel = async (newModel: NewModel) => {
-  //   console.log("hello")
-  //   const response = await axios.post(CREATE_MODEL_API, newModel);
-
-  //   const { model_name } = response.data;
-
-  //   const modelCreateResponse: ModelCreateResponse = {
-  //     modelName: model_name || ''
-  //   };
-
-  //   return { ...response, modelCreateResponse };
-  // };
-
-  // const mutation = useMutation(createModel);
-
-  // return mutation;
 };

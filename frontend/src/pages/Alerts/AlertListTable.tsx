@@ -189,7 +189,6 @@ const AlertListTable = ({ value }: modelProps) => {
   });
   const alertList = data?.alertList || [];
   const meta = data?.meta || { page: 0, total: 0, limit: 10, sort: 'name_asc' };
-  // console.log(alertList);
 
   const classes = useStyles();
 

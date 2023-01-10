@@ -28,9 +28,8 @@ const MonitorCreate = () => {
   const classes = useStyles();
   const location = useLocation();
   const data: any = location.state;
-  console.log(data?.value);
   return (
-    <Page title="Create a new Model | Waterdip">
+    <Page title="Create a new Monitor | Waterdip">
       <Box>
         <HeaderBreadcrumbs
           links={[{ name: 'Monitors', href: `${PATH_DASHBOARD.general.monitors}` }]}
@@ -40,11 +39,11 @@ const MonitorCreate = () => {
 
       <Box className={classes.stepperContainer}>
         <Box className={classes.createMonitorText}>
-          Create a monitor of type&nbsp;&nbsp;
-          <span className={classes.monitorTextType}>{data.value}</span> and model{' '}
+          Create a monitor of type&nbsp;
+          <span className={classes.monitorTextType}>{data.type}</span> and model{' '}
           <span className={classes.monitorTextType}></span>
         </Box>
-        <VerticalLinearStepper monitorType={data.value} />
+        <VerticalLinearStepper monitorType={data.type} model_id={data.model} model_version_id={data.version}/>
       </Box>
     </Page>
   );

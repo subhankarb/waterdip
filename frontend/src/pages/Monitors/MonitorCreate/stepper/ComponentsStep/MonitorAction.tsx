@@ -85,25 +85,29 @@ const MonitorAction = () => {
   const formikProps = useFormikContext();
   const classes = useStyles();
   const [monitorName, setmonitorName] = useState<string>();
-
+  const [severityValue, setseverityValue] = useState<string>('medium');
+  const handleRadioChange = (e: any) => {
+    setseverityValue(e.target.value);
+  };
   useEffect(() => {
-    formikProps.setFieldValue('monitor_name', monitorName);
-  }, [monitorName]);
+    formikProps.setFieldValue('actions.monitor_name', monitorName);
+    formikProps.setFieldValue('actions.severity', severityValue);
+  }, [monitorName, severityValue]);
   return (
     <>
       <Box className={classes.actionInput}>
         <Box className={classes.actionInputTitle}>Severity</Box>
         <Box className={classes.actionInputContent}>
           <label className={classes.label}>
-            <input type="radio" name="severity" value="low" id="" />
+            <input required type="radio" name="severity" value="low" id="" onChange={handleRadioChange}/>
             <Box className="low">Low</Box>
           </label>
           <label className={classes.label}>
-            <input defaultChecked type="radio" name="severity" value="medium" id="" />
+            <input required defaultChecked type="radio" name="severity" value="medium" id="" onChange={handleRadioChange}/>
             <Box className="medium">Medium</Box>
           </label>
           <label className={classes.label}>
-            <input type="radio" name="severity" value="high" id="" />
+            <input required type="radio" name="severity" value="high" id="" onChange={handleRadioChange} />
             <Box className="high">High</Box>
           </label>
         </Box>
@@ -111,6 +115,7 @@ const MonitorAction = () => {
       <Box className={classes.actionInput}>
         <Box className={classes.actionInputTitle}>Monitor Name</Box>
         <TextField
+          required
           placeholder="Eg: Monitor 1"
           className={classes.txtInp}
           onChange={(e: React.ChangeEvent<{ value: unknown }>) => {

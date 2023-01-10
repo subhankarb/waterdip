@@ -1,13 +1,40 @@
 import { makeStyles } from '@material-ui/styles';
-import { Box } from '@material-ui/core';
+import { Box, Button, Tab, TextField, Tabs, Select, MenuItem, DialogActions } from '@material-ui/core';
 import { colors } from '../../../../theme/colors';
 import { useGetDatasetsInfo } from '../../../../api/datasets/GetDatasetInfo';
 import { useState, useEffect } from 'react';
 import { Data } from 'emoji-mart';
 import { string } from 'yup/lib/locale';
+import { useGetDatasets } from '../../../../api/datasets/GetDatasets';
 import { useSelector } from '../../../../redux/store';
 import { DateRangeFilterState } from '../../../../redux/slices/dateRangeFilter';
+import { useModelInfo } from '../../../../api/models/GetModelInfo';
 const useStyles = makeStyles({
+  select: {
+    marginTop: '.75rem',
+    marginBottom: '.75rem',
+    backgroundColor: `${colors.white} !important`,
+    fontFamily: 'Poppins',
+    maxWidth: '20rem',
+    minWidth: '20rem',
+    transform: 'scale(1,.8)',
+    '& .MuiInputBase-input': {
+      transform: 'scale(1,1.2)'
+    },
+    [`& fieldset`]: {
+      borderRadius: 2,
+      borderColor: `${colors.textLight} !important`
+    },
+    [`&.Mui-focused fieldset`]: {
+      borderRadius: 4,
+      borderColor: `${colors.text} !important`
+    }
+  },
+  conatinerHeading: {
+    fontSize: '.9rem',
+    color: colors.text,
+    fontWeight: 500
+  },
   card: {
     width: '100%',
     maxWidth: '360px',
@@ -49,6 +76,76 @@ const CardEntry = ({ title, value }: any) => {
   );
 };
 
+type Props = {
+  model_id: string;
+  on_change: Function;
+}
+export const DataProfileVersionCard = ({ model_id, on_change }: Props) => {
+  const classes = useStyles();
+  const [selected, setSelected] = useState('');
+  useEffect(() => { on_change(selected) }, [selected])
+  const modelOverview = useModelInfo({
+    id: model_id
+  })
+  const handleChangeVersion = (event: any) => {
+    setSelected(event.target.value);
+    on_change(event.target.value);
+  }
+
+  return (
+    <>
+      <Box className={classes.card}>
+        <Box className={classes.conatinerHeading}>Select Model Version</Box>
+        {modelOverview && (
+          <Select defaultValue="select" className={classes.select} onChange={handleChangeVersion}>
+            <MenuItem value="select" disabled className="selectDisable">
+              Select Version
+            </MenuItem>
+            {modelOverview && modelOverview?.data?.data?.model_versions?.map((row: any) => (
+              <MenuItem value={row.model_version_id} key={row}>
+                {row.model_version_id}
+              </MenuItem>
+            ))}
+          </Select>
+        )}
+      </Box>
+    </>
+  );
+};
+
+export const DataDatasetSelectCard = (props: any) => {
+
+  const classes = useStyles();
+  const [selected, setSelected] = useState('');
+  const handleChangeVersion = (event: any) => {
+    setSelected(event.target.value);
+    props.on_change(event.target.value);
+  }
+  const { data } = useGetDatasets({ version_id: props.version_id });
+
+  return (
+    <>
+      <Box className={classes.card}>
+        <Box className={classes.conatinerHeading}>Select Dataset</Box>
+        <Select defaultValue="select" className={classes.select} onChange={handleChangeVersion}>
+          <MenuItem value="select" disabled className="selectDisable">
+            Choose Dataset
+          </MenuItem>
+          {data && data?.data.dataset_list.map((item: any) => {
+            return (
+              <MenuItem key={item.dataset_id} value={item.dataset_id}>
+                {item.dataset_name}
+              </MenuItem>
+            );
+          })}
+        </Select>
+        <Box className={classes.cardHeading}>Date from {props.dateTimeString}</Box>
+      </Box>
+    </>
+  );
+};
+
+
 export const DataProfileOverviewCards = ({ datasetId }: any) => {
   const classes = useStyles();
   const now = new Date();
@@ -62,8 +159,6 @@ export const DataProfileOverviewCards = ({ datasetId }: any) => {
     end_date: toDate
   });
   const datasetInfo = data && data;
-
-  console.log(datasetInfo);
 
   return (
     <Box className={classes.card}>

@@ -5,7 +5,6 @@ const {
     monitor_method,
     monitor_condition,
     monitor_identification,
-    monitor_name,
     monitor_domain,
     monitor_schedule,
     monitor_type
@@ -24,23 +23,26 @@ export default {
   },
   monitor_condition: {
     evaluation_window: '',
-    evaluation_metric: {},
+    evaluation_metric: '',
     dimensions: {
       features: [],
       predictions: []
     },
     threshold: {
-      gt: 0.2,
-      lt: 0.8
+      threshold: '',
+      value : 0
     },
-    actions: [{}],
+    actions: {
+      monitor_name: '',
+      severity: ''
+    },
     logicEvaluations: {}
   },
   monitor_identification: {
-    model: {},
-    environment: ''
+    model_id: '',
+    model_version_id: ''
   },
-  monitor_name: '',
+  
   monitor_domain: '',
   monitor_schedule: '',
   monitor_type: ''

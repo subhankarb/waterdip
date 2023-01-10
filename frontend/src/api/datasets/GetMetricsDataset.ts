@@ -18,20 +18,11 @@
 import { useQuery, UseQueryResult } from 'react-query';
 import { AxiosRequestConfig } from 'axios';
 import axios from '../../utils/axios';
-import { GET_DATASET_INFO_API } from '../apis';
+import { GET_METRICS_DATASET } from '../apis';
 import { Optional } from 'react-wordcloud';
 import { paramCase } from 'change-case';
 const BASE_URL = process.env.REACT_APP_API_URL;
 
-interface DatasetOverview {
-  dataset_name: string;
-  dataset_id: string;
-  total_row: number;
-  missing_total: number;
-  missing_percentage: number;
-  duplicate_total: number;
-  duplicate_percentage: number;
-}
 
 interface Histogram {
   bins: string[];
@@ -41,12 +32,11 @@ interface Histogram {
 interface NumericColumnStats {
   column_name: string;
   histogram: Histogram;
-  zeros_total: number;
+  zeros: number;
   missing_total: number;
   missing_percentage: number;
   mean: number;
-  median: number;
-  standard_deviation: number;
+  std_dev: number;
   min: number;
   max: number;
 }
@@ -61,7 +51,6 @@ interface CategoricalColumnStats {
 }
 
 interface DatasetInfoResponse {
-  dataset_overview: DatasetOverview;
   numeric_column_stats: NumericColumnStats[];
   categorical_column_stats: CategoricalColumnStats[];
 }
@@ -76,37 +65,31 @@ interface ResultData {
   request?: any;
 }
 
-interface GetDetasetInfoParams {
+interface GetMetricsDatasetParams {
+  model_id: string;
+  model_version_id: string;
   dataset_id: string;
   start_date?: Date | null;
   end_date?: Date | null;
 }
 
-type DatasetQuery = UseQueryResult<ResultData>;
 
-interface DatasetsType {
-  (params: GetDetasetInfoParams): DatasetQuery;
-}
-
-export const useGetDatasetsInfo = ({ dataset_id, start_date, end_date }: GetDetasetInfoParams) => {
+export const useGetMetricsDataset = ({model_id, model_version_id, dataset_id, start_date, end_date }: GetMetricsDatasetParams) => {
   return useQuery([dataset_id], queryDataset, {
     refetchOnWindowFocus: false
   });
   async function queryDataset() {
     const apiParams = {
+      model_id: model_id,
+      model_version_id: model_version_id, 
+      dataset_id: dataset_id,
       start_date: start_date,
       end_date: end_date
     };
-    const response = await axios.get<DatasetInfoResponse>(`${GET_DATASET_INFO_API}/${dataset_id}`, {
+    const response = await axios.get<DatasetInfoResponse>(GET_METRICS_DATASET, {
       params: apiParams
     });
 
-    const { dataset_overview, numeric_column_stats, categorical_column_stats } = response.data;
-
-    return {
-      dataset_overview,
-      numeric_column_stats,
-      categorical_column_stats
-    };
+    return response;
   }
 };
