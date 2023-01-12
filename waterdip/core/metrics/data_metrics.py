@@ -36,18 +36,6 @@ class DataMetrics(MongoMetric, ABC):
         super().__init__(collection)
         self._dataset_id = dataset_id
 
-    @staticmethod
-    def _time_filter_builder(time_range: TimeRange = None):
-        time_filter = {}
-        if time_range is not None:
-            time_filter = {
-                "created_at": {
-                    "$gte": time_range.start_time,
-                    "$lte": time_range.end_time,
-                }
-            }
-        return time_filter
-
 
 class CategoricalCountHistogram(DataMetrics):
     """
@@ -277,7 +265,7 @@ class CardinalityCategorical(DataMetrics):
         cardinality = {}
 
         agg_query = self._aggregation_query(
-            time_filter=self._time_filter_builder(time_range=None)
+            time_filter=self._time_filter_builder(time_range=time_range)
         )
         for doc in self._collection.aggregate(agg_query):
             column, values = doc["_id"], doc["value_counts"]
@@ -335,7 +323,7 @@ class NumericBasicMetrics(DataMetrics):
     ) -> Dict[str, Any]:
         basic_metrics: Dict[str, Dict] = {}
         agg_query = self._aggregation_query(
-            time_filter=self._time_filter_builder(time_range=None), **kwargs
+            time_filter=self._time_filter_builder(time_range=time_range), **kwargs
         )
         facets = self._collection.aggregate(agg_query).next()
         average_values = facets["average_values"]

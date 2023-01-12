@@ -17,6 +17,8 @@ from typing import Any, Dict, List
 
 from pymongo.collection import Collection
 
+from waterdip.core.commons.models import TimeRange
+
 
 class MongoMetric(ABC):
     def __init__(self, collection: Collection):
@@ -34,3 +36,15 @@ class MongoMetric(ABC):
     @abstractmethod
     def _aggregation_query(self, *args, **kwargs) -> List[Dict[str, Any]]:
         pass
+
+    @staticmethod
+    def _time_filter_builder(time_range: TimeRange = None):
+        time_filter = {}
+        if time_range is not None:
+            time_filter = {
+                "created_at": {
+                    "$gte": time_range.start_time,
+                    "$lte": time_range.end_time,
+                }
+            }
+        return time_filter
