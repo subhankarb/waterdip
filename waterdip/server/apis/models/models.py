@@ -271,6 +271,12 @@ class ModelOverviewResponse(BaseModel):
         alert overview alerts all the versions
     model_alert_list:
         latest five alerts from all the versions
+    number_of_model_versions:
+        number of versions registered under a particular model
+    latest_version:
+        latest version registered for the model
+    latest_version_created_at:
+        creation time of latest version of the model
 
     """
 
@@ -279,6 +285,9 @@ class ModelOverviewResponse(BaseModel):
     model_prediction_hist: ModelPredictionHistogram
     model_alert_overview: ModelOverviewAlerts
     model_alert_list: List[ModelOverviewAlertList]
+    number_of_model_versions: int = 0
+    latest_version: BaseModelVersionDB = None
+    latest_version_created_at: datetime = None
 
 
 class ModelInfoResponse(BaseModel):

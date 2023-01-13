@@ -323,6 +323,9 @@ class ModelService:
         )
         alert_week_stats = self._alert_service.alert_week_stats(model_id)
         latest_alerts = self._alert_service.find_alerts(model_id)
+        model_versions = self._model_version_service.find_all_versions_for_model(
+            model_id=model_id
+        )
 
         return ModelOverviewResponse(
             model_id=model_id,
@@ -343,4 +346,9 @@ class ModelService:
                 predictions=prediction_histogram,
                 predictions_versions=prediction_histogram_version,
             ),
+            number_of_model_versions=len(model_versions),
+            latest_version=model_versions[0] if len(model_versions) > 0 else None,
+            latest_version_created_at=model_versions[0].created_at
+            if len(model_versions) > 0
+            else None,
         )
