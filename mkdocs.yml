@@ -1,11 +1,11 @@
-site_name: Waterdip Documentation
+site_name: ""
 site_url: https://waterdipAI.github.io/waterdip/
 repo_url: https://github.com/WaterdipAI/waterdip
 repo_name: waterdipAI/waterdip
 edit_uri: blob/main/docs/
 theme:
   name: material
-  logo: assets/logo_white.png
+  logo: assets/wd_logo_white.svg
   favicon: assets/favicon.png
   icon:
     repo: fontawesome/brands/github
@@ -36,8 +36,10 @@ markdown_extensions:
   - pymdownx.inlinehilite
   - pymdownx.snippets
   - pymdownx.superfences
+  - attr_list
+  - md_in_html
 nav:
-  - Welcome: index.md
+  - Welcome to Waterdip: index.md
   - Introduction:
     - Introduction to Waterdip: introduction/introduction.md
     - Quick Start: introduction/quick_start.md
@@ -55,5 +57,7 @@ extra:
       link: https://github.com/waterdipai/waterdip
     - icon: fontawesome/brands/linkedin
       link: https://www.linkedin.com/company/waterdip
+    - icon: fontawesome/brands/discord
+      link: https://discord.gg/V4kjYcqhzg
 
 copyright: "&copy; 2022 BY WATERDIP LABS"
