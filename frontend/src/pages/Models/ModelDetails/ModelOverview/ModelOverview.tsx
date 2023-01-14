@@ -209,10 +209,11 @@ const ModelOverview = () => {
   );
 
   const { data, isLoading } = useModelOverview({ id: modelId });
+  console.log('DATA: ',data);
   const modelInfo = {
-    numberOfVersions: 5,
-    latestVersion: 'V3',
-    createTime: '22 Dec 2022',
+    numberOfVersions: data ? data.data.number_of_model_versions : 0,
+    latestVersion: data ? data.data.latest_version.model_version.toUpperCase() : "V1",
+    createTime: data ? formattedDate(data.data.latest_version_created_at) : '22 Dec 2022',
   }
   const classes = useStyles();
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);

@@ -43,9 +43,6 @@ export default function CollapsibleTable({ dataValue, data_type }: Props) {
               <TableCell className={classes.tableHead} align="center" width="14">
                 Histogram
               </TableCell>
-              <TableCell className={classes.tableHead} align="center" width="7">
-                Distinct
-              </TableCell>
               {data_type === 'NUMERIC' && (
                 <TableCell className={classes.tableHead} align="center" width="10">
                   Zeros
@@ -72,9 +69,6 @@ export default function CollapsibleTable({ dataValue, data_type }: Props) {
               ) : (
                 <>
                   <TableCell className={classes.tableHead} align="center" width="13">
-                    Missing Precentage
-                  </TableCell>
-                  <TableCell className={classes.tableHead} align="center" width="13">
                     Unique
                   </TableCell>
                   <TableCell className={classes.tableHead} align="center" width="12">
@@ -86,7 +80,7 @@ export default function CollapsibleTable({ dataValue, data_type }: Props) {
           </TableHead>
           <TableBody>
             {dataValue?.map((row: any) => (
-              <CollapsibleTableRow key={row.name} row={row} />
+              <CollapsibleTableRow key={row.name} row={row} data_type={data_type} />
             ))}
           </TableBody>
         </Table>

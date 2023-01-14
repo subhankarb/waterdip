@@ -52,6 +52,9 @@ interface GetModelOverviewResponse {
   model_prediction_hist: ModelPredictionHist;
   model_alert_overview: ModelAlertOverview;
   model_alert_list: Array<ModelAlertList>;
+  number_of_model_versions: number;
+  latest_version_created_at: string;
+  latest_version: any;
 }
 
 type ModelInfoQuery = UseQueryResult<any, unknown>;

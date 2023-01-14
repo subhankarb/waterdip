@@ -114,7 +114,7 @@ const ChartBar: React.FC<Props> = ({ name, categories, data, handleBarClick, opt
         series={[{ name, data }]}
         options={chartOptions}
         height={options?.height || 320}
-        width={isLargerWidth ? categories.length * barSize : options?.width ?? '100%'}
+        width={options ? options.width : '200'}
       />
     </div>
   );

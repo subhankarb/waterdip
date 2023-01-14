@@ -97,7 +97,7 @@ export default function ModelDetails() {
   const { modelId, tabName } = useParams();
 
   const { data } = useModelInfo({ id: modelId });
-  const model_name = "Sample TBC";
+  const model_name = data ? data.data.model_name : "Model";
 
   const handleOnChange = (value: string) => {
     setCurrentTab(value);

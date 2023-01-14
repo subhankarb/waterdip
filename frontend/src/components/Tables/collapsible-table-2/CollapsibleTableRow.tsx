@@ -58,10 +58,10 @@ const useStyles = makeStyles(() => ({
   }
 }));
 
-export default function CollapsibleTableRow(props: { row: any }) {
+export default function CollapsibleTableRow(props: { row: any, data_type: any }) {
   const classes = useStyles();
-  const { row } = props;
-
+  const { row, data_type } = props;
+  console.log(row);
   const [open, setOpen] = useState(false);
 
   return (
@@ -121,12 +121,9 @@ export default function CollapsibleTableRow(props: { row: any }) {
             }}
           />
         </TableCell>
-        <TableCell className={classes.tableCell} align="center">
-          {row.distinct ? <>{row.distinct}</> : <>-</>}
-        </TableCell>
-        {row.data_type === 'NUMERIC' && (
+        {data_type === 'NUMERIC' && (
           <TableCell className={classes.tableCell} align="center">
-            {row.zeros_total}&nbsp;&nbsp;
+            {row.zeros}&nbsp;&nbsp;
             <span className={classes.span}>{row.zeros_percentage}</span>
           </TableCell>
         )}
@@ -135,7 +132,7 @@ export default function CollapsibleTableRow(props: { row: any }) {
           {row.missing_total}&nbsp;&nbsp;
           <span className={classes.span}>{row.missing_percentage}</span>
         </TableCell>
-        {row.data_type === 'NUMERIC' ? (
+        {data_type === 'NUMERIC' ? (
           <>
             <TableCell className={classes.tableCell} align="center">
               {row.range ? <>{row.range}</> : <>-</>}
@@ -147,14 +144,11 @@ export default function CollapsibleTableRow(props: { row: any }) {
               {row.median ? <>{row.median}</> : <>-</>}
             </TableCell>
             <TableCell className={classes.tableCell} align="center">
-              {row.standard_deviation}
+              {row.std_dev}
             </TableCell>
           </>
         ) : (
           <>
-            <TableCell className={classes.tableCell} align="center">
-              {row.missing_percentage ? <>{row.missing_percentage}</> : <>-</>}
-            </TableCell>
             <TableCell className={classes.tableCell} align="center">
               {row.unique ? <>{row.unique}</> : <>-</>}
             </TableCell>
