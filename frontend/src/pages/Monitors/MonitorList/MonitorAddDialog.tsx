@@ -185,10 +185,11 @@ const MonitorAddDialog = (props: any) => {
     query: '',
     page: 1,
     limit: 10,
-    sort: 'name_asc',
+    sort: 'model_name_asc',
     get_all_versions_flag: true
   });
   const modelList = data?.modelList || [];
+  console.log(modelList);
   const handleChangeModel = (event: any) => {
     setModel(event.target.value);
 
@@ -207,6 +208,7 @@ const MonitorAddDialog = (props: any) => {
       return Model
     }
   }
+  console.log(modelList.filter(handleVersionFilter));
   return (
     <Box className={classes.dialogBoxMonitorType}>
       <Box className={classes.modelContainer}>
@@ -237,9 +239,9 @@ const MonitorAddDialog = (props: any) => {
             <MenuItem value="select" disabled className="selectDisable">
               Select Version
             </MenuItem>
-            {(modelList.filter(handleVersionFilter) !== []  && modelList.filter(handleVersionFilter)[0] && modelList.filter(handleVersionFilter)[0].versions)? Object.keys(modelList.filter(handleVersionFilter)[0].versions).map((row: any) => (
-              <MenuItem value={row} key={row}>
-                {row}
+            {(modelList.filter(handleVersionFilter) !== []  && modelList.filter(handleVersionFilter)[0] && modelList.filter(handleVersionFilter)[0].versions)? Object.values(modelList.filter(handleVersionFilter)[0].versions).map((row: any) => (
+              <MenuItem value={row.v1} key={row.v1}>
+                {row.v1}
               </MenuItem>
             )) : null}
           </Select>

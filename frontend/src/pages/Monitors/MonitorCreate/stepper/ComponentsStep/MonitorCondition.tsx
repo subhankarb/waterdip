@@ -359,9 +359,9 @@ const MonitorCondition = (props: any) => {
             setevaluationWindow(e.target.value as string);
           }}
         >
-          <MenuItem value="1 day">24 Hrs</MenuItem>
-          <MenuItem value="1 week">1 Week</MenuItem>
-          <MenuItem value="1 month">1 Month</MenuItem>
+          <MenuItem value="1d">24 Hrs</MenuItem>
+          <MenuItem value="7d">1 Week</MenuItem>
+          <MenuItem value="31d">1 Month</MenuItem>
         </Select>
       </Box>
     </Box>

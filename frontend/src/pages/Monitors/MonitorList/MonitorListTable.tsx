@@ -1,6 +1,10 @@
-import { useState } from 'react';
+import { useEffect, useState, useReducer } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useQuery, UseQueryResult } from 'react-query';
+import axios from '../../../utils/axios';
+import { GET_MONITORS_API } from '../../../api/apis';
 import MoreHorizIcon from '@material-ui/icons/MoreHoriz';
+import { useSnackbar } from 'notistack';
 import {
   Table,
   TableRow,
@@ -25,6 +29,8 @@ import MonitorListToolbar from './MonitorListToolbar';
 import { fontWeight } from '@material-ui/system';
 import { useSelector } from '../../../redux/store';
 import { ModelMonitorState } from '../../../redux/slices/ModelMonitorState';
+import { useGetMonitors } from 'api/monitors/GetMonitors';
+import { useMonitorDelete } from 'api/monitors/deleteMonitor';
 
 interface ModelColumn {
   id: 'name' | 'type' | 'modelName' | 'date' | 'lastRun' | 'severity' | 'number' | 'action';
@@ -171,59 +177,56 @@ interface SortProps {
   monitor_name: 'asc' | 'desc' | undefined;
   created: 'asc' | 'desc' | undefined;
 }
-const monitorList = [
-  {
-    monitor_name: 'monitor demo',
-    monitor_type: 'monitor type',
-    model_name: 'model name',
-    monitor_date: 'monitor date',
-    last_run: '',
-    severity: 'low',
-    num_alerts: ''
-  },
-  {
-    monitor_name: 'monitor demo',
-    monitor_type: 'monitor type',
-    model_name: 'model name',
-    monitor_date: 'monitor date',
-    last_run: '',
-    severity: 'medium',
-    num_alerts: ''
-  },
-  {
-    monitor_name: 'monitor demo',
-    monitor_type: 'monitor type',
-    model_name: 'model name',
-    monitor_date: 'monitor date',
-    last_run: '',
-    severity: 'medium',
-    num_alerts: ''
-  },
-  {
-    monitor_name: 'monitor demo',
-    monitor_type: 'monitor type',
-    model_name: 'model name',
-    monitor_date: 'monitor date',
-    last_run: '',
-    severity: 'low',
-    num_alerts: ''
-  },
-  {
-    monitor_name: 'monitor demo',
-    monitor_type: 'monitor type',
-    model_name: 'model name',
-    monitor_date: 'monitor date',
-    last_run: '',
-    severity: 'high',
-    num_alerts: ''
-  }
-];
-const MonitorListTable = () => {
+
+const MonitorListTable = (props: any) => {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [searchName, setSearchName] = useState('');
   const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
+  const [ignored, forceUpdate] = useReducer((x) => x + 1, 0);
 
+  const refetch = async () => {
+    const monitors = await axios.get<any>(
+      GET_MONITORS_API,
+      {
+        params: {
+          query: searchName,
+          page: page + 1,
+          limit: rowsPerPage,
+          ...(props.model_id && {model_id: props.model_id})
+        }
+      }
+      
+    );
+    console.log(monitors.data);
+    setMonitorList(monitors.data ? monitors.data.monitor_list : [])
+  }
+  const monitors = useGetMonitors({
+    query: searchName,
+    page: page + 1,
+    limit: rowsPerPage,
+    ...(props.model_id && {model_id: props.model_id})
+  });
+  const [monitorList, setMonitorList] = useState<any>(monitors.data ? monitors.data.data.monitor_list : []);
+  
+ 
+
+  const handleDelete = async (monitorId: string) => {
+    await MonitorDelete(monitorId);
+    setMonitorList(monitorList.filter((monitor : any) => monitor.monitor_id !== monitorId));
+    forceUpdate();
+    enqueueSnackbar('Deleted Monitor.', { variant: 'info' });
+  }
+
+  const { enqueueSnackbar } = useSnackbar();
+
+  const { isDeleting, error, MonitorDelete } = useMonitorDelete();
+
+  useEffect(() => {
+    refetch();
+  }, [ignored, searchName, page, rowsPerPage])
+
+  console.log(monitorList);
   const classes = useStyles();
 
   const { modelID } = useSelector(
@@ -242,13 +245,24 @@ const MonitorListTable = () => {
   const handleFilterByName = (searchName: string) => {
     setSearchName(searchName);
   };
-  const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+  const [openPopover, setOpenPopover] = useState('');
+  const handleClick = (event: React.MouseEvent<HTMLButtonElement>, id: string) => {
+    if (id === openPopover) {
+      setOpenPopover('');
+      setAnchorEl(null);
+    } else {
+      setOpenPopover(id);
+      setAnchorEl(event.currentTarget);
+    }
     setAnchorEl(event.currentTarget);
   };
 
   const handleClose = () => {
+    setOpenPopover('');
     setAnchorEl(null);
   };
+
+  
 
   const open = Boolean(anchorEl);
   const id = open ? 'simple-popover' : undefined;
@@ -298,7 +312,7 @@ const MonitorListTable = () => {
                         {row.monitor_name}
                       </TableCell>
                       <TableCell className={classes.tableCell} align="center">
-                        {row.monitor_date}
+                        {row.monitor_type}
                       </TableCell>
                       {modelID === null ? (
                         <TableCell className={classes.tableCell} align="center">
@@ -338,14 +352,15 @@ const MonitorListTable = () => {
                         <Button
                           className={classes.actionBtn}
                           aria-describedby={id}
-                          onClick={handleClick}
+                          onClick={(event) => handleClick(event, row.monitor_id)}
                         >
                           <MoreHorizIcon className={classes.icon} />
                         </Button>
                         <Popover
-                          id={id}
-                          open={open}
+                          id={row.monitor_id}
+                          open={row.monitor_id === openPopover}
                           anchorEl={anchorEl}
+                          key={row.monitor_id}
                           onClose={handleClose}
                           anchorOrigin={{
                             vertical: 'bottom',
@@ -356,7 +371,7 @@ const MonitorListTable = () => {
                           <Box className={classes.actionPopup}>
                             <Button className={classes.actionPopupBtn}>Disable</Button>
                             <Button className={classes.actionPopupBtn}>Edit</Button>
-                            <Button className={classes.actionPopupBtn}>Delete</Button>
+                            <Button onClick={() => handleDelete(row.monitor_id)} className={classes.actionPopupBtn}>Delete</Button>
                           </Box>
                         </Popover>
                       </TableCell>

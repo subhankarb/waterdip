@@ -27,7 +27,7 @@ const ModelMonitors = () => {
   return (
     <Page title="Model Monitor | Waterdip">
       <RootStyle>
-        <MonitorListTable />
+        <MonitorListTable model_id={ modelId }/>
       </RootStyle>
     </Page>
   );

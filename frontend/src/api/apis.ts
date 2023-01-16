@@ -23,5 +23,7 @@ export const GET_DATASET_INFO_API = makeUrl(`dataset.info`);
 export const GET_METRICS_DATASET = makeUrl(`metrics.dataset`);
 
 export const CREATE_MONITOR_API = makeUrl('monitor.create');
+export const GET_MONITORS_API = makeUrl('list.monitors');
+export const DELETE_MONITOR_API = makeUrl('monitor.delete');
 
 export const GET_ALERTS_API = makeUrl('list.incidents');
