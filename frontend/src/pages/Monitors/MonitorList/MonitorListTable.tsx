@@ -198,7 +198,6 @@ const MonitorListTable = (props: any) => {
       }
       
     );
-    console.log(monitors.data);
     setMonitorList(monitors.data ? monitors.data.monitor_list : [])
   }
   const monitors = useGetMonitors({
@@ -207,10 +206,8 @@ const MonitorListTable = (props: any) => {
     limit: rowsPerPage,
     ...(props.model_id && {model_id: props.model_id})
   });
+  const meta = monitors?.data?.data.meta || { page: 0, total: 0, limit: 10};
   const [monitorList, setMonitorList] = useState<any>(monitors.data ? monitors.data.data.monitor_list : []);
-  
- 
-
   const handleDelete = async (monitorId: string) => {
     await MonitorDelete(monitorId);
     setMonitorList(monitorList.filter((monitor : any) => monitor.monitor_id !== monitorId));
@@ -226,7 +223,6 @@ const MonitorListTable = (props: any) => {
     refetch();
   }, [ignored, searchName, page, rowsPerPage])
 
-  console.log(monitorList);
   const classes = useStyles();
 
   const { modelID } = useSelector(
@@ -383,9 +379,9 @@ const MonitorListTable = (props: any) => {
         </Scrollbar>
 
         <TablePagination
-          page={0}
+          page={meta.page}
           component="div"
-          count={0}
+          count={meta.total}
           rowsPerPage={rowsPerPage}
           onPageChange={handleChangePage}
           rowsPerPageOptions={[5, 10, 50]}
