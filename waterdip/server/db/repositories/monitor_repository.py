@@ -70,8 +70,15 @@ class MonitorRepository:
 
         return [BaseMonitorDB(**monitor) for monitor in monitors]
 
-    def delete_monitor(self, monitor_id: UUID) -> None:
-        self._mongo.database[MONGO_COLLECTION_MONITORS].delete_one(
-            {"monitor_id": str(monitor_id)}
-        )
-        return None
+    def delete_monitor(self, monitor_id: UUID) -> Dict:
+        try:
+            self._mongo.database[MONGO_COLLECTION_MONITORS].delete_one(
+                {"monitor_id": str(monitor_id)}
+            )
+            return {
+                "status": "success",
+            }
+        except Exception as e:
+            return {
+                "status": "error",
+            }

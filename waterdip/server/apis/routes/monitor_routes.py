@@ -60,7 +60,7 @@ def create_monitor(
         )
 
 
-@router.delete("/monitor.delete", name="monitor:delete")
+@router.post("/monitor.delete", name="monitor:delete")
 def delete_monitor(
     monitor_id: UUID = Body(..., description="the monitor id"),
     service: MonitorService = Depends(MonitorService.get_instance),
