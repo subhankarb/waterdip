@@ -112,6 +112,13 @@ class AlertService:
                     "count": {"$sum": 1},
                 }
             },
+            {
+                "$sort": {
+                    "_id.year": 1,
+                    "_id.month": 1,
+                    "_id.day": 1,
+                }
+            }
         ]
         week_stats = self._repository.agg_alerts(agg_alert_count_week_pipeline)
         day_vs_count = dict()

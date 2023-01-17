@@ -206,6 +206,13 @@ class EventDatasetRowService:
                     "count": {"$sum": 1},
                 }
             },
+            {
+                "$sort": {
+                    "_id.year": 1,
+                    "_id.month": 1,
+                    "_id.day": 1,
+                }
+            }
         ]
 
         prediction_histogram = self._repository.agg_prediction(
@@ -218,7 +225,6 @@ class EventDatasetRowService:
                 datetime(i["_id"]["year"], i["_id"]["month"], i["_id"]["day"])
             )
             val.append(i["count"])
-
         return DateHistogram(date_bins=date_bins, val=val)
 
     def prediction_histogram_version(self, model_id: str) -> dict:
@@ -257,6 +263,13 @@ class EventDatasetRowService:
                     },
                 }
             },
+            {
+                "$sort": {
+                    "_id.year": 1,
+                    "_id.month": 1,
+                    "_id.day": 1,
+                }
+            }
         ]
         predictions_versions = []
         for versions_prediction in self._repository.agg_prediction(
