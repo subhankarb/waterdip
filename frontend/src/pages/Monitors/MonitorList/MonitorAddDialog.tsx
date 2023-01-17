@@ -176,15 +176,18 @@ const TabContent = ({ data }: Props) => {
 };
 
 const MonitorAddDialog = (props: any) => {
+  const { modelID, pathLocation } = useSelector(
+    (state: { modelMonitorState: ModelMonitorState }) => state.modelMonitorState
+  );
   const classes = useStyles();
-  const [model, setModel] = useState('');
+  const [model, setModel] = useState(modelID ? modelID : '');
   const [version, setVersion] = useState('');
   const [type, setType] = useState('');
   const navigate = useNavigate();
   const { data } = usePaginatedModels({
     query: '',
     page: 1,
-    limit: 10,
+    limit: 1000,
     sort: 'model_name_asc',
     get_all_versions_flag: true
   });
@@ -200,15 +203,27 @@ const MonitorAddDialog = (props: any) => {
   const handleChangeType = (event: any) => {
     setType(event.target.value);
   };
-  const { modelID, pathLocation } = useSelector(
-    (state: { modelMonitorState: ModelMonitorState }) => state.modelMonitorState
-  );
+  
   const handleVersionFilter = (Model: any) => {
-    if (Model.id == model) {
-      return Model
+    if (pathLocation == "model"){
+      if (Model.id == modelID) {
+        return Model;
+      }
+    } else {
+      if (Model.id == model) {
+        return Model;
+      }
     }
   }
+  const MenuProps = {
+    PaperProps: {
+      style: {
+        maxHeight: 250,
+      },
+    },
+  };
   console.log(modelList.filter(handleVersionFilter));
+  console.log(pathLocation);
   return (
     <Box className={classes.dialogBoxMonitorType}>
       <Box className={classes.modelContainer}>
@@ -218,7 +233,7 @@ const MonitorAddDialog = (props: any) => {
             <MenuItem value={`${modelID}`}>{modelID}</MenuItem>
           </Select>
         ) : (
-          <Select defaultValue="select" className={classes.select} onChange={handleChangeModel}>
+          <Select defaultValue="select" className={classes.select} onChange={handleChangeModel} MenuProps={MenuProps}>
             <MenuItem value="select" disabled className="selectDisable">
               Select Model Name
             </MenuItem>
@@ -231,11 +246,18 @@ const MonitorAddDialog = (props: any) => {
         )}
         <Box className={classes.conatinerHeading}>Model Version</Box>
         {pathLocation === 'model' ? (
-          <Select defaultValue={`${modelID}`} className={classes.select} disabled onChange={handleChangeVersion}>
-            <MenuItem value={`${modelID}`}>{modelID}</MenuItem>
+          <Select defaultValue={"select"} className={classes.select} onChange={handleChangeVersion} MenuProps={MenuProps}>
+            <MenuItem value="select" disabled className="selectDisable">
+              Select Version
+            </MenuItem>
+            {(modelList.filter(handleVersionFilter) !== []  && modelList.filter(handleVersionFilter)[0] && modelList.filter(handleVersionFilter)[0].versions)? Object.values(modelList.filter(handleVersionFilter)[0].versions).map((row: any) => (
+              <MenuItem value={row.v1} key={row.v1}>
+                {row.v1}
+              </MenuItem>
+            )) : null}
           </Select>
         ) : (
-          <Select defaultValue="select" className={classes.select} onChange={handleChangeVersion}>
+          <Select defaultValue="select" className={classes.select} onChange={handleChangeVersion} MenuProps={MenuProps}>
             <MenuItem value="select" disabled className="selectDisable">
               Select Version
             </MenuItem>
@@ -248,8 +270,13 @@ const MonitorAddDialog = (props: any) => {
         )}
         <Box className={classes.conatinerHeading}>Monitor Type</Box>
         {pathLocation === 'model' ? (
-          <Select defaultValue={`${modelID}`} className={classes.select} disabled onChange={handleChangeType}>
-            <MenuItem value={`${modelID}`}>{modelID}</MenuItem>
+          <Select defaultValue="select" className={classes.select} onChange={handleChangeType} MenuProps={MenuProps}>
+            <MenuItem value="select" disabled className="selectDisable">
+              Select Type
+            </MenuItem>
+              <MenuItem value="Data Quality" key="1">Data Quality</MenuItem>
+              <MenuItem value="Drift" key="2">Drift</MenuItem>
+              <MenuItem value="Model Performance" key="3">Model Performance</MenuItem>
           </Select>
         ) : (
           <Select defaultValue="select" className={classes.select} onChange={handleChangeType}>

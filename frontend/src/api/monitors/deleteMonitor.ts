@@ -17,7 +17,7 @@ export const useMonitorDelete = (): DeleteMonitorHook => {
   const MonitorDelete = async (monitorID: string) => {
     setIsDeleting(true);
     try {
-      await axios.delete(DELETE_MONITOR_API, { data : ""+ monitorID });
+      await axios.post(DELETE_MONITOR_API,  monitorID);
     } catch (err) {
       setError(err as MyError);
     } finally {
