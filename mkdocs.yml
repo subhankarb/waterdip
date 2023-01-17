@@ -45,7 +45,7 @@ nav:
     - Quick Start: introduction/quick_start.md
   - Concepts:
     - What is ML Observability: concepts/what_is_ml_observability.md
-    - Model & Versions: concepts/model _and_versions.md
+    - Model & Versions: concepts/model_and_versions.md
     - Monitor & Alerts: concepts/monitor_and_alerts.md
   - Support:
     - Contact: support/contact.md
