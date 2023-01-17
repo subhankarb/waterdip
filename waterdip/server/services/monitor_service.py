@@ -173,6 +173,7 @@ class MonitorService:
 
     def delete_monitor(self, monitor_id: UUID):
         return self._repository.delete_monitor(monitor_id=str(monitor_id))
+
     def list_monitors(
         self,
         sort_request: Optional[RequestSort] = None,

@@ -66,6 +66,8 @@ def delete_monitor(
     service: MonitorService = Depends(MonitorService.get_instance),
 ):
     return service.delete_monitor(monitor_id)
+
+
 @router.get("/list.monitors", response_model=MonitorListResponse, name="list:monitor")
 def list_monitor(
     pagination: RequestPagination = Depends(),

@@ -326,16 +326,20 @@ class NumericBasicMetrics(DataMetrics):
             time_filter=self._time_filter_builder(time_range=time_range), **kwargs
         )
         facets = self._collection.aggregate(agg_query).next()
+        total_values = facets["total"]
         average_values = facets["average_values"]
         min_values = facets["min_values"]
         max_values = facets["max_values"]
         zero_values = facets["zero_values"]
         std_dev_values = facets["std_dev_values"] if "std_dev_values" in facets else []
 
-        for average_value in average_values:
+        for (average_value, total_value) in zip(average_values, total_values):
             basic_metrics[average_value["_id"]["column_name"]] = {
-                "avg": average_value["avg"]
+                "avg": round(average_value["avg"], 2)
             }
+            basic_metrics[total_value["_id"]["column_name"]]["total"] = total_value[
+                "count"
+            ]
         for min_value in min_values:
             basic_metrics[min_value["_id"]["column_name"]]["min"] = min_value["min"]
         for max_value in max_values:
@@ -344,10 +348,14 @@ class NumericBasicMetrics(DataMetrics):
             basic_metrics[zero_value["_id"]["column_name"]]["zeros"] = zero_value[
                 "zero_count"
             ]
+
         for std_dev_value in std_dev_values:
-            basic_metrics[std_dev_value["_id"]["column_name"]][
-                "std_dev"
-            ] = std_dev_value["std_dev"]
+            basic_metrics[std_dev_value["_id"]["column_name"]]["std_dev"] = round(
+                std_dev_value["std_dev"], 2
+            )
+            basic_metrics[std_dev_value["_id"]["column_name"]]["variance"] = round(
+                std_dev_value["std_dev"] ** 2
+            )
 
         return basic_metrics
 
@@ -356,6 +364,14 @@ class NumericBasicMetrics(DataMetrics):
     ) -> List[Dict[str, Any]]:
 
         facets = {
+            "total": [
+                {
+                    "$group": {
+                        "_id": {"column_name": "$columns.name"},
+                        "count": {"$sum": 1},
+                    }
+                }
+            ],
             "average_values": [
                 {
                     "$group": {
