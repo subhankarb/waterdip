@@ -124,13 +124,13 @@ export default function CollapsibleTableRow(props: { row: any, data_type: any })
         {data_type === 'NUMERIC' && (
           <TableCell className={classes.tableCell} align="center">
             {row.zeros}&nbsp;&nbsp;
-            <span className={classes.span}>{row.zeros_percentage}</span>
+            <span className={classes.span}>{row.total === 0 ? 0 : row.zeros / row.total}%</span>
           </TableCell>
         )}
 
         <TableCell className={classes.tableCell} align="center">
           {row.missing_total}&nbsp;&nbsp;
-          <span className={classes.span}>{row.missing_percentage}</span>
+          <span className={classes.span}>{row.missing_percentage}%</span>
         </TableCell>
         {data_type === 'NUMERIC' ? (
           <>
@@ -141,7 +141,7 @@ export default function CollapsibleTableRow(props: { row: any, data_type: any })
               {row.mean ? <>{row.mean}</> : <>-</>}
             </TableCell>
             <TableCell className={classes.tableCell} align="center">
-              {row.median ? <>{row.median}</> : <>-</>}
+              {row.variance ? <>{row.variance}</> : <>-</>}
             </TableCell>
             <TableCell className={classes.tableCell} align="center">
               {row.std_dev}

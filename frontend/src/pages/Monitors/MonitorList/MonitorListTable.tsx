@@ -379,9 +379,9 @@ const MonitorListTable = (props: any) => {
         </Scrollbar>
 
         <TablePagination
-          page={meta.page}
+          page={meta.page - 1}
           component="div"
-          count={meta.total}
+          count={monitorList.length}
           rowsPerPage={rowsPerPage}
           onPageChange={handleChangePage}
           rowsPerPageOptions={[5, 10, 50]}

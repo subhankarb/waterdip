@@ -60,7 +60,7 @@ export default function CollapsibleTable({ dataValue, data_type }: Props) {
                     Mean
                   </TableCell>
                   <TableCell className={classes.tableHead} align="center" width="7">
-                    Median
+                    Variance
                   </TableCell>
                   <TableCell className={classes.tableHead} align="center" width="7">
                     Std Dev
