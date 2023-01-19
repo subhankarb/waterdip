@@ -31,8 +31,9 @@ from waterdip.server.db.models.monitors import (
     MonitorIdentification,
 )
 from waterdip.server.db.repositories.monitor_repository import MonitorRepository
-from waterdip.server.services.model_service import ModelService, ModelVersionService
 from waterdip.server.services.alert_service import AlertService
+from waterdip.server.services.model_service import ModelService, ModelVersionService
+
 
 class ServiceBaseMonitor(BaseMonitorDB):
     pass
@@ -64,16 +65,14 @@ class MonitorService:
         model_version_service: ModelVersionService = Depends(
             ModelVersionService.get_instance
         ),
-        alert_service : AlertService = Depends(
-            AlertService.get_instance
-        )
+        alert_service: AlertService = Depends(AlertService.get_instance),
     ):
         if not cls._INSTANCE:
             cls._INSTANCE = cls(
                 repository=repository,
                 model_service=model_service,
                 model_version_service=model_version_service,
-                alert_service=alert_service
+                alert_service=alert_service,
             )
         return cls._INSTANCE
 
@@ -82,12 +81,13 @@ class MonitorService:
         repository: MonitorRepository,
         model_service: ModelService,
         model_version_service: ModelVersionService,
-        alert_service : AlertService
+        alert_service: AlertService,
     ):
         self._repository = repository
         self.model_service = model_service
         self.model_version_service = model_version_service
         self.alert_service = alert_service
+
     def _check_monitor_identification(
         self, monitor_identification: MonitorIdentification
     ):
@@ -201,12 +201,16 @@ class MonitorService:
             limit=pagination.limit if pagination else 10,
         )
         for monitor in monitors:
-            monitor.count_of_alerts =  self.alert_service.count_alert_by_filter({
-                "model_id": str(monitor.monitor_identification.model_id)
-            })
+            monitor.count_of_alerts = self.alert_service.count_alert_by_filter(
+                {"model_id": str(monitor.monitor_identification.model_id)}
+            )
             monitor.model_name = self.model_service.find_by_id(
                 model_id=monitor.monitor_identification.model_id
             ).model_name
         return monitors
+
     def count_monitors(self) -> int:
         return self._repository.count_monitors(filters={})
+
+    def delete_monitors_by_model_id(self, model_id: UUID):
+        self._repository.delete_monitors_by_model_id(model_id=str(model_id))

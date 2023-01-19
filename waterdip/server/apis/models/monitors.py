@@ -12,11 +12,12 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
+from datetime import datetime
 from typing import Dict, List, Optional, Union
 from uuid import UUID
 
 from pydantic import BaseModel
-from datetime import datetime
+
 from waterdip.core.commons.models import MonitorType
 from waterdip.core.monitors.models import MonitorCondition
 from waterdip.server.db.models.monitors import (
@@ -74,9 +75,9 @@ class MonitorListRow(BaseModel):
     monitor_type: MonitorType
     monitor_identification: MonitorIdentification
     monitor_condition: MonitorCondition
-    count_of_alerts : int
-    model_name : str
-    last_run : Optional[datetime]
+    count_of_alerts: int
+    model_name: str
+    last_run: Optional[datetime]
 
 
 class MonitorListResponse(BaseModel):

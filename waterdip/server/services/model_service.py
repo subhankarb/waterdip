@@ -48,10 +48,14 @@ from waterdip.server.db.repositories.model_repository import (
     ModelRepository,
     ModelVersionRepository,
 )
+from waterdip.server.db.repositories.monitor_repository import MonitorRepository
 from waterdip.server.errors.base_errors import EntityNotFoundError
 from waterdip.server.services.alert_service import AlertService
 from waterdip.server.services.dataset_service import DatasetService, ServiceEventDataset
-from waterdip.server.services.row_service import EventDatasetRowService
+from waterdip.server.services.row_service import (
+    BatchDatasetRowService,
+    EventDatasetRowService,
+)
 
 
 class ModelVersionService:
@@ -150,6 +154,9 @@ class ModelVersionService:
 
         return model_version
 
+    def delete_versions_by_model_id(self, model_id: uuid.UUID) -> None:
+        self._repository.delete_versions_by_model_id(str(model_id))
+
     def agg_model_versions_per_model(
         self, model_ids: List[str]
     ) -> Dict[str, List[str]]:
@@ -185,6 +192,11 @@ class ModelService:
             EventDatasetRowService.get_instance
         ),
         alert_service: AlertService = Depends(AlertService.get_instance),
+        batch_dataset_row_service: BatchDatasetRowService = Depends(
+            BatchDatasetRowService.get_instance
+        ),
+        dataset_service: DatasetService = Depends(DatasetService.get_instance),
+        monitor_repo: MonitorRepository = Depends(MonitorRepository.get_instance),
     ):
         if not cls._INSTANCE:
             cls._INSTANCE = cls(
@@ -192,6 +204,9 @@ class ModelService:
                 model_version_service=model_version_service,
                 row_service=row_service,
                 alert_service=alert_service,
+                batch_dataset_row_service=batch_dataset_row_service,
+                dataset_service=dataset_service,
+                monitor_repo=monitor_repo,
             )
         return cls._INSTANCE
 
@@ -201,11 +216,17 @@ class ModelService:
         model_version_service: ModelVersionService,
         row_service: EventDatasetRowService,
         alert_service: AlertService,
+        batch_dataset_row_service: BatchDatasetRowService,
+        dataset_service: DatasetService,
+        monitor_repo: MonitorRepository,
     ):
         self._repository = repository
         self._model_version_service = model_version_service
         self._row_service = row_service
         self._alert_service = alert_service
+        self._batch_dataset_row_service = batch_dataset_row_service
+        self._dataset_service = dataset_service
+        self._monitor_repo = monitor_repo
 
     def register_model(
         self, model_name: str, model_id: Optional[UUID] = None
@@ -352,3 +373,12 @@ class ModelService:
             if len(model_versions) > 0
             else None,
         )
+
+    def delete_model(self, model_id: UUID):
+        self._row_service.delete_rows_by_model_id(model_id)
+        self._batch_dataset_row_service.delete_rows_by_model_id(model_id)
+        self._dataset_service.delete_datasets_by_model_id(model_id)
+        self._monitor_repo.delete_monitors_by_model_id(model_id)
+        self._alert_service.delete_alerts_by_model_id(model_id)
+        self._model_version_service.delete_versions_by_model_id(model_id)
+        self._repository.delete_model(model_id)

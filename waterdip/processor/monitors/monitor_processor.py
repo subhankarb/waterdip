@@ -25,7 +25,11 @@ from waterdip.core.monitors.evaluators.data_quality import EmptyValueEvaluator
 from waterdip.core.monitors.models import DataQualityBaseMonitorCondition
 from waterdip.server.db.models.alerts import AlertDB, AlertIdentification, BaseAlertDB
 from waterdip.server.db.models.datasets import BaseDatasetDB
-from waterdip.server.db.mongodb import MONGO_COLLECTION_EVENT_ROWS, MONGO_COLLECTION_MONITORS, MongodbBackend
+from waterdip.server.db.mongodb import (
+    MONGO_COLLECTION_EVENT_ROWS,
+    MONGO_COLLECTION_MONITORS,
+    MongodbBackend,
+)
 from waterdip.server.db.repositories.alert_repository import AlertRepository
 from waterdip.server.db.repositories.dataset_repository import DatasetRepository
 from waterdip.server.errors.base_errors import EntityNotFoundError

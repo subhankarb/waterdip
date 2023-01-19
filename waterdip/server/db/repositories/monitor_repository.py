@@ -82,3 +82,16 @@ class MonitorRepository:
             return {
                 "status": "error",
             }
+
+    def delete_monitors_by_model_id(self, model_id: UUID) -> Dict:
+        try:
+            self._mongo.database[MONGO_COLLECTION_MONITORS].delete_many(
+                {"monitor_identification.model_id": str(model_id)}
+            )
+            return {
+                "status": "success",
+            }
+        except Exception as e:
+            return {
+                "status": "error",
+            }

@@ -78,6 +78,11 @@ class EventDatasetRowRepository:
             filter=filter
         )
 
+    def delete_rows_by_model_id(self, model_id: str):
+        return self._mongo.database[MONGO_COLLECTION_EVENT_ROWS].delete_many(
+            {"model_id": model_id}
+        )
+
 
 class BatchDatasetRowRepository:
 
@@ -113,4 +118,9 @@ class BatchDatasetRowRepository:
     def agg_rows(self, agg_pipeline: List[Dict]):
         return self._mongo.database[MONGO_COLLECTION_BATCH_ROWS].aggregate(
             pipeline=agg_pipeline
+        )
+
+    def delete_rows_by_model_id(self, model_id: str):
+        return self._mongo.database[MONGO_COLLECTION_BATCH_ROWS].delete_many(
+            {"model_id": model_id}
         )

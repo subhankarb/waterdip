@@ -19,7 +19,11 @@ import pytest
 from pydantic import ValidationError
 
 from tests.testing_helpers import MODEL_ID, MODEL_VERSION_ID_V1, MongodbBackendTesting
-from waterdip.server.db.mongodb import MONGO_COLLECTION_MONITORS , MONGO_COLLECTION_ALERTS , MONGO_COLLECTION_MODELS
+from waterdip.server.db.mongodb import (
+    MONGO_COLLECTION_ALERTS,
+    MONGO_COLLECTION_MODELS,
+    MONGO_COLLECTION_MONITORS,
+)
 from waterdip.server.db.repositories.monitor_repository import MonitorRepository
 from waterdip.server.services.monitor_service import MonitorService
 
@@ -58,10 +62,7 @@ class TestMonitorService:
         self.mock_mongo_backend.database[MONGO_COLLECTION_MONITORS].delete_many({})
         self.mock_mongo_backend.database[MONGO_COLLECTION_MONITORS].insert_one(data)
         self.MODEL_NAME = "Test Model"
-        model = {
-            "model_id" : MODEL_ID,
-            "model_name" : self.MODEL_NAME
-        }
+        model = {"model_id": MODEL_ID, "model_name": self.MODEL_NAME}
         self.mock_mongo_backend.database[MONGO_COLLECTION_MODELS].insert_one(model)
 
     def test_should_return_monitor_list(self):

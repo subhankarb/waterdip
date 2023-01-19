@@ -18,7 +18,7 @@ from typing import Dict, List
 
 from dateutil.parser import parse
 from fastapi import Depends
-
+from uuid import UUID
 from waterdip.core.commons.models import MonitorType
 from waterdip.server.apis.models.models import ModelOverviewAlertList
 from waterdip.server.db.repositories.alert_repository import (
@@ -118,7 +118,7 @@ class AlertService:
                     "_id.month": 1,
                     "_id.day": 1,
                 }
-            }
+            },
         ]
         week_stats = self._repository.agg_alerts(agg_alert_count_week_pipeline)
         day_vs_count = dict()
@@ -181,3 +181,6 @@ class AlertService:
 
         today_alert_count = self._repository.count_alerts(today_alerts_count_filter)
         return today_alert_count
+
+    def delete_alerts_by_model_id(self, model_id: UUID) -> None:
+        self._repository.delete_alerts_by_model_id(str(model_id))
