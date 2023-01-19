@@ -33,11 +33,15 @@ extra_css:
 markdown_extensions:
   - pymdownx.highlight:
       anchor_linenums: true
+  - pymdownx.emoji:
+      emoji_index: !!python/name:materialx.emoji.twemoji
+      emoji_generator: !!python/name:materialx.emoji.to_svg
   - pymdownx.inlinehilite
   - pymdownx.snippets
   - pymdownx.superfences
   - attr_list
   - md_in_html
+  - tables
 nav:
   - Welcome to Waterdip: index.md
   - Introduction:
@@ -45,7 +49,10 @@ nav:
     - Quick Start: introduction/quick_start.md
   - Concepts:
     - What is ML Observability: concepts/what_is_ml_observability.md
-    - Model & Versions: concepts/model_and_versions.md
+    - Metric Types:
+      - Data Quality: concepts/metric_type_data_quality.md
+      - Model Performance: concepts/metric_type_model_performance.md
+      - Drift: concepts/metric_type_drift.md
     - Monitor & Alerts: concepts/monitor_and_alerts.md
   - Support:
     - Contact: support/contact.md
