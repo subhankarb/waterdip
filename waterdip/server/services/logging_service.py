@@ -320,7 +320,7 @@ class EventLoggingService:
                     prediction_name,
                     prediction_data,
                     schema_details,
-                    ColumnMappingType.FEATURE,
+                    ColumnMappingType.PREDICTION,
                 )
             )
             prediction_cf[schema_details.list_index] = (
