@@ -99,26 +99,38 @@ export const ConfigBaseLine = ({ path }: Props) => {
   );
 };
 
+
 export const ConfigEvaluation = () => {
   const classes = useStyles();
-  const [data, setData] = useState<string>('0');
+  const [data, setData] = useState<string>('');
+  interface classList{
+    classN : string;
+  }
+  
+  const allClasses: Array<classList> = [
+    {classN: "Extremely Positive"},
+    {classN: "Extremely Negative"},
+    {classN: "Positive"},
+    {classN: "Negative"}
+  ]
+
 
   return (
     <Box className={classes.card}>
-      <Heading heading="Evaluation window" />
+      <Heading heading="Setup Positive Class" />
       <Box className={classes.baseLineContent}>
         <TextField
           select
           fullWidth
-          label="Select evaluation window"
+          label="Select positive class"
           value={data}
           onChange={(e) => setData(e.target.value)}
           sx={{ mt: 2, mb: 2.5 }}
           placeholder="Choose the evaluation"
         >
-          <MenuItem value="0">72 Hrs</MenuItem>
-          <MenuItem value="1">1 week</MenuItem>
-          <MenuItem value="2">1 month</MenuItem>
+          {allClasses.map((c: any)=> (
+                <MenuItem value={c.classN}>{c.classN}</MenuItem>
+          ))}
         </TextField>
         <Box className={classes.btnContainer}>
           <Button variant="contained" className={classes.btn}>

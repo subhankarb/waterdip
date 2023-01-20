@@ -73,13 +73,14 @@ const ChartLine = ({ state, data }: Props) => {
     }
   };
   useEffect(() => {
-    const updatedSeries = series.map(s => {
-      const id = s.name;
-      if (state[0][id] === false) {
-          ApexCharts.exec('overview', 'hideSeries', `${id}`);
-      } else {
-          ApexCharts.exec('overview', 'showSeries', `${id}`);
-      }
+    state.forEach((seriesState: any, index: any) => {
+        Object.keys(seriesState).forEach(id => {
+            if (seriesState[id] === false) {
+                ApexCharts.exec('overview', 'hideSeries', `${id}`);
+            } else {
+                ApexCharts.exec('overview', 'showSeries', `${id}`);
+            }
+        });
     });
   }, [state]);
   return (
