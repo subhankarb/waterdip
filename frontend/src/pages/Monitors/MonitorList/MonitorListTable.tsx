@@ -334,7 +334,7 @@ const MonitorListTable = (props: any) => {
                         </Box>
                       </TableCell>
                       <TableCell className={classes.tableCell} align="center">
-                        {capitalize(row.num_alerts)}
+                        {capitalize(row.count_of_alerts)}
                       </TableCell>
                       <TableCell
                         className={classes.tableCell}

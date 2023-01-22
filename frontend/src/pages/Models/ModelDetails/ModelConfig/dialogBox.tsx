@@ -4,8 +4,9 @@ import DateRangeSelect from './DateRangeSelect';
 import { formatDateTime } from '../../../../utils/date';
 import trashOutline from '@iconify/icons-eva/trash-outline';
 import { Icon } from '@iconify/react';
-import TextField from '@material-ui/core/TextField';
+import { Box, TextField, MenuItem, Button } from '@material-ui/core';
 import { Grid } from '@material-ui/core';
+import { colors } from '../../../../theme/colors';
 
 const useStyles = makeStyles(() => ({
   outerBox: {
@@ -146,6 +147,23 @@ const useStyles = makeStyles(() => ({
     background: '#ffffff',
     borderWidth: '1px',
     marginTop: '10px'
+  },
+  baseLineContent: {
+    width: '100%',
+    borderRadius: '4px',
+    paddingTop: '1rem',
+    paddingLeft: '1.1rem',
+    paddingRight: '1.1rem'
+  },
+  btnContainer: {
+    display: 'flex',
+    justifyContent: 'flex-end'
+  },
+  btn: {
+    paddingLeft: '1.5rem',
+    paddingRight: '1.5rem',
+    background: colors.textPrimary,
+    letterSpacing: '.1rem'
   }
 }));
 
@@ -162,6 +180,7 @@ export const DialogBoxPart = ({ onSave, onSelect }: Props) => {
   const [confiDisplay, setconfiDisplay] = useState(false);
   const [dataDisplay, setDataDisplay] = useState(false);
   const [dateRange, setDateRange] = useState([new Date(now.getTime() - 5 * 60 * 60 * 1000), now]);
+  const [data, setData] = useState<string>('');
   const [expandForm, setExpandForm] = useState(true);
 
   useEffect(() => {
@@ -200,7 +219,7 @@ export const DialogBoxPart = ({ onSave, onSelect }: Props) => {
             }}
           >
             {' '}
-            Datasets
+            Dataset Environment
           </button>
         </div>
       ) : null}
@@ -257,7 +276,7 @@ export const DialogBoxPart = ({ onSave, onSelect }: Props) => {
       {dataDisplay === true ? (
         <div className={classes.outerBox}>
           <div className={classes.boxHeading}>
-            Select Dataset from below list{' '}
+            Select Dataset Environment from below list{' '}
             <button
               type="button"
               className={classes.dateBoxButton}
@@ -269,6 +288,31 @@ export const DialogBoxPart = ({ onSave, onSelect }: Props) => {
               cancel
             </button>
           </div>
+          <Box className={classes.baseLineContent}>
+          <TextField
+            select
+            fullWidth
+            label="Select positive class"
+            value={data}
+            onChange={(e) => setData(e.target.value)}
+            sx={{ mt: 2, mb: 2.5 }}
+            placeholder="Select Environment"
+          >
+          <MenuItem value="TRAINING">Training</MenuItem>
+          <MenuItem value="TESTING">Testing</MenuItem>
+          <MenuItem value="VALIDATION">Validation</MenuItem>
+
+        </TextField>
+        <Box className={classes.btnContainer}>
+          <Button variant="contained" className={classes.btn}
+            onClick={() => {
+              setExpandForm(false);
+            }}
+          >
+            Save
+          </Button>
+        </Box>
+        </Box>
         </div>
       ) : null}
     </>
