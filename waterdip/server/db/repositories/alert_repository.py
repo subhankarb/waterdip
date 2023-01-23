@@ -68,3 +68,8 @@ class AlertRepository:
             .sort("created_at", -1)
             .limit(limit)
         )
+
+    def delete_alerts_by_model_id(self, model_id: str):
+        return self._mongo.database[MONGO_COLLECTION_ALERTS].delete_many(
+            {"model_id": model_id}
+        )

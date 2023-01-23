@@ -141,3 +141,12 @@ def model_version_info(
     return ModelVersionInfoResponse(
         model_version=model_version, datasets=associated_datasets
     )
+
+
+@router.post("/model.delete")
+def delete_model(
+    model_id: UUID = Body(..., description="the model id to delete"),
+    service: ModelService = Depends(ModelService.get_instance),
+):
+    service.delete_model(model_id=model_id)
+    return {"message": "Model deleted successfully"}

@@ -131,6 +131,13 @@ class TestAlertRepository:
                 if alert["alerts"][1]["monitor_type"] == MonitorType.PERFORMANCE:
                     assert alert["alerts"][1]["count"] == 1
 
+    def test_should_delete_alerts_by_model_id(self):
+        self.alert_repository.delete_alerts_by_model_id(str(self.model_ids[0]))
+        count = self.mock_mongo_backend.database[
+            MONGO_COLLECTION_ALERTS
+        ].count_documents({"model_id": str(self.model_ids[0])})
+        assert count == 0
+
     @classmethod
     def teardown_class(cls):
         cls.mock_mongo_backend.database[MONGO_COLLECTION_ALERTS].drop()

@@ -16,7 +16,7 @@ from datetime import date, datetime, timedelta
 from typing import Dict, List, Union
 
 from fastapi import Depends
-
+from uuid import UUID
 from waterdip.server.apis.models.models import DateHistogram, ModelOverviewPredictions
 from waterdip.server.db.models.dataset_rows import (
     BaseClassificationEventRowDB,
@@ -55,6 +55,9 @@ class BatchDatasetRowService:
     def insert_rows(self, rows: List[ServiceDatasetBatchRow]) -> int:
         inserted_rows = self._repository.inset_rows(rows)
         return len(inserted_rows)
+
+    def delete_rows_by_model_id(self, model_id: UUID) -> int:
+        self._repository.delete_rows_by_model_id(str(model_id))
 
 
 class ServiceEventRow(BaseEventRowDB):
@@ -212,7 +215,7 @@ class EventDatasetRowService:
                     "_id.month": 1,
                     "_id.day": 1,
                 }
-            }
+            },
         ]
 
         prediction_histogram = self._repository.agg_prediction(
@@ -269,7 +272,7 @@ class EventDatasetRowService:
                     "_id.month": 1,
                     "_id.day": 1,
                 }
-            }
+            },
         ]
         predictions_versions = []
         for versions_prediction in self._repository.agg_prediction(
@@ -289,3 +292,6 @@ class EventDatasetRowService:
                 }
             )
         return predictions_versions
+
+    def delete_rows_by_model_id(self, model_id: UUID) -> None:
+        self._repository.delete_rows_by_model_id(str(model_id))

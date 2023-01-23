@@ -133,3 +133,6 @@ class DatasetService:
             raise EntityNotFoundError(name=str(dataset_id), type="Dataset")
 
         return dataset_list[0]
+
+    def delete_datasets_by_model_id(self, model_id: UUID):
+        self._repository.delete_datasets_by_model_id(str(model_id))

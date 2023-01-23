@@ -20,7 +20,7 @@ import pytest
 from tests.testing_helpers import MongodbBackendTesting
 from waterdip.core.commons.models import MonitorType
 from waterdip.server.db.models.alerts import BaseAlertDB
-from waterdip.server.db.mongodb import MongodbBackend
+from waterdip.server.db.mongodb import MONGO_COLLECTION_ALERTS, MongodbBackend
 from waterdip.server.db.repositories.alert_repository import AlertRepository
 from waterdip.server.services.alert_service import AlertService
 
@@ -139,14 +139,11 @@ class TestAlertService:
         assert latest_alerts[0].alert_id == latest_alerts[0].alert_id
         assert latest_alerts[0].monitor_type == MonitorType.DRIFT
         assert latest_alerts[0].created_at == latest_alerts[0].created_at
-        # assert latest_alerts[0].monitor_name == latest_alerts[0].monitor_name
 
         assert latest_alerts[1].alert_id == latest_alerts[1].alert_id
         assert latest_alerts[1].monitor_type == MonitorType.DRIFT
         assert latest_alerts[1].created_at == latest_alerts[1].created_at
-        # assert latest_alerts[1].monitor_name == latest_alerts[1].monitor_name
 
     @classmethod
     def teardown_class(cls):
-        pass
-        # cls.mock_mongo_backend.database[MONGO_COLLECTION_ALERTS].drop()
+        cls.mock_mongo_backend.database[MONGO_COLLECTION_ALERTS].drop()

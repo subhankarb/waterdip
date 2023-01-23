@@ -200,3 +200,35 @@ class TestEventDatasetRowRepository:
             }
         )
         assert count == len(rows)
+
+    def test_should_delete_event_dataset_row(self, mock_mongo_backend: MongodbBackend):
+
+        event_repo = EventDatasetRowRepository(mongodb=mock_mongo_backend)
+        mongo_db = mock_mongo_backend.database[MONGO_COLLECTION_EVENT_ROWS]
+        mongo_db.delete_many({})
+        model_id = uuid.uuid4()
+        rows = [
+            BaseEventRowDB(
+                row_id=uuid.uuid4(),
+                dataset_id=uuid.uuid4(),
+                model_id=model_id,
+                model_version_id=uuid.uuid4(),
+                event_id="event_id",
+                columns=[
+                    EventDataColumnDB(
+                        name="column_name",
+                        value="column_value",
+                        value_numeric=1,
+                        value_categorical="column_value",
+                        data_type=ColumnDataType.CATEGORICAL,
+                        mapping_type=ColumnMappingType.FEATURE,
+                        column_list_index=1,
+                    )
+                ],
+                created_at=datetime.utcnow() - timedelta(days=5),
+            )
+            for _ in range(10)
+        ]
+        mongo_db.insert_many([row.dict() for row in rows])
+        event_repo.delete_rows_by_model_id(model_id=str(model_id))
+        assert mongo_db.count_documents({}) == 0

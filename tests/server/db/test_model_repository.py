@@ -40,6 +40,21 @@ class TestModelsRepository:
         )
         assert model_uuid == inserted_model.model_id
 
+    def test_should_delete_model(self, mock_mongo_backend: MongodbBackend):
+        model_repo = ModelRepository(mongodb=mock_mongo_backend)
+        model_uuid = uuid.uuid4()
+        inserted_model = model_repo.register_model(
+            BaseModelDB(model_id=model_uuid, model_name="test_model")
+        )
+        assert model_uuid == inserted_model.model_id
+        model_repo.delete_model(model_id=model_uuid)
+        assert (
+            mock_mongo_backend.database[
+                MONGO_COLLECTION_MODEL_VERSIONS
+            ].count_documents(filter={"model_id": str(model_uuid)})
+            == 0
+        )
+
 
 @pytest.mark.usefixtures("mock_mongo_backend")
 class TestModelVersionsRepository:
@@ -178,4 +193,43 @@ class TestModelVersionsRepository:
         assert len(response_versions[str(model_id)]) == len(model_versions)
         assert (
             response_versions[str(model_id)][0][1] == model_versions[0]["model_version"]
+        )
+
+    def test_should_delete_all_model_versions_by_id(
+        self, mock_mongo_backend: MongodbBackend
+    ):
+        model_repo = ModelVersionRepository(mongodb=mock_mongo_backend)
+        model_uuid, model_version_uuid, model_version_name = (
+            uuid.uuid4(),
+            uuid.uuid4(),
+            "v1",
+        )
+        mock_mongo_backend.database[MONGO_COLLECTION_MODEL_VERSIONS].delete_many({})
+
+        mock_mongo_backend.database[MONGO_COLLECTION_MODEL_VERSIONS].insert_one(
+            BaseModelVersionDB(
+                model_version_id=model_version_uuid,
+                model_version=model_version_name,
+                model_id=model_uuid,
+                version_schema=ModelVersionSchemaInDB(
+                    features={
+                        "f1": ModelVersionSchemaFieldDetails(
+                            data_type=ColumnDataType.NUMERIC
+                        )
+                    },
+                    predictions={
+                        "p1": ModelVersionSchemaFieldDetails(
+                            data_type=ColumnDataType.NUMERIC
+                        )
+                    },
+                ),
+            ).dict()
+        )
+
+        model_repo.delete_versions_by_model_id(model_id=str(model_uuid))
+        assert (
+            mock_mongo_backend.database[
+                MONGO_COLLECTION_MODEL_VERSIONS
+            ].count_documents({"model_id": str(model_uuid)})
+            == 0
         )

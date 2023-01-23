@@ -67,3 +67,8 @@ class DatasetRepository:
             filter=filters
         )
         return total
+
+    def delete_datasets_by_model_id(self, model_id: str):
+        self._mongo.database[MONGO_COLLECTION_DATASETS].delete_many(
+            filter={"model_id": model_id}
+        )

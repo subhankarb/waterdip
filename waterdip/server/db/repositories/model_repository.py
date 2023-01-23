@@ -89,6 +89,11 @@ class ModelRepository:
         )
         return total
 
+    def delete_model(self, model_id: str) -> None:
+        self._mongo.database[MONGO_COLLECTION_MODELS].delete_one(
+            {"model_id": str(model_id)}
+        )
+
 
 class ModelVersionRepository:
     _INSTANCE = None
@@ -160,3 +165,8 @@ class ModelVersionRepository:
                 )
             agg_model_versions[model_id] = model_versions
         return agg_model_versions
+
+    def delete_versions_by_model_id(self, model_id: str):
+        self._mongo.database[MONGO_COLLECTION_MODEL_VERSIONS].delete_many(
+            {"model_id": model_id}
+        )

@@ -12,11 +12,12 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
-from typing import TypeVar , Optional
+from datetime import datetime
+from typing import Optional, TypeVar
 
 from waterdip.core.commons.models import MonitorType
 from waterdip.core.monitors.models import BaseMonitorCondition
-from datetime import datetime
+
 try:
     from typing import Literal
 except ImportError:
@@ -40,9 +41,9 @@ class BaseMonitorDB(BaseModel):
         description="Monitor types can be data_drift | prediction_drift"
     )
     monitor_condition: BaseMonitorCondition = Field(...)
-    count_of_alerts : Optional[int]
-    model_name : Optional[str]
-    last_run : Optional[datetime]
+    count_of_alerts: Optional[int]
+    model_name: Optional[str]
+    last_run: Optional[datetime]
 
     def dict(self, *args, **kwargs) -> "DictStrAny":
         monitor = super().dict(*args, **kwargs)
