@@ -20,6 +20,7 @@ from pydantic import BaseModel
 from waterdip.core.commons.models import (
     ColumnDataType,
     DateHistogram,
+    ModelBaseline,
     MonitorType,
     PredictionTaskType,
 )
@@ -55,6 +56,7 @@ class RegisterModelResponse(BaseModel):
 
     model_id: UUID
     model_name: str
+    baseline: ModelBaseline
 
 
 class ModelVersionSchema(BaseModel):

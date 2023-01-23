@@ -93,6 +93,16 @@ class DatasetService:
         model_version = self._model_version_repository.find_by_id(
             dataset.model_version_id
         )
+        existed_dataset = self._repository.find_datasets(
+            filters={
+                "model_version_id": str(model_version.model_version_id),
+                "environment": dataset.environment.value,
+            }
+        )
+        if len(existed_dataset) != 0:
+            raise Exception(
+                f"Dataset for Env: [{dataset.environment.value}] already exists"
+            )
 
         if model_version is None:
             raise EntityNotFoundError(

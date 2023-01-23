@@ -20,6 +20,22 @@ from uuid import UUID
 from pydantic import BaseModel, Field, root_validator
 
 
+class Environment(str, Enum):
+    """
+    Model Dataset Environment
+    Attributes:
+    ------------------
+    TRAINING: Training environment
+    TESTING: Testing environment
+    VALIDATION: Validation environment
+    """
+
+    TRAINING = "TRAINING"
+    TESTING = "TESTING"
+    VALIDATION = "VALIDATION"
+    PRODUCTION = "PRODUCTION"
+
+
 class MonitorType(str, Enum):
     """
     Monitor types of the model
@@ -67,19 +83,60 @@ class TimeRange(BaseModel):
 
 
 class MovingTimeWindow(BaseModel):
+    """
+    Fixed time window.
+
+    Attributes:
+    ------------------
+    skip_period:
+       how many days from current day the window starts
+    time_period:
+       time in days for the moving time window
+    aggregation_period:
+       agg period for the time window. Default is 1 day
+    """
+
     skip_period: str = Field(description="", default="1d")
     time_period: str = Field(description="15d", default="15d")
     aggregation_period: str = Field(default="1d")
 
 
 class FixedTimeWindow(BaseModel):
+    """
+    Fixed time window.
+    Attributes:
+    ------------------
+    start_time:
+        start time of the time window
+    end_time:
+        end time of the time window
+    aggregation_period:
+        agg period for the time window. Default is 1 day
+    """
+
     start_time: datetime = Field(...)
     end_time: datetime = Field(...)
     aggregation_period: str = Field(default="1d")
 
 
 class ModelBaseline(BaseModel):
-    dataset_id: Optional[UUID] = Field(description="dataset id", default=None)
+    """
+    Model baseline.
+    Model baseline can either be a batch dataset or a time window.
+    Any one of it is mandatory
+
+    Attributes:
+    ------------------
+    dataset_env:
+        the dataset env. If ENV is Testing, then baseline will point to the dataset for this env
+    time_window:
+        time window for the baseline. Time window can be either FixedTimeWindow or MovingTimeWindow
+
+    """
+
+    dataset_env: Optional[Environment] = Field(
+        description="dataset environment", default=None
+    )
     time_window: Optional[Union[MovingTimeWindow, FixedTimeWindow]] = Field(
         default=MovingTimeWindow()
     )

@@ -28,7 +28,7 @@ from tests.testing_helper_metrics_data import (
     metrics_batch_data_rows,
     metrics_event_rows,
 )
-from waterdip.core.commons.models import DatasetType
+from waterdip.core.commons.models import DatasetType, Environment
 from waterdip.server.db.models.dataset_rows import (
     BaseDatasetBatchRowDB,
     BaseEventRowDB,
@@ -174,7 +174,7 @@ def setup_dataset_data(database):
             model_version_id=UUID(MODEL_VERSION_ID_V1),
             dataset_type=DatasetType.BATCH,
             dataset_name="V1_training",
-            environment="training",
+            environment=Environment.TRAINING,
             created_at=datetime(year=2022, month=11, day=17),
         ),
         BaseDatasetDB(
@@ -183,7 +183,7 @@ def setup_dataset_data(database):
             model_version_id=UUID(MODEL_VERSION_ID_V1),
             dataset_type=DatasetType.BATCH,
             dataset_name="V1_validation",
-            environment="validation",
+            environment=Environment.TESTING,
             created_at=datetime(year=2022, month=11, day=18),
         ),
         BaseDatasetDB(
@@ -192,7 +192,7 @@ def setup_dataset_data(database):
             model_version_id=UUID(MODEL_VERSION_ID_V1),
             dataset_type=DatasetType.EVENT,
             dataset_name="V1_production",
-            environment="production",
+            environment=Environment.PRODUCTION,
             created_at=datetime(year=2022, month=11, day=17),
         ),
         BaseDatasetDB(
@@ -201,7 +201,7 @@ def setup_dataset_data(database):
             model_version_id=UUID(MODEL_VERSION_ID_V2),
             dataset_type=DatasetType.EVENT,
             dataset_name="V2_production",
-            environment="production",
+            environment=Environment.PRODUCTION,
             created_at=datetime(year=2022, month=11, day=17),
         ),
         BaseDatasetDB(
@@ -210,7 +210,7 @@ def setup_dataset_data(database):
             model_version_id=UUID(METRICS_MODEL_VERSION_ID_V1),
             dataset_type=DatasetType.BATCH,
             dataset_name="V1_validation",
-            environment="validation",
+            environment=Environment.VALIDATION,
             created_at=datetime(year=2022, month=12, day=28),
         ),
         BaseDatasetDB(
@@ -219,7 +219,7 @@ def setup_dataset_data(database):
             model_version_id=UUID(METRICS_MODEL_VERSION_ID_V1),
             dataset_type=DatasetType.EVENT,
             dataset_name="V1_production",
-            environment="production",
+            environment=Environment.PRODUCTION,
             created_at=datetime(year=2022, month=12, day=28),
         ),
     ]

@@ -18,13 +18,16 @@ from uuid import UUID
 
 from pydantic import BaseModel, Field, root_validator
 
-from waterdip.core.commons.models import ColumnDataType
+from waterdip.core.commons.models import ColumnDataType, ModelBaseline, MovingTimeWindow
 
 
 class BaseModelDB(BaseModel):
     model_id: UUID
     model_name: str
     created_at: Optional[datetime]
+    baseline: ModelBaseline = Field(
+        default=ModelBaseline(time_window=MovingTimeWindow())
+    )
 
     def dict(self, *args, **kwargs) -> "DictStrAny":
         model = super().dict(*args, **kwargs)
@@ -33,70 +36,6 @@ class BaseModelDB(BaseModel):
 
 
 ModelDB = TypeVar("ModelDB", bound=BaseModelDB)
-
-
-class MovingTimeWindow(BaseModel):
-    """
-    Fixed time window.
-
-    Attributes:
-    ------------------
-    skip_period:
-       how many days from current day the window starts
-    time_period:
-       time in days for the moving time window
-    aggregation_period:
-       agg period for the time window. Default is 1 day
-    """
-
-    skip_period: str = Field(default="1d")
-    time_period: str = Field(default="15d")
-    aggregation_period: str = Field(default="1d")
-
-
-class FixedTimeWindow(BaseModel):
-    """
-    Fixed time window.
-    Attributes:
-    ------------------
-    start_time:
-        start time of the time window
-    end_time:
-        end time of the time window
-    aggregation_period:
-        agg period for the time window. Default is 1 day
-    """
-
-    start_time: datetime = Field(...)
-    end_time: datetime = Field(...)
-    aggregation_period: str = Field(default="1d")
-
-
-class ModelBaseline(BaseModel):
-    """
-    Model baseline.
-    Model baseline can either be a batch dataset or a time window.
-    Any one of it is mandatory
-
-    Attributes:
-    ------------------
-    dataset_id:
-        batch dataset attached to the version id
-    time_window:
-        time window for the baseline. Time window can be either FixedTimeWindow or MovingTimeWindow
-
-    """
-
-    dataset_id: Optional[UUID] = Field(description="dataset id", default=None)
-    time_window: Optional[Union[MovingTimeWindow, FixedTimeWindow]] = Field(
-        default=MovingTimeWindow()
-    )
-
-    @root_validator
-    def any_of(cls, v):
-        if not any(v.values()):
-            raise ValueError("one of dataset_id or time_window must have a value")
-        return v
 
 
 class ModelVersionSchemaFieldDetails(BaseModel):
@@ -143,9 +82,6 @@ class BaseModelVersionDB(BaseModel):
     created_at: Optional[datetime] = None
     version_schema: ModelVersionSchemaInDB = Field(
         description="Schema for the model version"
-    )
-    baseline: ModelBaseline = Field(
-        default=ModelBaseline(time_window=MovingTimeWindow())
     )
 
     def dict(self, *args, **kwargs) -> "DictStrAny":

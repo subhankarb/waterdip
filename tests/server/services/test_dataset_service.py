@@ -17,7 +17,7 @@ import uuid
 import pytest
 from pydantic import ValidationError
 
-from waterdip.core.commons.models import DatasetType
+from waterdip.core.commons.models import DatasetType, Environment
 from waterdip.server.apis.models.params import RequestSort
 from waterdip.server.db.models.datasets import BaseDatasetDB
 from waterdip.server.db.mongodb import MongodbBackend
@@ -38,6 +38,7 @@ class TestDatasetService:
                     BaseDatasetDB(
                         dataset_id=uuid.uuid4(),
                         dataset_name="d1",
+                        environment=Environment.TRAINING,
                         dataset_type=DatasetType.BATCH,
                         model_id=_model_id,
                         model_version_id=_model_version_id,
@@ -76,6 +77,7 @@ class TestDatasetService:
                 BaseDatasetDB(
                     dataset_id=uuid.uuid4(),
                     dataset_name="d1",
+                    environment=Environment.TRAINING,
                     dataset_type=DatasetType.BATCH,
                     model_id=self._model_id,
                     model_version_id=self._model_version_id,
@@ -108,6 +110,7 @@ class TestDatasetService:
                 BaseDatasetDB(
                     dataset_id=uuid.uuid4(),
                     dataset_name="d1",
+                    environment=Environment.TRAINING,
                     dataset_type=DatasetType.BATCH,
                     model_id=self._model_id,
                     model_version_id=self._model_version_id,

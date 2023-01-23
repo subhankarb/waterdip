@@ -22,7 +22,7 @@ from tests.testing_helpers import (
     MODEL_VERSION_ID_V2,
     MongodbBackendTesting,
 )
-from waterdip.core.commons.models import DatasetType, TimeRange
+from waterdip.core.commons.models import DatasetType, Environment, TimeRange
 from waterdip.core.metrics.data_metrics import (
     CardinalityCategorical,
     CategoricalCountHistogram,
@@ -52,7 +52,7 @@ batch_dataset = BaseDatasetDB(
     model_version_id=UUID(MODEL_VERSION_ID_V2),
     dataset_type=DatasetType.BATCH,
     dataset_name="V2_validation",
-    environment="validation",
+    environment=Environment.VALIDATION,
     created_at=datetime(year=2022, month=11, day=17),
 )
 database = MongodbBackendTesting.get_instance().database

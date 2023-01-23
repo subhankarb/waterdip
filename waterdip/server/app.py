@@ -88,13 +88,13 @@ def configure_middleware(app: FastAPI):
             response.headers["X-Process-Time"] = str(process_time) + " ms"
             logger.info("{0} took time {1} ms", request.url.path, process_time)
             return response
-        except Exception:
+        except Exception as e:
             logger.error(traceback.print_exc())
             return Response(
                 json.dumps(
                     {
                         "loc": [],
-                        "msg": "Internal Server Error",
+                        "msg": f"Internal Server Error: [{str(e)}]",
                         "type": "unexpected_error",
                     }
                 ),

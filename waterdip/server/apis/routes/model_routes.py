@@ -83,7 +83,10 @@ def model_list(
 
 
 @router.post(
-    "/model.register", response_model=RegisterModelResponse, name="model:register"
+    "/model.register",
+    response_model=RegisterModelResponse,
+    name="model:register",
+    response_model_exclude_none=True,
 )
 def register_model(
     request: RegisterModelRequest = Body(
@@ -96,7 +99,9 @@ def register_model(
     )
 
     return RegisterModelResponse(
-        model_id=registered_model.model_id, model_name=registered_model.model_name
+        model_id=registered_model.model_id,
+        model_name=registered_model.model_name,
+        baseline=registered_model.baseline,
     )
 
 

@@ -16,6 +16,7 @@ import uuid
 from datetime import datetime
 from typing import Dict, List, Optional, Union
 
+from waterdip.core.commons.models import Environment
 from waterdip.server.apis.models.params import RequestPagination, RequestSort
 from waterdip.server.db.models.datasets import DatasetDB
 
@@ -132,11 +133,11 @@ class ModelVersionService:
 
         event_dataset = ServiceEventDataset(
             dataset_id=serving_dataset_id,
-            dataset_name=f"{model_version}_serving",
+            dataset_name=Environment.PRODUCTION.value,
             created_at=datetime.utcnow(),
             model_id=model_id,
             model_version_id=model_version_id,
-            environment="PRODUCTION",
+            environment=Environment.PRODUCTION,
         )
 
         model_version_db = BaseModelVersionDB(

@@ -12,7 +12,7 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 from datetime import datetime
-from typing import List, Optional
+from typing import List, Literal, Optional
 from uuid import UUID
 
 from pydantic import UUID4
@@ -45,7 +45,7 @@ class BatchDatasetLogRequest:
     """
 
     model_version_id: UUID
-    environment: str
+    environment: Literal["TRAINING", "TESTING", "VALIDATION"]
     rows: List[BatchDatasetLogRowReq]
 
 

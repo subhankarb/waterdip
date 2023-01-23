@@ -16,9 +16,9 @@ from datetime import datetime
 from typing import Any, Dict, List, Optional, TypeVar
 from uuid import UUID
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, root_validator
 
-from waterdip.core.commons.models import ColumnDataType, DatasetType
+from waterdip.core.commons.models import ColumnDataType, DatasetType, Environment
 
 
 class BaseColumnInfoDB(BaseModel):
@@ -43,8 +43,30 @@ class BaseDatasetDB(BaseModel):
     )
     model_id: UUID = Field(description="Reference model id")
     model_version_id: UUID = Field(description="Reference model version id")
-    environment: Optional[str] = None
+    environment: Environment = Field(
+        description="""
+                                               Dataset environment. Use can upload at max one dataset every
+                                               environment. There are three environment. So user can only upload
+                                               max three dataset per model version
+                                               """
+    )
     meta: Optional[Dict] = None
+
+    @classmethod
+    @root_validator
+    def env_dataset_type_validator(cls, values):
+        dataset_type: DatasetType = values.get("dataset_type")
+        environment: Environment = values.get("environment")
+        if dataset_type == DatasetType.EVENT:
+            if environment != Environment.PRODUCTION:
+                raise ValueError(
+                    "DatasetType EVENT can only applicable to PRODUCTION Env"
+                )
+        if dataset_type == DatasetType.BATCH:
+            if environment == Environment.PRODUCTION:
+                raise ValueError(
+                    "DatasetType BATCH can not applicable to PRODUCTION Env"
+                )
 
     def dict(self, *args, **kwargs) -> "DictStrAny":
         dataset = super().dict(*args, **kwargs)

@@ -16,7 +16,7 @@ import uuid
 
 import pytest
 
-from waterdip.core.commons.models import DatasetType
+from waterdip.core.commons.models import DatasetType, Environment
 from waterdip.server.db.models.datasets import BaseDatasetDB
 from waterdip.server.db.mongodb import MONGO_COLLECTION_DATASETS, MongodbBackend
 from waterdip.server.db.repositories.dataset_repository import DatasetRepository
@@ -34,6 +34,7 @@ class TestDatasetsRepository:
         dataset = BaseDatasetDB(
             dataset_id=dataset_id,
             dataset_name="dataset",
+            environment=Environment.TRAINING,
             model_id=model_id,
             model_version_id=model_version_id,
             dataset_type=DatasetType.BATCH,

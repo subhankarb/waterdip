@@ -20,7 +20,7 @@ from uuid import UUID
 
 from fastapi import Depends
 
-from waterdip.core.commons.models import ColumnDataType, ColumnMappingType
+from waterdip.core.commons.models import ColumnDataType, ColumnMappingType, Environment
 from waterdip.server.db.models.dataset_rows import (
     DataColumn,
     DatasetBatchRowDB,
@@ -192,11 +192,11 @@ class BatchLoggingService:
         dataset_id = uuid.uuid4()
         dataset = ServiceBatchDataset(
             dataset_id=dataset_id,
-            dataset_name=f"{model_version.model_version}_{environment}",
+            dataset_name=environment,
             created_at=datetime.utcnow(),
             model_id=model_version.model_id,
             model_version_id=model_version_id,
-            environment=environment,
+            environment=Environment(environment),
         )
 
         self._dataset_service.create_batch_dataset(dataset=dataset)

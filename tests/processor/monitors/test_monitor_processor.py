@@ -17,7 +17,12 @@ import uuid
 
 import pytest
 
-from waterdip.core.commons.models import DataQualityMetric, DatasetType, MonitorType
+from waterdip.core.commons.models import (
+    DataQualityMetric,
+    DatasetType,
+    Environment,
+    MonitorType,
+)
 from waterdip.core.monitors.models import MonitorDimensions, MonitorThreshold
 from waterdip.processor.monitors.monitor_processor import MonitorProcessor
 from waterdip.server.db.models.datasets import BaseDatasetDB
@@ -37,12 +42,12 @@ class TestMonitorProcessor:
         self, mocker, mock_mongo_backend: MongodbBackend
     ):
 
-        # _get_event_dataset
         mocker.patch(
             "waterdip.processor.monitors.monitor_processor.MonitorProcessor._get_event_dataset",
             return_value=BaseDatasetDB(
                 dataset_id=uuid.uuid4(),
                 dataset_name="name",
+                environment=Environment.PRODUCTION,
                 created_at=datetime.datetime.now(),
                 dataset_type=DatasetType.EVENT,
                 model_id=uuid.uuid4(),
