@@ -55,12 +55,13 @@ class TestDatasetsRepository:
             model_id=model_id,
             model_version_id=model_version_id,
             dataset_type=DatasetType.BATCH,
+            environment=Environment.TRAINING,
         )
         mock_mongo_backend.database[MONGO_COLLECTION_DATASETS].insert_one(
             dataset.dict()
         )
         dataset_repo.delete_datasets_by_model_id(str(model_id))
-        dataset_repo.delete_datasets_by_model_id({"model_id": str(model_id)})
+        dataset_repo.delete_datasets_by_model_id(str(model_id))
         count = mock_mongo_backend.database[MONGO_COLLECTION_DATASETS].count_documents(
             {"model_id": str(model_id)}
         )
