@@ -15,7 +15,7 @@
 from datetime import datetime
 from typing import Optional, TypeVar
 
-from waterdip.core.commons.models import MonitorType
+from waterdip.core.commons.models import MonitorType, MonitorSeverity
 from waterdip.core.monitors.models import BaseMonitorCondition
 
 try:
@@ -43,7 +43,9 @@ class BaseMonitorDB(BaseModel):
     monitor_condition: BaseMonitorCondition = Field(...)
     count_of_alerts: Optional[int]
     model_name: Optional[str]
-    last_run: Optional[datetime]
+    last_run: Optional[str]
+    created_at: datetime
+    severity: MonitorSeverity = Field(default=MonitorSeverity.LOW)
 
     def dict(self, *args, **kwargs) -> "DictStrAny":
         monitor = super().dict(*args, **kwargs)
@@ -54,6 +56,7 @@ class BaseMonitorDB(BaseModel):
         monitor["monitor_identification"]["model_id"] = str(
             monitor["monitor_identification"]["model_id"]
         )
+
         return monitor
 
 

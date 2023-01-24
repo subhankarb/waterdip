@@ -12,19 +12,19 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
+from waterdip.server.services.monitor_service import ServiceBaseMonitor
+from waterdip.server.db.models.monitors import (
+    BaseMonitorCondition,
+    MonitorIdentification,
+)
+from waterdip.core.monitors.models import MonitorCondition
+from waterdip.core.commons.models import MonitorType, MonitorSeverity
+from waterdip.core.commons.models import MonitorType
 from datetime import datetime
 from typing import Dict, List, Optional, Union
 from uuid import UUID
 
 from pydantic import BaseModel
-
-from waterdip.core.commons.models import MonitorType
-from waterdip.core.monitors.models import MonitorCondition
-from waterdip.server.db.models.monitors import (
-    BaseMonitorCondition,
-    MonitorIdentification,
-)
-from waterdip.server.services.monitor_service import ServiceBaseMonitor
 
 
 class CreateMonitorRequest(BaseModel):
@@ -46,6 +46,7 @@ class CreateMonitorRequest(BaseModel):
     monitor_identification: MonitorIdentification
     monitor_type: MonitorType
     monitor_condition: BaseMonitorCondition
+    severity: MonitorSeverity
 
 
 class CreateMonitorResponse(ServiceBaseMonitor):
@@ -78,6 +79,8 @@ class MonitorListRow(BaseModel):
     count_of_alerts: int
     model_name: str
     last_run: Optional[datetime]
+    created_at: datetime
+    severity: MonitorSeverity
 
 
 class MonitorListResponse(BaseModel):

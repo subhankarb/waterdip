@@ -144,7 +144,8 @@ class ModelBaseline(BaseModel):
     @root_validator
     def any_of(cls, v):
         if not any(v.values()):
-            raise ValueError("one of dataset_id or time_window must have a value")
+            raise ValueError(
+                "one of dataset_id or time_window must have a value")
         return v
 
 
@@ -235,3 +236,22 @@ class ColumnMappingType(str, Enum):
     PREDICTION_SCORE = "PREDICTION_SCORE"
     ACTUAL = "ACTUAL"
     ACTUAL_SCORE = "ACTUAL_SCORE"
+
+
+class MonitorSeverity(str, Enum):
+    """
+    severity of the monitor
+
+    Attributes:
+    ------------------
+    LOW:
+        Low severity
+    MEDIUM:
+        Medium severity
+    HIGH:
+        High severity
+    """
+
+    LOW = "LOW"
+    MEDIUM = "MEDIUM"
+    HIGH = "HIGH"

@@ -22,6 +22,7 @@ from waterdip.core.commons.models import (
     DriftMetric,
     MonitorType,
     PerformanceMetric,
+    MonitorSeverity,
 )
 from waterdip.core.monitors.models import (
     DataQualityBaseMonitorCondition,
@@ -62,6 +63,9 @@ class TestMonitorRepository:
             monitor_identification=self.monitor_identification,
             monitor_condition=data_quality_condition,
             monitor_type=MonitorType.DATA_QUALITY,
+            created_at="2021-08-01T00:00:00Z",
+            last_run="2021-08-01T00:00:00Z",
+            severity=MonitorSeverity.LOW,
         )
         monitor_repo.insert_monitor(data_quality_monitor)
 
@@ -86,6 +90,9 @@ class TestMonitorRepository:
             monitor_identification=self.monitor_identification,
             monitor_condition=perf_condition,
             monitor_type=MonitorType.PERFORMANCE,
+            created_at="2021-08-01T00:00:00Z",
+            last_run="2021-08-01T00:00:00Z",
+            severity=MonitorSeverity.LOW,
         )
         res = monitor_repo.insert_monitor(perf_monitor)
 
@@ -114,6 +121,9 @@ class TestMonitorRepository:
             monitor_identification=self.monitor_identification,
             monitor_condition=drift_condition,
             monitor_type=MonitorType.DRIFT,
+            created_at="2021-08-01T00:00:00Z",
+            last_run="2021-08-01T00:00:00Z",
+            severity=MonitorSeverity.LOW,
         )
         res = monitor_repo.insert_monitor(drift_monitor)
 
@@ -139,6 +149,8 @@ class TestMonitorRepository:
                 baseline=ModelBaseline(),
             ),
             monitor_type=MonitorType.DRIFT,
+            created_at="2021-08-01T00:00:00Z",
+            severity=MonitorSeverity.LOW,
         )
         monitor_repo.insert_monitor(drift_monitor)
 
@@ -167,10 +179,14 @@ class TestMonitorRepository:
                 baseline=ModelBaseline(),
             ),
             monitor_type=MonitorType.DRIFT,
+            created_at="2021-08-01T00:00:00Z",
+            severity=MonitorSeverity.LOW,
+
         )
         monitor_repo.insert_monitor(drift_monitor)
 
-        monitor_repo.delete_monitors_by_model_id(str(self.monitor_identification.model_id))
+        monitor_repo.delete_monitors_by_model_id(
+            str(self.monitor_identification.model_id))
 
         created_monitor_version_in_db = mock_mongo_backend.database[
             MONGO_COLLECTION_MONITORS

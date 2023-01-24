@@ -18,6 +18,7 @@ import pytest
 from fastapi.testclient import TestClient
 
 from tests.testing_helpers import MODEL_ID, MODEL_VERSION_ID_V1, MongodbBackendTesting
+from waterdip.core.commons.models import MonitorSeverity
 from waterdip.server.db.mongodb import MONGO_COLLECTION_MONITORS
 
 
@@ -39,6 +40,7 @@ class TestMonitorCreate:
                 "threshold": {"threshold": "gt", "value": 20},
                 "evaluation_window": "3d",
             },
+            "severity": MonitorSeverity.LOW,
         }
 
         response = test_client.post(url="/v1/monitor.create", json=data)
@@ -71,6 +73,7 @@ class TestMonitorCreate:
                 "threshold": {"threshold": "lt", "value": 0.5},
                 "evaluation_window": "3d",
             },
+            "severity": MonitorSeverity.LOW,
         }
 
         response = test_client.post(url="/v1/monitor.create", json=data)
@@ -111,6 +114,7 @@ class TestMonitorCreate:
                 },
                 "evaluation_window": "3d",
             },
+            "severity": MonitorSeverity.LOW,
         }
 
         response = test_client.post(url="/v1/monitor.create", json=data)
@@ -152,6 +156,8 @@ class TestMonitorCreate:
                 },
                 "evaluation_window": "3d",
             },
+            "created_at": "2021-01-01 00:00:00",
+            "severity": MonitorSeverity.LOW,
         }
         collection = MongodbBackendTesting.get_instance().database[
             MONGO_COLLECTION_MONITORS
