@@ -16,7 +16,8 @@ from uuid import UUID
 
 import pytest
 from fastapi.testclient import TestClient
-
+from waterdip.server.db.models.models import ModelBaseline
+from waterdip.core.commons.models import Environment, MovingTimeWindow
 from tests.testing_helpers import (
     MODEL_ID,
     MODEL_VERSION_ID_V1,
@@ -68,7 +69,8 @@ class TestRegisterModelVersion:
                 "predictions": {"p1": "NUMERIC"},
             },
         }
-        response = test_client.post(url="/v1/model.version.register", json=request_body)
+        response = test_client.post(
+            url="/v1/model.version.register", json=request_body)
 
         assert response.status_code == 200
 
@@ -113,3 +115,65 @@ class TestModelInfo:
         assert response_data["model_id"] == MODEL_ID
 
         assert len(response_data["model_versions"]) == 2
+
+
+@pytest.mark.usefixtures("test_client")
+class TestModelUpdate:
+    def test_should_update_model_baseline(self, test_client: TestClient):
+
+        model = {
+            "model_name": "test_model_p1",
+            "model_id": MODEL_ID,
+        }
+        collection = MongodbBackendTesting.get_instance().database[
+            MONGO_COLLECTION_MODELS
+        ]
+        collection.insert_one(model)
+        property_name = "baseline"
+        baseline = ModelBaseline(
+            dataset_env=Environment.TESTING,
+            time_window=MovingTimeWindow(
+                skip_period="1d",
+                time_period="15d",
+                aggregation_period="1d"
+            )
+        )
+
+        response = test_client.post(
+            url="/v1/model.update", json={"model_id": MODEL_ID, 'property_name': property_name, "baseline": baseline.dict()}
+        )
+
+        updated_model = collection.find_one({"model_id": MODEL_ID})
+        collection.delete_one({"model_id": MODEL_ID})
+        assert response.status_code == 200
+        assert updated_model["baseline"] == baseline.dict()
+
+    def test_should_update_model_positive_class(self, test_client: TestClient):
+        model = {
+            "model_name": "test_model_p1",
+            "model_id": MODEL_ID,
+        }
+        collection = MongodbBackendTesting.get_instance().database[
+            MONGO_COLLECTION_MODELS
+        ]
+        collection.insert_one(model)
+        property_name = "baseline"
+        baseline = ModelBaseline(
+            dataset_env=Environment.TESTING,
+            time_window=MovingTimeWindow(
+                skip_period="1d",
+                time_period="15d",
+                aggregation_period="1d"
+            )
+        )
+        positive_class = {
+            "name": "test class",
+        } 
+        property_name = "positive_class"
+        response = test_client.post(
+            url="/v1/model.update", json={"model_id": MODEL_ID, 'property_name': property_name, "positive_class": positive_class}
+        )
+        updated_model = collection.find_one({"model_id": MODEL_ID})
+        collection.delete_one({"model_id": MODEL_ID})
+        assert response.status_code == 200
+        assert updated_model["positive_class"] == positive_class
