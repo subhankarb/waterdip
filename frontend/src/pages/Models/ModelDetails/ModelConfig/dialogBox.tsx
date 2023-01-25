@@ -7,6 +7,9 @@ import { Icon } from '@iconify/react';
 import { Box, TextField, MenuItem, Button } from '@material-ui/core';
 import { Grid } from '@material-ui/core';
 import { colors } from '../../../../theme/colors';
+import { useModelDelete } from 'api/models/DeleteModel';
+import { useNavigate, useParams } from 'react-router';
+import { PATH_DASHBOARD } from 'routes/paths';
 
 const useStyles = makeStyles(() => ({
   outerBox: {
@@ -189,7 +192,7 @@ export const DialogBoxPart = ({ onSave, onSelect }: Props) => {
       onSelect(dateRange);
     }
   }, [expandForm]);
-
+  
   const handleSelect = (data: any, boxShow: any) => {
     setDateRange(data);
     setSelectDate(boxShow);
@@ -328,6 +331,9 @@ export const DeleteDialogBox = ({ onDelete }: DeleteProps) => {
   const [boxDisplay, setBoxDisplay] = useState(true);
   const [confiDisplay, setconfiDisplay] = useState(false);
   const [expandForm, setExpandForm] = useState(true);
+  const { isDeleting, error, ModelDelete } = useModelDelete();
+  const { modelId } = useParams();
+  const navigate = useNavigate();
 
   useEffect(() => {
     onDelete(expandForm);
@@ -399,8 +405,12 @@ export const DeleteDialogBox = ({ onDelete }: DeleteProps) => {
             <button
               type="button"
               className={classes.confiDeleteButton}
-              onClick={() => {
+              onClick={async () => {
                 setExpandForm(false);
+                await ModelDelete(modelId);
+                if (!isDeleting) {
+                  navigate(PATH_DASHBOARD.general.models);
+                }
               }}
             >
               DELETE

@@ -250,7 +250,7 @@ const MonitorAddDialog = (props: any) => {
             <MenuItem value="select" disabled className="selectDisable">
               Select Version
             </MenuItem>
-            {(modelList.filter(handleVersionFilter) !== []  && modelList.filter(handleVersionFilter)[0] && modelList.filter(handleVersionFilter)[0].versions)? Object.values(modelList.filter(handleVersionFilter)[0].versions).map((row: any) => (
+            {(modelList.filter(handleVersionFilter).length !== 0  && modelList.filter(handleVersionFilter)[0] && modelList.filter(handleVersionFilter)[0].versions)? Object.values(modelList.filter(handleVersionFilter)[0].versions).map((row: any) => (
               <MenuItem value={row.v1} key={row.v1}>
                 {row.v1}
               </MenuItem>
@@ -261,7 +261,7 @@ const MonitorAddDialog = (props: any) => {
             <MenuItem value="select" disabled className="selectDisable">
               Select Version
             </MenuItem>
-            {(modelList.filter(handleVersionFilter) !== []  && modelList.filter(handleVersionFilter)[0] && modelList.filter(handleVersionFilter)[0].versions)? Object.values(modelList.filter(handleVersionFilter)[0].versions).map((row: any) => (
+            {(modelList.filter(handleVersionFilter).length !== 0  && modelList.filter(handleVersionFilter)[0] && modelList.filter(handleVersionFilter)[0].versions)? Object.values(modelList.filter(handleVersionFilter)[0].versions).map((row: any) => (
               <MenuItem value={row.v1} key={row.v1}>
                 {row.v1}
               </MenuItem>

@@ -10,6 +10,7 @@ export const GET_MODEL_Overview_API = makeUrl('model.overview');
 export const GET_MODEL_PERFORMANCE_API = makeUrl('model.performance');
 export const CREATE_MODEL_API = makeUrl('model.register');
 export const GET_MODEL_VERSION_INFO_API = makeUrl('model.version.info')
+export const DELETE_MODEL_API = makeUrl('model.delete')
 
 export const GET_MODEL_DATA_PERF_PCA_API = makeUrl('data.perf.pca');
 export const GET_MODEL_DATA_PERF_CLUSTER_API = makeUrl('data.perf.cluster');
