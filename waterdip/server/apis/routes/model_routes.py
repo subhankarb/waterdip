@@ -25,6 +25,8 @@ from waterdip.server.apis.models.models import (
     RegisterModelResponse,
     RegisterModelVersionRequest,
     RegisterModelVersionResponse,
+    UpdateModelRequest,
+    UpdateModelResponse,
 )
 from waterdip.server.apis.models.params import RequestPagination, RequestSort
 from waterdip.server.db.models.datasets import DatasetDB
@@ -53,7 +55,8 @@ def model_info(
     ),
 ):
     model: ModelDB = model_service.find_by_id(model_id=model_id)
-    versions = model_version_service.find_all_versions_for_model(model_id=model_id)
+    versions = model_version_service.find_all_versions_for_model(
+        model_id=model_id)
     return ModelInfoResponse(
         model_id=model.model_id, model_name=model.model_name, model_versions=versions
     )
@@ -155,3 +158,21 @@ def delete_model(
 ):
     service.delete_model(model_id=model_id)
     return {"message": "Model deleted successfully"}
+
+
+@router.post("/model.update",
+    response_model=UpdateModelResponse,
+    name="model:update",)
+def update_model(
+    request: UpdateModelRequest = Body(
+        ..., description="the request model update info"
+    ),
+    service: ModelService = Depends(ModelService.get_instance),
+):
+    updated_model = service.update_model(
+        model_id=request.model_id,
+        property_name=request.property_name,
+        baseline=request.baseline,
+        positive_class=request.positive_class,
+    )
+    return updated_model

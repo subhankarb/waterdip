@@ -23,9 +23,10 @@ from waterdip.core.commons.models import (
     ModelBaseline,
     MonitorType,
     PredictionTaskType,
+    ModelBaseline,
 )
 from waterdip.server.db.models.datasets import DatasetDB
-from waterdip.server.db.models.models import BaseModelVersionDB
+from waterdip.server.db.models.models import BaseModelVersionDB, BaseModelDB
 
 
 class RegisterModelRequest(BaseModel):
@@ -40,6 +41,28 @@ class RegisterModelRequest(BaseModel):
 
     model_name: str
     model_id: Optional[UUID] = None
+
+class UpdateModelRequest(BaseModel):
+    """
+    Update model API request
+
+    Attributes:
+    ------------------
+    model_name:
+        name of the model
+    property_name:
+        name of the property to update
+    baseline:
+        baseline of the model
+    positive_class:
+        positive class of the model
+    """
+
+    model_id: Optional[UUID] = None
+    property_name: Optional[str] = None
+    baseline: Optional[ModelBaseline] = None
+    positive_class : Optional[Dict] = None
+
 
 
 class RegisterModelResponse(BaseModel):
@@ -309,3 +332,7 @@ class ModelInfoResponse(BaseModel):
     model_id: UUID
     model_name: str
     model_versions: List[BaseModelVersionDB]
+
+class UpdateModelResponse(BaseModelDB):
+    pass
+    

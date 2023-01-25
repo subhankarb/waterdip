@@ -28,6 +28,7 @@ class BaseModelDB(BaseModel):
     baseline: ModelBaseline = Field(
         default=ModelBaseline(time_window=MovingTimeWindow())
     )
+    positive_class: Optional[Dict] = None
 
     def dict(self, *args, **kwargs) -> "DictStrAny":
         model = super().dict(*args, **kwargs)
@@ -87,7 +88,8 @@ class BaseModelVersionDB(BaseModel):
     def dict(self, *args, **kwargs) -> "DictStrAny":
         model_version = super().dict(*args, **kwargs)
         model_version["model_id"] = str(model_version["model_id"])
-        model_version["model_version_id"] = str(model_version["model_version_id"])
+        model_version["model_version_id"] = str(
+            model_version["model_version_id"])
         return model_version
 
 

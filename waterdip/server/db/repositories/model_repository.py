@@ -23,6 +23,7 @@ from waterdip.server.db.models.models import (
     BaseModelVersionDB,
     ModelDB,
     ModelVersionDB,
+    ModelBaseline,
 )
 from waterdip.server.db.mongodb import (
     MONGO_COLLECTION_MODEL_VERSIONS,
@@ -93,6 +94,17 @@ class ModelRepository:
         self._mongo.database[MONGO_COLLECTION_MODELS].delete_one(
             {"model_id": str(model_id)}
         )
+
+    def update_model(self, model_id: UUID, updates : Dict) -> ModelDB:
+        self._mongo.database[MONGO_COLLECTION_MODELS].update_one(
+            {"model_id": str(model_id)},
+            {"$set": updates},
+        )
+        updated_model = self._mongo.database[MONGO_COLLECTION_MODELS].find_one(
+            {"model_id": str(model_id)}
+        )
+
+        return BaseModelDB(**updated_model)
 
 
 class ModelVersionRepository:
@@ -170,3 +182,4 @@ class ModelVersionRepository:
         self._mongo.database[MONGO_COLLECTION_MODEL_VERSIONS].delete_many(
             {"model_id": model_id}
         )
+        

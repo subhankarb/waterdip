@@ -36,6 +36,7 @@ from waterdip.server.apis.models.models import (
     ModelOverviewResponse,
     ModelPredictionHistogram,
     ModelVersionSchema,
+    UpdateModelResponse,
 )
 from waterdip.server.db.models.models import (
     BaseModelDB,
@@ -44,6 +45,7 @@ from waterdip.server.db.models.models import (
     ModelVersionDB,
     ModelVersionSchemaFieldDetails,
     ModelVersionSchemaInDB,
+    ModelBaseline,
 )
 from waterdip.server.db.repositories.model_repository import (
     ModelRepository,
@@ -71,7 +73,8 @@ class ModelVersionService:
         dataset_service: DatasetService = Depends(DatasetService.get_instance),
     ):
         if not cls._INSTANCE:
-            cls._INSTANCE = cls(repository=repository, dataset_service=dataset_service)
+            cls._INSTANCE = cls(repository=repository,
+                                dataset_service=dataset_service)
         return cls._INSTANCE
 
     def __init__(
@@ -86,7 +89,8 @@ class ModelVersionService:
         )
 
         if not found_model_version:
-            raise EntityNotFoundError(name=str(model_version_id), type="Model Version")
+            raise EntityNotFoundError(
+                name=str(model_version_id), type="Model Version")
 
         return found_model_version
 
@@ -147,10 +151,12 @@ class ModelVersionService:
             created_at=datetime.utcnow(),
             version_schema=ModelVersionSchemaInDB(
                 features=self._schema_conversion(version_schema, "features"),
-                predictions=self._schema_conversion(version_schema, "predictions"),
+                predictions=self._schema_conversion(
+                    version_schema, "predictions"),
             ),
         )
-        model_version = self._repository.register_model_version(model_version_db)
+        model_version = self._repository.register_model_version(
+            model_version_db)
         self._dataset_service.create_event_dataset(event_dataset)
 
         return model_version
@@ -197,7 +203,8 @@ class ModelService:
             BatchDatasetRowService.get_instance
         ),
         dataset_service: DatasetService = Depends(DatasetService.get_instance),
-        monitor_repo: MonitorRepository = Depends(MonitorRepository.get_instance),
+        monitor_repo: MonitorRepository = Depends(
+            MonitorRepository.get_instance),
     ):
         if not cls._INSTANCE:
             cls._INSTANCE = cls(
@@ -286,7 +293,6 @@ class ModelService:
         )
 
         def get_latest_version(model_id: UUID) -> Union[UUID, None]:
-
             """
             Get the latest version of a model
             if the model has no versions, return None
@@ -317,7 +323,8 @@ class ModelService:
                 num_alert_perf=alerts.get(str(model.model_id), {}).get(
                     "MODEL_PERFORMANCE", 0
                 ),
-                num_alert_drift=alerts.get(str(model.model_id), {}).get("DRIFT", 0),
+                num_alert_drift=alerts.get(
+                    str(model.model_id), {}).get("DRIFT", 0),
                 num_alert_data_quality=alerts.get(str(model.model_id), {}).get(
                     "DATA_QUALITY", 0
                 ),
@@ -334,7 +341,8 @@ class ModelService:
         model_id = str(model_id)
 
         prediction_average = self._row_service.prediction_average(model_id)
-        week_prediction_stats = self._row_service.week_prediction_stats(model_id)
+        week_prediction_stats = self._row_service.week_prediction_stats(
+            model_id)
         prediction_histogram = self._row_service.prediction_histogram(model_id)
         prediction_histogram_version = self._row_service.prediction_histogram_version(
             model_id
@@ -369,7 +377,8 @@ class ModelService:
                 predictions_versions=prediction_histogram_version,
             ),
             number_of_model_versions=len(model_versions),
-            latest_version=model_versions[0] if len(model_versions) > 0 else None,
+            latest_version=model_versions[0] if len(
+                model_versions) > 0 else None,
             latest_version_created_at=model_versions[0].created_at
             if len(model_versions) > 0
             else None,
@@ -383,3 +392,11 @@ class ModelService:
         self._alert_service.delete_alerts_by_model_id(model_id)
         self._model_version_service.delete_versions_by_model_id(model_id)
         self._repository.delete_model(model_id)
+
+    def update_model(self, model_id: UUID, property_name: str, baseline: ModelBaseline, positive_class: Dict) -> BaseModelDB:
+        if property_name == "baseline":
+            updates = {"baseline": baseline.dict()}
+        elif property_name == "positive_class":
+            updates = {"positive_class": positive_class}
+        updated_model = self._repository.update_model(model_id=model_id, updates=updates)
+        return updated_model
