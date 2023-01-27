@@ -9,6 +9,19 @@ theme:
   favicon: assets/favicon.png
   icon:
     repo: fontawesome/brands/github
+    admonition:
+      note: fontawesome/solid/note-sticky
+      abstract: fontawesome/solid/book
+      info: fontawesome/solid/circle-info
+      tip: fontawesome/solid/bullhorn
+      success: fontawesome/solid/check
+      question: fontawesome/solid/circle-question
+      warning: fontawesome/solid/triangle-exclamation
+      failure: fontawesome/solid/bomb
+      danger: fontawesome/solid/skull
+      bug: fontawesome/solid/robot
+      example: fontawesome/solid/flask
+      quote: fontawesome/solid/quote-left
   features:
     - navigation.expand
     - toc.follow
@@ -42,6 +55,8 @@ markdown_extensions:
   - attr_list
   - md_in_html
   - tables
+  - admonition
+  - pymdownx.details
 nav:
   - Welcome to Waterdip: index.md
   - Introduction:
@@ -54,6 +69,9 @@ nav:
       - Model Performance: concepts/metric_type_model_performance.md
       - Drift: concepts/metric_type_drift.md
     - Monitor & Alerts: concepts/monitor_and_alerts.md
+  - Sending Data:
+      - Uploading Baseline Dataset: sending_data/uploading_baseline_dataset.md
+      - Sending Live Events: sending_data/sending_live_events.md
   - Support:
     - Contact: support/contact.md
 

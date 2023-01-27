@@ -13,8 +13,9 @@ import uuid
 from sklearn import datasets
 ```
 
-- Download the Iris dataset from sklearn
+Download the Iris dataset from sklearn
 ```python
+HOST = "<backend_host> by default https://127.0.0.1:4422"
 iris = datasets.load_iris()
 ```
 
@@ -26,14 +27,14 @@ iris = datasets.load_iris()
 
 ```python
 def register_model(model_name):
-    post_url = "http://0.0.0.0:5001/v1/model.register"
+    post_url = f"{HOST}/v1/model.register"
 
     data_dict = {
         "model_name": model_name
     }
 
-    r = requests.post(url=post_url, json=data_dict)
-    return r.json()['model_id']
+    response = requests.post(url=post_url, json=data_dict)
+    return response.json()['model_id']
 ```
 
 
@@ -45,7 +46,7 @@ def register_model(model_name):
 
 ```python
 def register_model_version(data, model_id):
-    url = "http://0.0.0.0:5001/v1/model.version.register"
+    url = f"{HOST}/v1/model.version.register"
 
     data_dict = {
         "model_id": str(model_id),
@@ -72,12 +73,11 @@ Note: The structure of upload_dataset, I.e. names of the keys of this dictionary
 ```python
 
 def log_training_data(data, model_version_id):
-    url = "http://0.0.0.0:5001/v1/log.dataset"
+    url = f"{HOST}/v1/log.dataset"
 
     data_dict = {
         "model_version_id": str(model_version_id),
-        "dataset_name": "Training IRIS",
-        "environment": "training"
+        "environment": "TRAINING"
     }
 
     rows = []
@@ -103,7 +103,7 @@ def log_training_data(data, model_version_id):
         rows.append(row_dict)
 
     data_dict["rows"] = rows
-    r = requests.post(url=url, json=data_dict)
+    requests.post(url=url, json=data_dict)
 ```
 
 ##**Log events and actuals**
@@ -113,7 +113,7 @@ After we have uploaded the training dataset, we must also send the actuals data 
 The following code  shows how to log events/actuals.
 ```python
 def log_event(data, model_version_id):
-    url = "http://0.0.0.0:5001/v1/log.event"
+    url = f"{HOST}/v1/log.events"
 
     data_dict = {
         "model_version_id": str(model_version_id)
@@ -145,7 +145,7 @@ def log_event(data, model_version_id):
         events.append(row_dict)
 
     data_dict["events"] = events
-    r = requests.post(url=url, json=data_dict)
+    requests.post(url=url, json=data_dict)
 ```
 
 - Log_event() takes model_version_id as parameter i.e. the version for which we want to log actuals
