@@ -14,9 +14,10 @@
 
 from datetime import date, datetime, timedelta
 from typing import Dict, List, Union
+from uuid import UUID
 
 from fastapi import Depends
-from uuid import UUID
+
 from waterdip.server.apis.models.models import DateHistogram, ModelOverviewPredictions
 from waterdip.server.db.models.dataset_rows import (
     BaseClassificationEventRowDB,
@@ -254,6 +255,13 @@ class EventDatasetRowService:
                 }
             },
             {
+                "$sort": {
+                    "_id.year": 1,
+                    "_id.month": 1,
+                    "_id.day": 1,
+                }
+            },
+            {
                 "$group": {
                     "_id": "$_id.version",
                     "prediction": {
@@ -264,13 +272,6 @@ class EventDatasetRowService:
                             "count": "$$ROOT.count",
                         }
                     },
-                }
-            },
-            {
-                "$sort": {
-                    "_id.year": 1,
-                    "_id.month": 1,
-                    "_id.day": 1,
                 }
             },
         ]
