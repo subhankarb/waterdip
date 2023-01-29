@@ -99,14 +99,15 @@ export default function VerticalLinearStepper({ monitorType, model_id, model_ver
           "model_version_id": values.monitor_identification.model_version_id,
         },
         "monitor_condition": {
-        "evaluation_metric": values.monitor_condition.evaluation_metric,
-        ...(values.monitor_type!== "Model Performance") && {"dimensions": values.monitor_condition.dimensions},
-        "threshold": {
-          "threshold" : values.monitor_condition.threshold.threshold == "Lesser" ? "lt" : "gt",
-          "value" : values.monitor_condition.threshold.value
+          "evaluation_metric": values.monitor_condition.evaluation_metric,
+          ...(values.monitor_type!== "Model Performance") && {"dimensions": values.monitor_condition.dimensions},
+          "threshold": {
+            "threshold" : values.monitor_condition.threshold.threshold == "Lesser" ? "lt" : "gt",
+            "value" : values.monitor_condition.threshold.value
+          },
+          "evaluation_window": values.monitor_condition.evaluation_window,
         },
-        "evaluation_window": values.monitor_condition.evaluation_window,
-      },
+        "severity": values.actions.severity
       }
       mutation.mutate(value, {
         onSuccess: () => {

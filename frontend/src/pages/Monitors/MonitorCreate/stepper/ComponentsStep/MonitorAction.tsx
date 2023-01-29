@@ -85,7 +85,7 @@ const MonitorAction = () => {
   const formikProps = useFormikContext();
   const classes = useStyles();
   const [monitorName, setmonitorName] = useState<string>();
-  const [severityValue, setseverityValue] = useState<string>('medium');
+  const [severityValue, setseverityValue] = useState<string>('MEDIUM');
   const handleRadioChange = (e: any) => {
     setseverityValue(e.target.value);
   };
@@ -99,15 +99,15 @@ const MonitorAction = () => {
         <Box className={classes.actionInputTitle}>Severity</Box>
         <Box className={classes.actionInputContent}>
           <label className={classes.label}>
-            <input required type="radio" name="severity" value="low" id="" onChange={handleRadioChange}/>
+            <input required type="radio" name="severity" value="LOW" id="" onChange={handleRadioChange}/>
             <Box className="low">Low</Box>
           </label>
           <label className={classes.label}>
-            <input required defaultChecked type="radio" name="severity" value="medium" id="" onChange={handleRadioChange}/>
+            <input required defaultChecked type="radio" name="severity" value="MEDIUM" id="" onChange={handleRadioChange}/>
             <Box className="medium">Medium</Box>
           </label>
           <label className={classes.label}>
-            <input required type="radio" name="severity" value="high" id="" onChange={handleRadioChange} />
+            <input required type="radio" name="severity" value="HIGH" id="" onChange={handleRadioChange} />
             <Box className="high">High</Box>
           </label>
         </Box>

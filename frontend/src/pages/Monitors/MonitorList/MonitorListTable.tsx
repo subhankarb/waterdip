@@ -31,6 +31,7 @@ import { useSelector } from '../../../redux/store';
 import { ModelMonitorState } from '../../../redux/slices/ModelMonitorState';
 import { useGetMonitors } from 'api/monitors/GetMonitors';
 import { useMonitorDelete } from 'api/monitors/deleteMonitor';
+import { formattedDate } from 'utils/date';
 
 interface ModelColumn {
   id: 'name' | 'type' | 'modelName' | 'date' | 'lastRun' | 'severity' | 'number' | 'action';
@@ -317,7 +318,7 @@ const MonitorListTable = (props: any) => {
                       ) : null}
 
                       <TableCell className={classes.tableCell} align="center">
-                        {row.monitor_type}
+                        {formattedDate(row.created_at)}
                       </TableCell>
                       <TableCell className={classes.tableCell} align="center">
                         {row.last_run}
