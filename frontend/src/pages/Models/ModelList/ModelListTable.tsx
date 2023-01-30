@@ -12,7 +12,8 @@ import {
   // Typography,
   Box,
   CircularProgress,
-  Stack
+  Stack,
+  Popover
 } from '@material-ui/core';
 import { capitalize } from 'lodash';
 import { makeStyles } from '@material-ui/core/styles';
@@ -34,9 +35,12 @@ import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
+import MoreHorizIcon from '@material-ui/icons/MoreHoriz';
+import { useModelDelete } from 'api/models/DeleteModel';
+import { useSnackbar } from 'notistack';
 
 interface ModelColumn {
-  id: 'name' | 'date' | 'action' | 'alert';
+  id: 'name' | 'date' | 'action' | 'alert' | 'delete';
   label: string;
   minWidth?: number;
   align?: 'left' | 'center' | 'right';
@@ -51,7 +55,8 @@ interface subModelColumn {
     | 'lastPrediction'
     | 'performance'
     | 'behavior'
-    | 'integrity';
+    | 'integrity'
+    | 'delete';
   label: string;
   minWidth?: number;
   align?: 'left' | 'center' | 'right';
@@ -61,7 +66,8 @@ interface subModelColumn {
 
 const MODEL_COLUMNS: ModelColumn[] = [
   { id: 'action', label: 'Actions', minWidth: 50, align: 'center', span: 2 },
-  { id: 'alert', label: 'Alerts', minWidth: 50, align: 'center', span: 3 }
+  { id: 'alert', label: 'Alerts', minWidth: 50, align: 'center', span: 3 },
+  { id: 'delete', label: 'Options', minWidth: 50, align: 'center', span: 1}
 ];
 const sub_MODEL_COLUMNS: subModelColumn[] = [
   { id: 'submodel', label: '', minWidth: 50, subSpan: 1, align: 'center' },
@@ -70,13 +76,50 @@ const sub_MODEL_COLUMNS: subModelColumn[] = [
   { id: 'lastPrediction', label: 'Last Prediction', minWidth: 50, subSpan: 1, align: 'center' },
   { id: 'performance', label: 'Model Performance', minWidth: 50, subSpan: 1, align: 'center' },
   { id: 'behavior', label: 'Data Drift', minWidth: 50, subSpan: 1, align: 'center' },
-  { id: 'integrity', label: 'Data Quality', minWidth: 50, subSpan: 1, align: 'center' }
+  { id: 'integrity', label: 'Data Quality', minWidth: 50, subSpan: 1, align: 'center' },
+  { id: 'delete', label: '', minWidth: 50, subSpan: 1, align: 'center' }
 ];
 const useStyles = makeStyles(() => ({
   card: {
     backgroundColor: colors.white,
     borderRadius: '10px',
     marginBottom: '20px'
+  },
+  actionBtn: {
+    padding: 0,
+    margin: 0,
+    color: colors.textLight,
+    '& :hover': {
+      backgroundColor: 'rgba(103, 128, 220, 0.2)',
+      color: colors.textPrimary,
+      borderRadius: '4px'
+    },
+    borderRadius: '4px',
+    letterSpacing: 3.6,
+    fontWeight: 900
+  },
+  actionPopup: {
+    display: 'flex',
+    flexDirection: 'column',
+    borderRadius: '4px'
+  },
+  actionPopupBtn: {
+    padding: '.5rem 2rem',
+    borderRadius: '4px',
+    color: colors.textLight,
+    fontWeight: 500,
+    '&:last-child': {
+      borderBottom: 0
+    },
+    '& :hover': {
+      color: colors.textPrimary
+    }
+  },
+  popupBox: {
+    '& .css-1p14d49-MuiPaper-root-MuiPopover-paper': {
+      borderRadius: '4px !important'
+    },
+    borderRadius: '4px !important'
   },
   tableContainer: {
     width: '100%',
@@ -168,7 +211,12 @@ const useStyles = makeStyles(() => ({
     fontWeight: 300,
     fontSize: '12px',
     color: colors.textLight
-  }
+  },
+  icon: {
+    '&:hover': {
+      backgroundColor: 'transparent'
+    }
+  },
 }));
 
 interface SortProps {
@@ -185,6 +233,35 @@ const ModelListTable = () => {
   const [expandForm, setExpandForm] = useState(false);
   const [orderDirection, setOrderDirection] = useState<SortProps>({ name: 'asc', created: 'asc' });
 
+
+  const [openPopover, setOpenPopover] = useState('');
+  const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
+  const handleActionClick = (event: React.MouseEvent<HTMLButtonElement>, id: string) => {
+    if (id === openPopover) {
+      setOpenPopover('');
+      setAnchorEl(null);
+    } else {
+      setOpenPopover(id);
+      setAnchorEl(event.currentTarget);
+    }
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleClose = () => {
+    setOpenPopover('');
+    setAnchorEl(null);
+  };
+  const { enqueueSnackbar } = useSnackbar();
+  const { isDeleting, error, ModelDelete } = useModelDelete();
+  const handleDelete = async (modelId: string) => {
+    await ModelDelete(modelId);
+    enqueueSnackbar(`Successfully Deleted Model`, { variant: 'info' });
+    setItems(ItemLists.filter((model : any) => model.model_id !== modelId));
+    forceUpdate();
+  }
+  
+  const open = Boolean(anchorEl);
+  const id = open ? 'simple-popover' : undefined;
   const { data, isLoading } = usePaginatedModels({
     query: searchName,
     page: page + 1,
@@ -410,6 +487,40 @@ const ModelListTable = () => {
                         sx={{ borderRightWidth: '0px', borderRightColor: colors.white }}
                       >
                         {capitalize(row.num_alert_data_quality)}
+                      </TableCell>
+                      <TableCell
+                        className={classes.tableCell}
+                        align="center"
+                        sx={{
+                          borderRightWidth: '0px',
+                          borderRightColor: colors.white,
+                          color: 'black'
+                        }}
+                        onClick={(event) => event.stopPropagation()}
+                      >
+                        <Button
+                          className={classes.actionBtn}
+                          aria-describedby={id}
+                          onClick={(event) => handleActionClick(event, row.model_id)}
+                        >
+                          <MoreHorizIcon className={classes.icon} />
+                        </Button>
+                        <Popover
+                          id={row.model_id}
+                          open={row.model_id === openPopover}
+                          anchorEl={anchorEl}
+                          key={row.model_id}
+                          onClose={handleClose}
+                          anchorOrigin={{
+                            vertical: 'bottom',
+                            horizontal: 'left'
+                          }}
+                          className={classes.popupBox}
+                        >
+                          <Box className={classes.actionPopup}>
+                            <Button onClick={() => handleDelete(row.model_id)} className={classes.actionPopupBtn}>Delete</Button>
+                          </Box>
+                        </Popover>
                       </TableCell>
                     </TableRow>
                   ))}
