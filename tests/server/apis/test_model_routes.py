@@ -16,14 +16,21 @@ from uuid import UUID
 
 import pytest
 from fastapi.testclient import TestClient
-from waterdip.server.db.models.models import ModelBaseline
-from waterdip.core.commons.models import Environment, MovingTimeWindow
+
 from tests.testing_helpers import (
     MODEL_ID,
     MODEL_VERSION_ID_V1,
     MODEL_VERSION_ID_V1_NAME,
     MODEL_VERSION_V1_SCHEMA,
     MongodbBackendTesting,
+)
+from waterdip.core.commons.models import (
+    Environment,
+    MovingTimeWindow,
+)
+from waterdip.server.db.models.datasets import BaseDatasetDB
+from waterdip.server.db.models.models import (
+    ModelBaseline,
 )
 from waterdip.server.db.mongodb import (
     MONGO_COLLECTION_MODEL_VERSIONS,
@@ -133,14 +140,17 @@ class TestModelUpdate:
         baseline = ModelBaseline(
             dataset_env=Environment.TESTING,
             time_window=MovingTimeWindow(
-                skip_period="1d",
-                time_period="15d",
-                aggregation_period="1d"
-            )
+                skip_period="1d", time_period="15d", aggregation_period="1d"
+            ),
         )
 
         response = test_client.post(
-            url="/v1/model.update", json={"model_id": MODEL_ID, 'property_name': property_name, "baseline": baseline.dict()}
+            url="/v1/model.update",
+            json={
+                "model_id": MODEL_ID,
+                "property_name": property_name,
+                "baseline": baseline.dict(),
+            },
         )
 
         updated_model = collection.find_one({"model_id": MODEL_ID})
@@ -158,20 +168,17 @@ class TestModelUpdate:
         ]
         collection.insert_one(model)
         property_name = "baseline"
-        baseline = ModelBaseline(
-            dataset_env=Environment.TESTING,
-            time_window=MovingTimeWindow(
-                skip_period="1d",
-                time_period="15d",
-                aggregation_period="1d"
-            )
-        )
         positive_class = {
             "name": "test class",
-        } 
+        }
         property_name = "positive_class"
         response = test_client.post(
-            url="/v1/model.update", json={"model_id": MODEL_ID, 'property_name': property_name, "positive_class": positive_class}
+            url="/v1/model.update",
+            json={
+                "model_id": MODEL_ID,
+                "property_name": property_name,
+                "positive_class": positive_class,
+            },
         )
         updated_model = collection.find_one({"model_id": MODEL_ID})
         collection.delete_one({"model_id": MODEL_ID})

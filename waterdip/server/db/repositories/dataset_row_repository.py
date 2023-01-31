@@ -12,8 +12,9 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
-from datetime import date, datetime
+from datetime import datetime
 from typing import Dict, List
+
 
 from fastapi import Depends
 from pymongo.collection import Collection

@@ -15,7 +15,6 @@ from typing import List, Optional
 from uuid import UUID
 
 from fastapi import APIRouter, Body, Depends
-
 from waterdip.server.apis.models.models import (
     ModelInfoResponse,
     ModelListResponse,
@@ -28,7 +27,10 @@ from waterdip.server.apis.models.models import (
     UpdateModelRequest,
     UpdateModelResponse,
 )
-from waterdip.server.apis.models.params import RequestPagination, RequestSort
+from waterdip.server.apis.models.params import (
+    RequestPagination,
+    RequestSort,
+)
 from waterdip.server.db.models.datasets import DatasetDB
 from waterdip.server.db.models.models import ModelDB, ModelVersionDB
 from waterdip.server.services.model_service import ModelService, ModelVersionService
@@ -160,9 +162,11 @@ def delete_model(
     return {"message": "Model deleted successfully"}
 
 
-@router.post("/model.update",
+@router.post(
+    "/model.update",
     response_model=UpdateModelResponse,
-    name="model:update",)
+    name="model:update",
+)
 def update_model(
     request: UpdateModelRequest = Body(
         ..., description="the request model update info"

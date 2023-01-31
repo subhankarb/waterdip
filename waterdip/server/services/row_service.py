@@ -94,7 +94,8 @@ class EventDatasetRowService:
         return len(inserted_rows)
 
     def count_prediction_by_model_id(self, model_id: str) -> int:
-        total_predictions = self._repository.count_prediction_by_model_id(model_id)
+        total_predictions = self._repository.count_prediction_by_model_id(
+            model_id)
         return total_predictions
 
     def find_last_prediction_date(self, model_id: str) -> datetime:
@@ -117,7 +118,8 @@ class EventDatasetRowService:
         if window.days > days:
             window_date = datetime.utcnow() - days
         window_prediction_count = self._repository.prediction_count(
-            filter={"model_id": str(model_id), "created_at": {"$gte": window_date}}
+            filter={"model_id": str(model_id), "created_at": {
+                "$gte": window_date}}
         )
         if not window.days:
             """
@@ -153,7 +155,8 @@ class EventDatasetRowService:
             {"$sort": {"created_at": 1}},
             {"$group": {"_id": "$day", "count": {"$sum": 1}}},
         ]
-        week_stats = self._repository.agg_prediction(agg_week_prediction_count_pipeline)
+        week_stats = self._repository.agg_prediction(
+            agg_week_prediction_count_pipeline)
         day = []
         count = []
         for i in week_stats:

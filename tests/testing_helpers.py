@@ -51,6 +51,7 @@ from waterdip.server.db.mongodb import (
 )
 
 MODEL_ID = "de6af49c-e80b-4852-b8dd-3b8fdd7f98f8"
+MODEL_ID_2 = "de6af49c-e80b-4852-b8dd-3b8fdd7f98f9"
 MODEL_VERSION_ID_V1 = "1e195bf6-9a3f-4a33-b7b1-37a603aadf41"
 MODEL_VERSION_ID_V1_NAME = "v1"
 DATASET_EVENT_ID_V1 = "1e195bf6-7a1f-4a33-b7b1-37a603aadde1"

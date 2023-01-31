@@ -16,7 +16,7 @@ import uuid
 from datetime import datetime
 from typing import Dict, List, Optional, Union
 
-from waterdip.core.commons.models import Environment
+from waterdip.core.commons.models import Environment, TimeRange
 from waterdip.server.apis.models.params import RequestPagination, RequestSort
 from waterdip.server.db.models.datasets import DatasetDB
 
@@ -36,16 +36,15 @@ from waterdip.server.apis.models.models import (
     ModelOverviewResponse,
     ModelPredictionHistogram,
     ModelVersionSchema,
-    UpdateModelResponse,
 )
 from waterdip.server.db.models.models import (
     BaseModelDB,
     BaseModelVersionDB,
+    ModelBaseline,
     ModelDB,
     ModelVersionDB,
     ModelVersionSchemaFieldDetails,
     ModelVersionSchemaInDB,
-    ModelBaseline,
 )
 from waterdip.server.db.repositories.model_repository import (
     ModelRepository,
@@ -393,10 +392,18 @@ class ModelService:
         self._model_version_service.delete_versions_by_model_id(model_id)
         self._repository.delete_model(model_id)
 
-    def update_model(self, model_id: UUID, property_name: str, baseline: ModelBaseline, positive_class: Dict) -> BaseModelDB:
+    def update_model(
+        self,
+        model_id: UUID,
+        property_name: str,
+        baseline: ModelBaseline,
+        positive_class: Dict,
+    ) -> BaseModelDB:
         if property_name == "baseline":
             updates = {"baseline": baseline.dict()}
         elif property_name == "positive_class":
             updates = {"positive_class": positive_class}
-        updated_model = self._repository.update_model(model_id=model_id, updates=updates)
+        updated_model = self._repository.update_model(
+            model_id=model_id, updates=updates
+        )
         return updated_model

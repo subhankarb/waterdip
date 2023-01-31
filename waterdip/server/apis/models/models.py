@@ -15,7 +15,7 @@ from datetime import datetime
 from typing import Dict, List, Optional, Union
 from uuid import UUID
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 from waterdip.core.commons.models import (
     ColumnDataType,
@@ -23,10 +23,11 @@ from waterdip.core.commons.models import (
     ModelBaseline,
     MonitorType,
     PredictionTaskType,
-    ModelBaseline,
+    TimeRange,
 )
+from waterdip.server.apis.models.params import TimeRangeParam
 from waterdip.server.db.models.datasets import DatasetDB
-from waterdip.server.db.models.models import BaseModelVersionDB, BaseModelDB
+from waterdip.server.db.models.models import BaseModelDB, BaseModelVersionDB
 
 
 class RegisterModelRequest(BaseModel):
@@ -41,6 +42,7 @@ class RegisterModelRequest(BaseModel):
 
     model_name: str
     model_id: Optional[UUID] = None
+
 
 class UpdateModelRequest(BaseModel):
     """
@@ -61,8 +63,7 @@ class UpdateModelRequest(BaseModel):
     model_id: Optional[UUID] = None
     property_name: Optional[str] = None
     baseline: Optional[ModelBaseline] = None
-    positive_class : Optional[Dict] = None
-
+    positive_class: Optional[Dict] = None
 
 
 class RegisterModelResponse(BaseModel):
@@ -333,6 +334,6 @@ class ModelInfoResponse(BaseModel):
     model_name: str
     model_versions: List[BaseModelVersionDB]
 
+
 class UpdateModelResponse(BaseModelDB):
     pass
-    

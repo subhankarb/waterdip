@@ -15,10 +15,11 @@
 from collections import OrderedDict
 from datetime import date, datetime, timedelta
 from typing import Dict, List
+from uuid import UUID
 
 from dateutil.parser import parse
 from fastapi import Depends
-from uuid import UUID
+
 from waterdip.core.commons.models import MonitorType
 from waterdip.server.apis.models.models import ModelOverviewAlertList
 from waterdip.server.db.repositories.alert_repository import (

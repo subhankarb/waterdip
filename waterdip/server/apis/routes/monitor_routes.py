@@ -46,7 +46,6 @@ def create_monitor(
             identification=request.monitor_identification,
             condition=request.monitor_condition,
             severity=request.severity,
-
         )
     elif monitor_type == MonitorType.PERFORMANCE:
         return service.create_model_performance_monitor(
@@ -54,7 +53,6 @@ def create_monitor(
             identification=request.monitor_identification,
             condition=request.monitor_condition,
             severity=request.severity,
-
         )
     elif monitor_type == MonitorType.DRIFT:
         return service.create_drift_monitor(
@@ -62,7 +60,6 @@ def create_monitor(
             identification=request.monitor_identification,
             condition=request.monitor_condition,
             severity=request.severity,
-
         )
 
 

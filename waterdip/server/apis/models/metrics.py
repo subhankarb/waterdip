@@ -12,7 +12,7 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
-from typing import List, Optional
+from typing import List, Optional, Dict
 
 from pydantic import BaseModel
 
@@ -45,3 +45,43 @@ class CategoricalColumnStats(BaseModel):
 class DatasetMetricsResponse(BaseModel):
     numeric_column_stats: List[NumericColumnStats]
     categorical_column_stats: List[CategoricalColumnStats]
+
+
+class PerfomanceMetricResponse(BaseModel):
+    """
+    Perfomance model API response
+
+    Attributes:
+    ------------------
+    accuracy:
+        accuracy of the model
+    true_positive:
+        true positive of the model
+    false_negative:
+        false negative of the model
+    true_negative:
+        true negative of the model
+    false_positive:
+        false positive of the model
+    precision:
+        precision of the model
+    recall:
+        recall of the model
+    sensitivity:
+        sensitivity of the model
+    specificity:
+        specificity of the model
+    f1:
+        f1 of the model
+    """
+
+    accuracy: Dict
+    true_positive: Dict
+    false_negative: Dict
+    true_negative: Dict
+    false_positive: Dict
+    precision: Dict
+    recall: Dict
+    sensitivity: Dict
+    specificity: Dict
+    f1: Dict
