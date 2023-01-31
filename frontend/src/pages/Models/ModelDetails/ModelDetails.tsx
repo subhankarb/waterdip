@@ -97,7 +97,7 @@ export default function ModelDetails() {
   const { modelId, tabName } = useParams();
 
   const { data } = useModelInfo({ id: modelId });
-  const model_name = data ? data.data.model_name : "Model";
+  const model_name = (data && Object.keys(data).length > 0) ? data.data.model_name : "Model";
 
   const handleOnChange = (value: string) => {
     setCurrentTab(value);
@@ -108,9 +108,9 @@ export default function ModelDetails() {
 
   useEffect(() => {
     const isNotFound = MODEL_TABS.filter((tab) => tab.value === tabName).length === 0;
-    if (isNotFound) navigate(PATH_PAGE.page404);
+    if (isNotFound || (data && Object.keys(data).length === 0)) navigate(PATH_PAGE.page404);
     setCurrentTab(tabName);
-  }, [tabName, navigate, modelId]);
+  }, [tabName, navigate, modelId, data]);
 
   const headerBody = (isDesktop: boolean) => (
     <>
@@ -173,11 +173,13 @@ export default function ModelDetails() {
 
       <Container maxWidth={false} style={{ marginTop: '30px' }}>
         <Box sx={{ mb: 1 }} />
-        {MODEL_TABS.map((tab) => (
-          <TabPanel value={currentTab} index={tab.value} key={tab.value}>
-            {tab.component}
-          </TabPanel>
-        ))}
+        {(data && Object.keys(data).length > 0) && 
+          MODEL_TABS.map((tab) => (
+            <TabPanel value={currentTab} index={tab.value} key={tab.value}>
+              {tab.component}
+            </TabPanel>
+          ))
+        }
       </Container>
     </Page>
   );

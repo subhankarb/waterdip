@@ -2,6 +2,7 @@ import { useQuery, UseQueryResult } from 'react-query';
 import axios from '../../utils/axios';
 import { GET_MODEL_Info_API } from '../apis';
 import { data_type } from '../../@types/model';
+import { useState } from 'react';
 
 interface GetModelInfoParams {
   id: string;
@@ -38,18 +39,20 @@ export const useModelInfo  = (params: UseModelInfo) => {
     refetchOnWindowFocus: false
   });
 
-  async function queryModels() {
+  async function queryModels(): Promise<{} | any> {
     const apiParams = {
       model_id: params.id
     };
-    const response = await axios.get<GetModelInfoResponse>(
-      GET_MODEL_Info_API,
-      {
-        params: apiParams
-      }
-    );
-
-    return response;
-    
+    try {
+      const response = await axios.get<GetModelInfoResponse>(
+        GET_MODEL_Info_API,
+        {
+          params: apiParams
+        }
+      );
+      return response;
+    } catch (err) {
+      return {};
+    }
   }
 };
