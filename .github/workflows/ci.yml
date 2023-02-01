@@ -64,6 +64,12 @@ jobs:
       - name: Run tests
         run: |
           source .venv/bin/activate
-          pytest -p no:warnings ./tests/*
+          coverage run -m pytest -p no:warnings ./tests/*
         env:
           WD_IS_TESTING: true
+          
+      #-----------------------------------------
+      # Run Pytest
+      #---------------------------------------
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v3
