@@ -10,6 +10,8 @@ import { colors } from '../../../../theme/colors';
 import { useModelDelete } from 'api/models/DeleteModel';
 import { useNavigate, useParams } from 'react-router';
 import { PATH_DASHBOARD } from 'routes/paths';
+import { useModelUpdate } from 'api/models/UpdateModel';
+import { useSnackbar } from 'notistack';
 
 const useStyles = makeStyles(() => ({
   outerBox: {
@@ -185,6 +187,9 @@ export const DialogBoxPart = ({ onSave, onSelect }: Props) => {
   const [dateRange, setDateRange] = useState([new Date(now.getTime() - 5 * 60 * 60 * 1000), now]);
   const [data, setData] = useState<string>('');
   const [expandForm, setExpandForm] = useState(true);
+  const { isUpdating, error, ModelUpdate } = useModelUpdate();
+  const { modelId } = useParams();
+  const { enqueueSnackbar } = useSnackbar();
 
   useEffect(() => {
     onSave(expandForm);
@@ -257,7 +262,22 @@ export const DialogBoxPart = ({ onSave, onSelect }: Props) => {
             <button
               type="button"
               className={classes.confiSaveButton}
-              onClick={() => {
+              onClick={async () => {
+                await ModelUpdate({
+                  model_id: modelId,
+                  property_name: "baseline",
+                  baseline: {
+                    time_window : {
+                      time_period: (dateRange[1].getTime() - dateRange[0].getTime()) /(1000 * 3600 * 24)+"d"
+                    }
+                  }
+                })
+                if (error) {
+                  enqueueSnackbar(`Something went wrong!`, { variant: 'error' });
+                }
+                else if (!isUpdating) {
+                  enqueueSnackbar(`Updated Successfully`, { variant: 'success' });
+                }
                 setExpandForm(false);
               }}
             >
@@ -307,13 +327,29 @@ export const DialogBoxPart = ({ onSave, onSelect }: Props) => {
 
         </TextField>
         <Box className={classes.btnContainer}>
-          <Button variant="contained" className={classes.btn}
-            onClick={() => {
-              setExpandForm(false);
-            }}
-          >
-            Save
-          </Button>
+          {
+            data &&
+            <Button variant="contained" className={classes.btn}
+              onClick={async () => {
+                await ModelUpdate({
+                  model_id: modelId,
+                  property_name: "baseline",
+                  baseline: {
+                    dataset_env: data
+                  }
+                })
+                if (error) {
+                  enqueueSnackbar(`Something went wrong!`, { variant: 'error' });
+                }
+                else if (!isUpdating) {
+                  enqueueSnackbar(`Updated Successfully`, { variant: 'success' });
+                }
+                setExpandForm(false);
+              }}
+            >
+              Save
+            </Button>
+          } 
         </Box>
         </Box>
         </div>
@@ -330,11 +366,12 @@ export const DeleteDialogBox = ({ onDelete }: DeleteProps) => {
   const classes = useStyles();
   const [boxDisplay, setBoxDisplay] = useState(true);
   const [confiDisplay, setconfiDisplay] = useState(false);
+  const [confirm, setConfirm] = useState('');
   const [expandForm, setExpandForm] = useState(true);
   const { isDeleting, error, ModelDelete } = useModelDelete();
   const { modelId } = useParams();
   const navigate = useNavigate();
-
+  const { enqueueSnackbar } = useSnackbar();
   useEffect(() => {
     onDelete(expandForm);
   }, [expandForm]);
@@ -396,25 +433,31 @@ export const DeleteDialogBox = ({ onDelete }: DeleteProps) => {
                     label="Type"
                     variant="outlined"
                     sx={{ height: '60px !important', width: '300px' }}
+                    onChange={(e: React.ChangeEvent<{ value: unknown }>) => {
+                      setConfirm(e.target.value as string);
+                    }}
                   />
                 </div>
               </Grid>
             </Grid>
           </div>
           <div className={classes.boxDiv}>
-            <button
-              type="button"
-              className={classes.confiDeleteButton}
-              onClick={async () => {
-                setExpandForm(false);
-                await ModelDelete(modelId);
-                if (!isDeleting) {
-                  navigate(PATH_DASHBOARD.general.models);
-                }
-              }}
-            >
-              DELETE
-            </button>
+            { confirm.toUpperCase() === "MODEL" && 
+              <button
+                type="button"
+                className={classes.confiDeleteButton}
+                onClick={async () => {
+                  setExpandForm(false);
+                  await ModelDelete(modelId);   
+                  if (!isDeleting) {
+                    enqueueSnackbar(`Model Deleted`, { variant: 'info' })
+                    navigate(PATH_DASHBOARD.general.models);
+                  }
+                }}
+              >
+                DELETE
+              </button>
+            }             
             <button
               type="button"
               className={classes.confiNoButton}
