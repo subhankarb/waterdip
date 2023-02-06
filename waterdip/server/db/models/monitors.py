@@ -15,7 +15,7 @@
 from datetime import datetime
 from typing import Optional, TypeVar
 
-from waterdip.core.commons.models import MonitorType, MonitorSeverity
+from waterdip.core.commons.models import MonitorSeverity, MonitorType
 from waterdip.core.monitors.models import BaseMonitorCondition
 
 try:

@@ -15,13 +15,16 @@ import json
 from typing import Dict, List
 from uuid import UUID
 
-from fastapi import Depends
+from fastapi import Depends, HTTPException
 
 from waterdip.core.commons.models import (
     ColumnDataType,
     DatasetType,
     Histogram,
     TimeRange,
+)
+from waterdip.core.metrics.classification_metrics import (
+    ClassificationDateHistogramDBMetrics,
 )
 from waterdip.core.metrics.data_metrics import (
     CardinalityCategorical,
@@ -42,7 +45,7 @@ from waterdip.server.db.repositories.dataset_row_repository import (
     EventDatasetRowRepository,
 )
 from waterdip.server.services.dataset_service import DatasetService
-from waterdip.server.services.model_service import ModelVersionService
+from waterdip.server.services.model_service import ModelService, ModelVersionService
 
 
 class DatasetMetricsService:
@@ -160,7 +163,6 @@ class DatasetMetricsService:
     def categorical_count_histogram(
         self, dataset_id: UUID, dataset_type: DatasetType, time_range: TimeRange = None
     ) -> Dict[str, Histogram]:
-
         if dataset_type == DatasetType.BATCH:
             hist_categorical = CategoricalCountHistogram(
                 collection=self._batch_repo.collection, dataset_id=dataset_id
@@ -227,7 +229,6 @@ class DatasetMetricsService:
         dataset_id: UUID,
         time_range: TimeRange,
     ) -> DatasetMetricsResponse:
-
         dataset = self._dataset_service.find_dataset_by_id(dataset_id)
 
         model_version = self._model_version_service.find_by_id(
@@ -253,7 +254,6 @@ class DatasetMetricsService:
         numeric_columns_stats: List[NumericColumnStats] = []
 
         for categorical_column, mapping in columns["CATEGORICAL"].items():
-
             count_histogram = categorical_count_histogram.get(categorical_column, None)
             cardinality = categorical_cardinality.get(categorical_column, {})
             empty_values = empty_histogram.get(categorical_column, {})
@@ -291,3 +291,55 @@ class DatasetMetricsService:
             categorical_column_stats=cat_columns_stats,
             numeric_column_stats=numeric_columns_stats,
         )
+
+
+class ClassificationPerformance:
+    _INSTANCE: "ClassificationPerformance" = None
+
+    @classmethod
+    def get_instance(
+        cls,
+        event_repo: EventDatasetRowRepository = Depends(
+            EventDatasetRowRepository.get_instance
+        ),
+        dataset_service: DatasetService = Depends(DatasetService.get_instance),
+        model_service: ModelService = Depends(ModelService.get_instance),
+    ):
+        if not cls._INSTANCE:
+            cls._INSTANCE = cls(
+                event_repo=event_repo,
+                dataset_service=dataset_service,
+                model_service=model_service,
+            )
+        return cls._INSTANCE
+
+    def __init__(
+        self,
+        event_repo: EventDatasetRowRepository,
+        dataset_service: DatasetService,
+        model_service: ModelService,
+    ):
+        self._event_repo = event_repo
+        self._dataset_service = dataset_service
+        self._model_service = model_service
+
+    def model_performance(
+        self, model_id: UUID, model_version_id: UUID, time_range: TimeRange
+    ):
+        dataset_id = self._dataset_service.find_event_dataset_by_model_version_id(
+            model_version_id
+        ).dataset_id
+        positive_class = self._model_service.find_by_id(model_id).positive_class
+        if positive_class is None:
+            raise HTTPException(
+                status_code=400,
+                detail="Positive class is not set for this model",
+            )
+        hist = ClassificationDateHistogramDBMetrics(
+            self._event_repo.collection,
+            dataset_id=dataset_id,
+            positive_class=positive_class["name"],
+        )
+
+        result = hist.aggregation_result(time_range=time_range)
+        return result

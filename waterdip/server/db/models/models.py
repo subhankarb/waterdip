@@ -88,8 +88,7 @@ class BaseModelVersionDB(BaseModel):
     def dict(self, *args, **kwargs) -> "DictStrAny":
         model_version = super().dict(*args, **kwargs)
         model_version["model_id"] = str(model_version["model_id"])
-        model_version["model_version_id"] = str(
-            model_version["model_version_id"])
+        model_version["model_version_id"] = str(model_version["model_version_id"])
         return model_version
 
 

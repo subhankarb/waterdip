@@ -21,9 +21,9 @@ from fastapi import Depends
 from waterdip.server.db.models.models import (
     BaseModelDB,
     BaseModelVersionDB,
+    ModelBaseline,
     ModelDB,
     ModelVersionDB,
-    ModelBaseline,
 )
 from waterdip.server.db.mongodb import (
     MONGO_COLLECTION_MODEL_VERSIONS,
@@ -95,7 +95,7 @@ class ModelRepository:
             {"model_id": str(model_id)}
         )
 
-    def update_model(self, model_id: UUID, updates : Dict) -> ModelDB:
+    def update_model(self, model_id: UUID, updates: Dict) -> ModelDB:
         self._mongo.database[MONGO_COLLECTION_MODELS].update_one(
             {"model_id": str(model_id)},
             {"$set": updates},
@@ -182,4 +182,3 @@ class ModelVersionRepository:
         self._mongo.database[MONGO_COLLECTION_MODEL_VERSIONS].delete_many(
             {"model_id": model_id}
         )
-        

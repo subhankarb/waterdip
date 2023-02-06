@@ -12,13 +12,14 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 import uuid
-from typing import Dict, Optional, List
+from datetime import datetime
+from typing import Dict, List, Optional
 from uuid import UUID
 
 from fastapi import Depends
 from pydantic import Field
-from datetime import datetime
-from waterdip.core.commons.models import MonitorType, MonitorSeverity
+
+from waterdip.core.commons.models import MonitorSeverity, MonitorType
 from waterdip.core.monitors.models import (
     DataQualityBaseMonitorCondition,
     DriftBaseMonitorCondition,
@@ -40,14 +41,12 @@ class ServiceBaseMonitor(BaseMonitorDB):
 
 
 class ServiceDataQualityMonitor(ServiceBaseMonitor):
-    monitor_type: MonitorType = Field(
-        default=MonitorType.DATA_QUALITY, const=True)
+    monitor_type: MonitorType = Field(default=MonitorType.DATA_QUALITY, const=True)
     monitor_condition: DataQualityBaseMonitorCondition = Field(...)
 
 
 class ServicePerformanceMonitor(ServiceBaseMonitor):
-    monitor_type: MonitorType = Field(
-        default=MonitorType.PERFORMANCE, const=True)
+    monitor_type: MonitorType = Field(default=MonitorType.PERFORMANCE, const=True)
     monitor_condition: PerformanceBaseMonitorCondition = Field(...)
 
 
@@ -62,8 +61,7 @@ class MonitorService:
     @classmethod
     def get_instance(
         cls,
-        repository: MonitorRepository = Depends(
-            MonitorRepository.get_instance),
+        repository: MonitorRepository = Depends(MonitorRepository.get_instance),
         model_service: ModelService = Depends(ModelService.get_instance),
         model_version_service: ModelVersionService = Depends(
             ModelVersionService.get_instance
@@ -128,7 +126,6 @@ class MonitorService:
             ),
             severity=severity,
             created_at=datetime.utcnow(),
-
         )
 
         return self._repository.insert_monitor(monitor=service_quality_monitor)
@@ -139,7 +136,6 @@ class MonitorService:
         identification: MonitorIdentification,
         condition: BaseMonitorCondition,
         severity: MonitorSeverity,
-
     ) -> ServiceBaseMonitor:
         self._check_monitor_identification(identification)
 
@@ -157,7 +153,6 @@ class MonitorService:
             ),
             created_at=datetime.utcnow(),
             severity=severity,
-
         )
 
         return self._repository.insert_monitor(monitor=service_perf_monitor)
@@ -168,7 +163,6 @@ class MonitorService:
         identification: MonitorIdentification,
         condition: BaseMonitorCondition,
         severity: MonitorSeverity,
-
     ) -> ServiceBaseMonitor:
         self._check_monitor_identification(identification)
 
@@ -206,8 +200,7 @@ class MonitorService:
         if model_id:
             filters["monitor_identification.model_id"] = str(model_id)
         if model_version_id:
-            filters["monitor_identification.model_version_id"] = str(
-                model_version_id)
+            filters["monitor_identification.model_version_id"] = str(model_version_id)
 
         monitors = self._repository.find_monitors(
             filters=filters,

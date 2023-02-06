@@ -15,11 +15,20 @@
 from uuid import UUID
 
 from fastapi import APIRouter, Depends
+from datetime import datetime, timedelta
+from typing import Optional
+from uuid import UUID
+
+from fastapi import APIRouter, Depends
 
 from waterdip.core.commons.models import TimeRange
-from waterdip.server.apis.models.metrics import DatasetMetricsResponse
+from waterdip.server.apis.models.metrics import DatasetMetricsResponse, PerfomanceMetricResponse
 from waterdip.server.apis.models.params import TimeRangeParam
 from waterdip.server.services.metrics_service import DatasetMetricsService
+from waterdip.core.commons.models import TimeRange
+from waterdip.server.apis.models.params import TimeRangeParam
+
+from waterdip.server.services.metrics_service import ClassificationPerformance
 
 router = APIRouter()
 
@@ -32,7 +41,8 @@ def model_list(
     model_version_id: UUID,
     dataset_id: UUID,
     time_range_param: TimeRangeParam = Depends(),
-    service: DatasetMetricsService = Depends(DatasetMetricsService.get_instance),
+    service: DatasetMetricsService = Depends(
+        DatasetMetricsService.get_instance),
 ):
     time_range = TimeRange(
         start_time=time_range_param.start_time, end_time=time_range_param.end_time
@@ -46,3 +56,23 @@ def model_list(
     )
 
     return metrics
+
+
+@router.get(
+    "/metric.performance",
+    response_model=PerfomanceMetricResponse,
+    name="metric:performance",
+)
+def metric_performance(
+    model_id: UUID,
+    model_version_id: UUID,
+    start_time: Optional[datetime] = datetime.utcnow() - timedelta(days=7),
+    end_time: Optional[datetime] = datetime.utcnow(),
+    metric_service: ClassificationPerformance = Depends(
+        ClassificationPerformance.get_instance),
+):
+    return metric_service.model_performance(
+        model_id=model_id,
+        model_version_id=model_version_id,
+        time_range=TimeRange(start_time=start_time, end_time=end_time),
+    )

@@ -131,7 +131,11 @@ class DatasetService:
         dataset_list: List[DatasetDB] = self._repository.find_datasets(filters=filters)
 
         if len(dataset_list) == 0:
-            raise EntityNotFoundError(name=str(model_version_id), type="Event Dataset")
+            raise EntityNotFoundError(
+                name=str(model_version_id),
+                type="Event Dataset",
+                message="Dataset not found",
+            )
 
         return dataset_list[0]
 

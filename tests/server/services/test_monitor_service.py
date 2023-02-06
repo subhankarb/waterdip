@@ -13,12 +13,14 @@
 #  limitations under the License.
 
 import uuid
+from datetime import datetime
 from uuid import uuid4
 
 import pytest
 from pydantic import ValidationError
 
 from tests.testing_helpers import MODEL_ID, MODEL_VERSION_ID_V1, MongodbBackendTesting
+from waterdip.core.commons.models import MonitorSeverity
 from waterdip.server.db.mongodb import (
     MONGO_COLLECTION_ALERTS,
     MONGO_COLLECTION_MODELS,
@@ -26,8 +28,6 @@ from waterdip.server.db.mongodb import (
 )
 from waterdip.server.db.repositories.monitor_repository import MonitorRepository
 from waterdip.server.services.monitor_service import MonitorService
-from waterdip.core.commons.models import MonitorSeverity
-from datetime import datetime
 
 
 @pytest.mark.usefixtures("mock_mongo_backend")
@@ -63,14 +63,11 @@ class TestMonitorService:
             "severity": MonitorSeverity.LOW,
             "created_at": datetime.utcnow(),
         }
-        self.mock_mongo_backend.database[MONGO_COLLECTION_MONITORS].delete_many({
-        })
-        self.mock_mongo_backend.database[MONGO_COLLECTION_MONITORS].insert_one(
-            data)
+        self.mock_mongo_backend.database[MONGO_COLLECTION_MONITORS].delete_many({})
+        self.mock_mongo_backend.database[MONGO_COLLECTION_MONITORS].insert_one(data)
         self.MODEL_NAME = "Test Model"
         model = {"model_id": MODEL_ID, "model_name": self.MODEL_NAME}
-        self.mock_mongo_backend.database[MONGO_COLLECTION_MODELS].insert_one(
-            model)
+        self.mock_mongo_backend.database[MONGO_COLLECTION_MODELS].insert_one(model)
 
     def test_should_return_monitor_list(self):
         response = self.monitor_service.list_monitors()
@@ -80,7 +77,5 @@ class TestMonitorService:
 
     @classmethod
     def teardown_class(self):
-        self.mock_mongo_backend.database[MONGO_COLLECTION_MONITORS].delete_many({
-        })
-        self.mock_mongo_backend.database[MONGO_COLLECTION_MODELS].delete_many({
-        })
+        self.mock_mongo_backend.database[MONGO_COLLECTION_MONITORS].delete_many({})
+        self.mock_mongo_backend.database[MONGO_COLLECTION_MODELS].delete_many({})

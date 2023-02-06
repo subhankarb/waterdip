@@ -20,9 +20,9 @@ from tests.testing_helpers import MongodbBackendTesting
 from waterdip.core.commons.models import (
     DataQualityMetric,
     DriftMetric,
+    MonitorSeverity,
     MonitorType,
     PerformanceMetric,
-    MonitorSeverity,
 )
 from waterdip.core.monitors.models import (
     DataQualityBaseMonitorCondition,
@@ -181,12 +181,12 @@ class TestMonitorRepository:
             monitor_type=MonitorType.DRIFT,
             created_at="2021-08-01T00:00:00Z",
             severity=MonitorSeverity.LOW,
-
         )
         monitor_repo.insert_monitor(drift_monitor)
 
         monitor_repo.delete_monitors_by_model_id(
-            str(self.monitor_identification.model_id))
+            str(self.monitor_identification.model_id)
+        )
 
         created_monitor_version_in_db = mock_mongo_backend.database[
             MONGO_COLLECTION_MONITORS

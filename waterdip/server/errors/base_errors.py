@@ -17,7 +17,6 @@ from starlette import status
 
 
 class WDServerError(Exception):
-
     HTTP_STATUS: int = status.HTTP_500_INTERNAL_SERVER_ERROR
 
     @classmethod
@@ -62,6 +61,7 @@ class EntityNotFoundError(WDServerError):
 
     HTTP_STATUS = status.HTTP_404_NOT_FOUND
 
-    def __init__(self, name: str, type: Union[Type, str]):
+    def __init__(self, name: str, type: Union[Type, str], message: str = None):
         self.name = name
         self.type = type if isinstance(type, str) else type.__name__
+        self.message = message

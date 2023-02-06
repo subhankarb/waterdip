@@ -21,8 +21,8 @@ from waterdip.core.commons.models import (
     DataQualityMetric,
     DatasetType,
     Environment,
-    MonitorType,
     MonitorSeverity,
+    MonitorType,
 )
 from waterdip.core.monitors.models import MonitorDimensions, MonitorThreshold
 from waterdip.processor.monitors.monitor_processor import MonitorProcessor
@@ -82,10 +82,8 @@ class TestMonitorProcessor:
         monitor_processor = MonitorProcessor(
             monitor=monitor_db.dict(),
             mongodb_backend=mock_mongo_backend,
-            alert_repo=AlertRepository.get_instance(
-                mongodb=mock_mongo_backend),
-            dataset_repo=DatasetRepository.get_instance(
-                mongodb=mock_mongo_backend),
+            alert_repo=AlertRepository.get_instance(mongodb=mock_mongo_backend),
+            dataset_repo=DatasetRepository.get_instance(mongodb=mock_mongo_backend),
         )
         violation = monitor_processor.process()
         assert len(violation) == 1
