@@ -57,10 +57,11 @@ def model_info(
     ),
 ):
     model: ModelDB = model_service.find_by_id(model_id=model_id)
+    model_baseline = model.baseline
     versions = model_version_service.find_all_versions_for_model(
         model_id=model_id)
     return ModelInfoResponse(
-        model_id=model.model_id, model_name=model.model_name, model_versions=versions
+        model_id=model.model_id, model_name=model.model_name, model_versions=versions, model_baseline=model_baseline,
     )
 
 

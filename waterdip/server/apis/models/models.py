@@ -328,11 +328,14 @@ class ModelInfoResponse(BaseModel):
         model name
     model_versions:
         list of all model versions associated with this model
+    model_baseline:
+        baseline of model
     """
 
     model_id: UUID
     model_name: str
     model_versions: List[BaseModelVersionDB]
+    model_baseline: ModelBaseline
 
 
 class UpdateModelResponse(BaseModelDB):
