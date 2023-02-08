@@ -61,7 +61,7 @@ class TestEventDatasetRowRepository:
             for _ in range(10)
         ]
 
-        created_rows = event_repo.inset_rows(rows=rows)
+        created_rows = event_repo.insert_rows(rows=rows)
         assert len(created_rows) == len(rows)
 
     def test_count_prediction_by_model_id(self, mock_mongo_backend: MongodbBackend):

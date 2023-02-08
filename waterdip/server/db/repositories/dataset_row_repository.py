@@ -46,7 +46,7 @@ class EventDatasetRowRepository:
     def collection(self) -> Collection:
         return self._mongo.database[MONGO_COLLECTION_EVENT_ROWS]
 
-    def inset_rows(self, rows: List[BaseEventRowDB]):
+    def insert_rows(self, rows: List[BaseEventRowDB]):
         created_rows = self._mongo.database[MONGO_COLLECTION_EVENT_ROWS].insert_many(
             [row.dict() for row in rows]
         )
@@ -104,13 +104,13 @@ class BatchDatasetRowRepository:
     def collection(self) -> Collection:
         return self._mongo.database[MONGO_COLLECTION_BATCH_ROWS]
 
-    def inset_row(self, row: BaseDatasetBatchRowDB):
+    def insert_row(self, row: BaseDatasetBatchRowDB):
         created_row = self._mongo.database[MONGO_COLLECTION_BATCH_ROWS].insert_one(
             row.dict()
         )
         return created_row.inserted_id
 
-    def inset_rows(self, rows: List[BaseDatasetBatchRowDB]):
+    def insert_rows(self, rows: List[BaseDatasetBatchRowDB]):
         created_rows = self._mongo.database[MONGO_COLLECTION_BATCH_ROWS].insert_many(
             [row.dict() for row in rows]
         )

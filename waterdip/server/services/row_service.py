@@ -54,7 +54,7 @@ class BatchDatasetRowService:
         self._repository = repository
 
     def insert_rows(self, rows: List[ServiceDatasetBatchRow]) -> int:
-        inserted_rows = self._repository.inset_rows(rows)
+        inserted_rows = self._repository.insert_rows(rows)
         return len(inserted_rows)
 
     def delete_rows_by_model_id(self, model_id: UUID) -> int:
@@ -90,7 +90,7 @@ class EventDatasetRowService:
     def insert_rows(
         self, rows: Union[List[ServiceEventRow], List[ServiceClassificationEventRow]]
     ) -> int:
-        inserted_rows = self._repository.inset_rows(rows)
+        inserted_rows = self._repository.insert_rows(rows)
         return len(inserted_rows)
 
     def count_prediction_by_model_id(self, model_id: str) -> int:
