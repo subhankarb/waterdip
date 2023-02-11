@@ -15,7 +15,7 @@ const RootStyle = styled('div')({
 });
 const useStyles = makeStyles(() => ({}));
 
-const ModelConfiguration = () => {
+const ModelConfiguration = (d: any) => {
   const classes = useStyles();
   const location = useLocation();
   const data = location.state === null ? false : true;
@@ -24,7 +24,7 @@ const ModelConfiguration = () => {
     <Page title="Model Configruration | Waterdip">
       <RootStyle>
         <Box>
-          <ConfigBaseLine path={data} />
+          <ConfigBaseLine path={data} data={d}/>
           <ConfigEvaluation />
           <ConfigAdvanced />
         </Box>

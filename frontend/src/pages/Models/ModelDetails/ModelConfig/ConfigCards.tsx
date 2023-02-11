@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Heading } from '../../../../components/Heading';
 import { makeStyles } from '@material-ui/styles';
 import { formatDateTime } from '../../../../utils/date';
@@ -62,17 +62,39 @@ const useStyles = makeStyles({
 
 type Props = {
   path: boolean;
+  data: any;
 };
 
-export const ConfigBaseLine = ({ path }: Props) => {
+const stringToMilliseconds = (str: string) => {
+  const [value, unit] = str.split('d');
+  const millisecondsInADay = 24 * 60 * 60 * 1000;
+  return parseInt(value) * millisecondsInADay;
+};
+
+export const ConfigBaseLine = ({ path, data }: Props) => {
   const now = new Date();
   const [dateRange, setDateRange] = useState([new Date(now.getTime() - 5 * 60 * 60 * 1000), now]);
+  const [dateTimeString, setDateTimeString] = useState(`${formatDateTime(dateRange[0] ? dateRange[0] : now)} to ${formatDateTime(
+    dateRange[1] ? dateRange[1] : now
+  )} `)
   const classes = useStyles();
   const [expandForm, setExpandForm] = useState(path);
 
-  const dateTimeString = `${formatDateTime(dateRange[0] ? dateRange[0] : now)} to ${formatDateTime(
-    dateRange[1] ? dateRange[1] : now
-  )} `;
+  useEffect(() => {
+    if (data && data.data && data.data.data) {
+      const milliseconds = stringToMilliseconds(data.data.data.model_baseline?.time_window?.time_period ? data.data.data.model_baseline.time_window.time_period : "30d");
+      setDateRange([new Date(now.getTime() - milliseconds), now]);
+    }
+
+    console.log(dateRange)
+  }, [data]);
+
+  useEffect(() => {
+    setDateTimeString(`${formatDateTime(dateRange[0] ? dateRange[0] : now)} to ${formatDateTime(
+      dateRange[1] ? dateRange[1] : now
+    )}`)
+  },[dateRange])
+
 
   const handleSave = (data: any) => {
     setExpandForm(data);

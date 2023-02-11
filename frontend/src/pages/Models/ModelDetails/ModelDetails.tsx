@@ -18,50 +18,6 @@ import ModelMonitors from './ModelMonitors/ModelMonitors';
 import ModelAlerts from './ModelAlerts/ModelAlerts';
 import { capitalize } from 'lodash';
 
-const MODEL_TABS = [
-  {
-    value: 'overview',
-    // icon: <Icon icon={barChartOutline} width={20} height={20} />,
-    component: <ModelOverview />,
-    isDisabled: false
-  },
-  {
-    value: 'performance',
-    // icon: <Icon icon={baselineDeveloperBoard} width={20} height={20} />,
-    component: <ModelPerformance />,
-    isDisabled: false
-  },
-  {
-    value: 'drift',
-    // icon: <Icon icon={activityOutline} width={20} height={20} />,
-    component: <ModelDrift />,
-    isDisabled: false
-  },
-  {
-    value: 'dataset',
-    // icon: <Icon icon={fileTextOutline} width={20} height={20} />,
-    component: <ModelDataProfile />,
-    isDisabled: false
-  },
-  {
-    value: 'alerts',
-    // icon: <Icon icon={fileTextOutline} width={20} height={20} />,
-    component: <ModelAlerts />,
-    isDisabled: false
-  },
-  {
-    value: 'monitors',
-    // icon: <Icon icon={fileTextOutline} width={20} height={20} />,
-    component: <ModelMonitors />,
-    isDisabled: false
-  },
-  {
-    value: 'configuration',
-    // icon: <Icon icon={fileTextOutline} width={20} height={20} />,
-    component: <ModelConfiguration />,
-    isDisabled: false
-  }
-];
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -90,6 +46,7 @@ function useQuery() {
   return React.useMemo(() => new URLSearchParams(search), [search]);
 }
 export default function ModelDetails() {
+  
   let query = useQuery();
 
   const navigate = useNavigate();
@@ -98,6 +55,51 @@ export default function ModelDetails() {
 
   const { data } = useModelInfo({ id: modelId });
   const model_name = (data && Object.keys(data).length > 0) ? data.data.model_name : "Model";
+
+  const MODEL_TABS = [
+    {
+      value: 'overview',
+      // icon: <Icon icon={barChartOutline} width={20} height={20} />,
+      component: <ModelOverview />,
+      isDisabled: false
+    },
+    {
+      value: 'performance',
+      // icon: <Icon icon={baselineDeveloperBoard} width={20} height={20} />,
+      component: <ModelPerformance />,
+      isDisabled: false
+    },
+    {
+      value: 'drift',
+      // icon: <Icon icon={activityOutline} width={20} height={20} />,
+      component: <ModelDrift />,
+      isDisabled: false
+    },
+    {
+      value: 'dataset',
+      // icon: <Icon icon={fileTextOutline} width={20} height={20} />,
+      component: <ModelDataProfile />,
+      isDisabled: false
+    },
+    {
+      value: 'alerts',
+      // icon: <Icon icon={fileTextOutline} width={20} height={20} />,
+      component: <ModelAlerts />,
+      isDisabled: false
+    },
+    {
+      value: 'monitors',
+      // icon: <Icon icon={fileTextOutline} width={20} height={20} />,
+      component: <ModelMonitors />,
+      isDisabled: false
+    },
+    {
+      value: 'configuration',
+      // icon: <Icon icon={fileTextOutline} width={20} height={20} />,
+      component: <ModelConfiguration data={data}/>,
+      isDisabled: false
+    }
+  ];
 
   const handleOnChange = (value: string) => {
     setCurrentTab(value);
