@@ -4,7 +4,8 @@ import { GET_MODEL_PERFORMANCE_API } from '../apis';
 // import { ModelPerformance } from '../../@types/model';
 
 interface GetModelInfoParams {
-  id: string;
+  model_id: string;
+  model_version_id: string;
   start_date?: Date | null;
   end_date?: Date | null;
 }
@@ -20,7 +21,7 @@ interface ApiAccuracyInfo {
   }[];
 }
 interface GetModelInfoResponse {
-  model_id: string;
+  
   accuracy: ApiAccuracyInfo;
 }
 // interface ResultData {
@@ -41,28 +42,29 @@ interface UseModelPerformance {
 }
 
 export const useModelPerformance: UseModelPerformance = (params) => {
-  return useQuery(['model.performance', params], queryModelPerformance, {
+  return useQuery(['metric.performance', params], queryModelPerformance, {
     refetchOnWindowFocus: false
   });
 
   async function queryModelPerformance() {
     const apiParams = {
-      model_version_id:params.id,
+      model_id: params.model_id,
+      model_version_id:params.model_version_id,
       start_date: params.start_date,
       end_date: params.end_date
     };
-    const response = await axios.get<GetModelInfoResponse>(
-      `${GET_MODEL_PERFORMANCE_API}/`,
-      {
-        params: apiParams
-      }
-    );
-    const { model_id } = response.data;
-
-    const modelPerformance: any = {
-      id: model_id
-    };
-
-    return { ...response, modelPerformance };
+    try{
+      const response = await axios.get<GetModelInfoResponse>(
+        `${GET_MODEL_PERFORMANCE_API}/`,
+        {
+          params: apiParams
+        }
+      )
+      console.log(response);
+      return response;
+    } catch (error) {
+      throw error;
+    }
+    
   }
 };

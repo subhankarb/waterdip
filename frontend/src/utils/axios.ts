@@ -26,19 +26,7 @@ const axiosInstance = (): AxiosInstance => {
   axiosConf.interceptors.response.use(
     (response) => response,
     (error) => {
-      if (error.response) {
-        // eslint-disable-next-line prefer-promise-reject-errors
-        return Promise.reject(error?.response?.data?.errors);
-      }
-      if (error.request) {
-        // The request was made but no response was received
-        // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
-        // http.ClientRequest in node.js
-        // eslint-disable-next-line prefer-promise-reject-errors
-        return Promise.reject([{ msg: 'Something went wrong!! Please reload.' }]);
-      }
-      // eslint-disable-next-line prefer-promise-reject-errors
-      return Promise.reject([{ msg: error.message }]);
+      return Promise.reject(error);
     }
   );
   return axiosConf;
