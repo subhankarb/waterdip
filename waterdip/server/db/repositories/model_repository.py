@@ -90,7 +90,7 @@ class ModelRepository:
         )
         return total
 
-    def delete_model(self, model_id: str) -> None:
+    def delete_model(self, model_id: UUID) -> None:
         self._mongo.database[MONGO_COLLECTION_MODELS].delete_one(
             {"model_id": str(model_id)}
         )
@@ -154,7 +154,6 @@ class ModelVersionRepository:
     def agg_model_versions_per_model(
         self, model_ids: List[str], top_n=1
     ) -> Dict[str, List[str]]:
-
         pipeline = [
             {"$match": {"model_id": {"$in": model_ids}}},
             {"$sort": {"created_at": -1}},

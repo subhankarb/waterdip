@@ -18,7 +18,13 @@ from uuid import UUID
 
 from pydantic import BaseModel, Field, root_validator
 
-from waterdip.core.commons.models import ColumnDataType, ModelBaseline, MovingTimeWindow
+from waterdip.core.commons.models import (
+    ColumnDataType,
+    ModelBaseline,
+    ModelBaselineTimeWindow,
+    ModelBaselineTimeWindowType,
+    MovingTimeWindow,
+)
 
 
 class BaseModelDB(BaseModel):
@@ -26,7 +32,12 @@ class BaseModelDB(BaseModel):
     model_name: str
     created_at: Optional[datetime]
     baseline: ModelBaseline = Field(
-        default=ModelBaseline(time_window=MovingTimeWindow())
+        default=ModelBaseline(
+            time_window=ModelBaselineTimeWindow(
+                time_window_type=ModelBaselineTimeWindowType.MOVING_TIME_WINDOW,
+                moving_time_window=MovingTimeWindow(),
+            )
+        )
     )
     positive_class: Optional[Dict] = None
 

@@ -26,12 +26,12 @@ from tests.testing_helpers import (
 )
 from waterdip.core.commons.models import (
     Environment,
+    ModelBaselineTimeWindow,
+    ModelBaselineTimeWindowType,
     MovingTimeWindow,
 )
 from waterdip.server.db.models.datasets import BaseDatasetDB
-from waterdip.server.db.models.models import (
-    ModelBaseline,
-)
+from waterdip.server.db.models.models import ModelBaseline
 from waterdip.server.db.mongodb import (
     MONGO_COLLECTION_MODEL_VERSIONS,
     MONGO_COLLECTION_MODELS,
@@ -65,7 +65,6 @@ class TestRegisterModel:
 @pytest.mark.usefixtures("test_client")
 class TestRegisterModelVersion:
     def test_should_generate_model_version(self, test_client: TestClient):
-
         model_version = "test_version"
         request_body = {
             "model_id": MODEL_ID,
@@ -76,8 +75,7 @@ class TestRegisterModelVersion:
                 "predictions": {"p1": "NUMERIC"},
             },
         }
-        response = test_client.post(
-            url="/v1/model.version.register", json=request_body)
+        response = test_client.post(url="/v1/model.version.register", json=request_body)
 
         assert response.status_code == 200
 
@@ -97,7 +95,6 @@ class TestRegisterModelVersion:
 @pytest.mark.usefixtures("test_client")
 class TestModelVersionInfo:
     def test_should_return_model_version_info(self, test_client: TestClient):
-
         response = test_client.get(
             url=f"/v1/model.version.info?model_version_id={MODEL_VERSION_ID_V1}"
         )
@@ -114,7 +111,6 @@ class TestModelVersionInfo:
 @pytest.mark.usefixtures("test_client")
 class TestModelInfo:
     def test_should_return_model_info(self, test_client: TestClient):
-
         response = test_client.get(url=f"/v1/model.info?model_id={MODEL_ID}")
         assert response.status_code == 200
 
@@ -127,7 +123,6 @@ class TestModelInfo:
 @pytest.mark.usefixtures("test_client")
 class TestModelUpdate:
     def test_should_update_model_baseline(self, test_client: TestClient):
-
         model = {
             "model_name": "test_model_p1",
             "model_id": MODEL_ID,
@@ -139,8 +134,11 @@ class TestModelUpdate:
         property_name = "baseline"
         baseline = ModelBaseline(
             dataset_env=Environment.TESTING,
-            time_window=MovingTimeWindow(
-                skip_period="1d", time_period="15d", aggregation_period="1d"
+            time_window=ModelBaselineTimeWindow(
+                time_window_type=ModelBaselineTimeWindowType.MOVING_TIME_WINDOW,
+                moving_time_window=MovingTimeWindow(
+                    skip_period="1d", time_period="15d"
+                ),
             ),
         )
 

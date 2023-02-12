@@ -7,7 +7,8 @@
 
 <p align="center">
 <img alt="License" src="https://img.shields.io/badge/license-Apache--2.0-0466C8"/>
-<img alt="Status" src="https://img.shields.io/github/checks-status/waterdipai/waterdip/main?logo=0466C8"/>
+<img alt="coverage" src="https://codecov.io/gh/waterdipai/waterdip/branch/main/graph/badge.svg?token=cn6lkDRXpl">
+<img alt="Status" src="https://github.com/waterdipai/waterdip/actions/workflows/ci.yml/badge.svg?branch=main"/>
 
 <div align="center">
 ⭐️ If you like it, star the repo <a href="https://github.com/waterdipai/waterdip/stargazers"><img src="docs/assets/star_github.png" width="30"/></a> ⭐

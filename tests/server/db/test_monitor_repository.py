@@ -11,7 +11,7 @@
 #  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
-
+import datetime
 import uuid
 
 import pytest
@@ -121,7 +121,9 @@ class TestMonitorRepository:
             monitor_identification=self.monitor_identification,
             monitor_condition=drift_condition,
             monitor_type=MonitorType.DRIFT,
-            created_at="2021-08-01T00:00:00Z",
+            created_at=datetime.datetime.strptime(
+                "2021-08-01T00:00:00Z", "%Y-%m-%dT%H:%M:%SZ"
+            ),
             last_run="2021-08-01T00:00:00Z",
             severity=MonitorSeverity.LOW,
         )
@@ -149,7 +151,9 @@ class TestMonitorRepository:
                 baseline=ModelBaseline(),
             ),
             monitor_type=MonitorType.DRIFT,
-            created_at="2021-08-01T00:00:00Z",
+            created_at=datetime.datetime.strptime(
+                "2021-08-01T00:00:00Z", "%Y-%m-%dT%H:%M:%SZ"
+            ),
             severity=MonitorSeverity.LOW,
         )
         monitor_repo.insert_monitor(drift_monitor)
@@ -179,14 +183,14 @@ class TestMonitorRepository:
                 baseline=ModelBaseline(),
             ),
             monitor_type=MonitorType.DRIFT,
-            created_at="2021-08-01T00:00:00Z",
+            created_at=datetime.datetime.strptime(
+                "2021-08-01T00:00:00Z", "%Y-%m-%dT%H:%M:%SZ"
+            ),
             severity=MonitorSeverity.LOW,
         )
         monitor_repo.insert_monitor(drift_monitor)
 
-        monitor_repo.delete_monitors_by_model_id(
-            str(self.monitor_identification.model_id)
-        )
+        monitor_repo.delete_monitors_by_model_id(self.monitor_identification.model_id)
 
         created_monitor_version_in_db = mock_mongo_backend.database[
             MONGO_COLLECTION_MONITORS

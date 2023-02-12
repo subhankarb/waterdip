@@ -25,9 +25,12 @@ class Environment(str, Enum):
     Model Dataset Environment
     Attributes:
     ------------------
-    TRAINING: Training environment
-    TESTING: Testing environment
-    VALIDATION: Validation environment
+    TRAINING:
+        Training environment
+    TESTING:
+        Testing environment
+    VALIDATION:
+        Validation environment
     """
 
     TRAINING = "TRAINING"
@@ -43,8 +46,11 @@ class MonitorType(str, Enum):
     Attributes:
     ------------------
     DATA_QUALITY:
+        Data quality monitor
     DRIFT:
+        Drift monitor
     MODEL_PERFORMANCE:
+        Model performance monitor
     """
 
     DATA_QUALITY = "DATA_QUALITY"
@@ -53,6 +59,14 @@ class MonitorType(str, Enum):
 
 
 class DriftMetric(str, Enum):
+    """
+    Drift metrics
+    Attributes:
+    ------------------
+    PSI:
+        PSI type drift
+    """
+
     PSI = "PSI"
 
 
@@ -82,6 +96,21 @@ class TimeRange(BaseModel):
     end_time: datetime
 
 
+class ModelBaselineTimeWindowType(str, Enum):
+    """
+    Model baseline time window type.
+    Attributes:
+    ------------------
+    MOVING_TIME_WINDOW:
+        moving time window
+    FIXED_TIME_WINDOW:
+        fixed time window
+    """
+
+    MOVING_TIME_WINDOW = "MOVING_TIME_WINDOW"
+    FIXED_TIME_WINDOW = "FIXED_TIME_WINDOW"
+
+
 class MovingTimeWindow(BaseModel):
     """
     Fixed time window.
@@ -92,13 +121,14 @@ class MovingTimeWindow(BaseModel):
        how many days from current day the window starts
     time_period:
        time in days for the moving time window
-    aggregation_period:
-       agg period for the time window. Default is 1 day
     """
 
-    skip_period: str = Field(description="", default="1d")
-    time_period: str = Field(description="15d", default="15d")
-    aggregation_period: str = Field(default="1d")
+    skip_period: str = Field(
+        default="1d", description="Moving time window skip period. Default is 1d"
+    )
+    time_period: str = Field(
+        default="7d", description="Moving time window time period. Default is 7d"
+    )
 
 
 class FixedTimeWindow(BaseModel):
@@ -110,13 +140,35 @@ class FixedTimeWindow(BaseModel):
         start time of the time window
     end_time:
         end time of the time window
-    aggregation_period:
-        agg period for the time window. Default is 1 day
     """
 
-    start_time: datetime = Field(...)
-    end_time: datetime = Field(...)
-    aggregation_period: str = Field(default="1d")
+    start_time: datetime = Field(description="start time of the time window")
+    end_time: datetime = Field(description="end time of the time window")
+
+
+class ModelBaselineTimeWindow(BaseModel):
+    """
+    Model baseline time window.
+    Model baseline time window can either be a fixed time window or a moving time window.
+    Any one of it is mandatory
+    Attributes:
+    ------------------
+    time_window_type:
+        type of the time window
+    fixed_time_window:
+        fixed time window
+    """
+
+    time_window_type: ModelBaselineTimeWindowType = Field(
+        description="type of the time window",
+        default=ModelBaselineTimeWindowType.MOVING_TIME_WINDOW,
+    )
+    fixed_time_window: Optional[FixedTimeWindow] = Field(
+        default=None, description="fixed time window"
+    )
+    moving_time_window: Optional[MovingTimeWindow] = Field(
+        default=MovingTimeWindow(), description="moving time window"
+    )
 
 
 class ModelBaseline(BaseModel):
@@ -137,8 +189,8 @@ class ModelBaseline(BaseModel):
     dataset_env: Optional[Environment] = Field(
         description="dataset environment", default=None
     )
-    time_window: Optional[Union[MovingTimeWindow, FixedTimeWindow]] = Field(
-        default=MovingTimeWindow()
+    time_window: ModelBaselineTimeWindow = Field(
+        default=ModelBaselineTimeWindow(), description="time window for the baseline"
     )
 
     @root_validator
@@ -149,6 +201,17 @@ class ModelBaseline(BaseModel):
 
 
 class Histogram(BaseModel):
+    """
+    Histogram for a metrics
+
+    Attributes:
+    ------------------
+    bins:
+        bins of the histogram
+    val:
+        value of the histogram
+    """
+
     bins: List[str]
     val: List[Union[float, int]]
 
