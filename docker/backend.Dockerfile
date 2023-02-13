@@ -7,7 +7,7 @@ WORKDIR /src
 
 COPY poetry.lock pyproject.toml ./
 RUN apt-get -y install --no-install-recommends make=* && \
-    pip install poetry==1.2.2 && \
+    pip install poetry==1.3.0 && \
     poetry config virtualenvs.create false && \
     poetry install
 

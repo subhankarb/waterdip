@@ -7,7 +7,7 @@
 #### Requirements
 
 - Python >= 3.7
-- Poetry >= 1.2.2
+- Poetry >= 1.3.0
 - Mongodb >= 5.0.0
 
 #### Setup MongoDB
