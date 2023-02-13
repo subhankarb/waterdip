@@ -96,8 +96,10 @@ class ModelVersionSchema(BaseModel):
 
     Example:
         version_schema = ModelVersionSchema(
-            features={"age": ColumnDataType.NUMERIC, "location": ColumnDataType.CATEGORICAL},
+            features={"age": ColumnDataType.NUMERIC,
+                "location": ColumnDataType.CATEGORICAL},
             predictions={"is_eligible": ColumnDataType.BOOLEAN},
+
         )
 
     """
@@ -328,12 +330,15 @@ class ModelInfoResponse(BaseModel):
         model name
     model_versions:
         list of all model versions associated with this model
+    model_prediction_classes:
+        list of prediction classes
     model_baseline:
         baseline of model
     """
 
     model_id: UUID
     model_name: str
+    model_prediction_classes: Optional[List[Union[str, int]]]
     model_versions: List[BaseModelVersionDB]
     model_baseline: ModelBaseline
 

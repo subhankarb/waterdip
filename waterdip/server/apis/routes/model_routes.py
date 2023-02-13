@@ -15,6 +15,7 @@ from typing import List, Optional
 from uuid import UUID
 
 from fastapi import APIRouter, Body, Depends
+
 from waterdip.server.apis.models.models import (
     ModelInfoResponse,
     ModelListResponse,
@@ -27,10 +28,7 @@ from waterdip.server.apis.models.models import (
     UpdateModelRequest,
     UpdateModelResponse,
 )
-from waterdip.server.apis.models.params import (
-    RequestPagination,
-    RequestSort,
-)
+from waterdip.server.apis.models.params import RequestPagination, RequestSort
 from waterdip.server.db.models.datasets import DatasetDB
 from waterdip.server.db.models.models import ModelDB, ModelVersionDB
 from waterdip.server.services.model_service import ModelService, ModelVersionService
@@ -58,10 +56,13 @@ def model_info(
 ):
     model: ModelDB = model_service.find_by_id(model_id=model_id)
     model_baseline = model.baseline
-    versions = model_version_service.find_all_versions_for_model(
-        model_id=model_id)
+    versions = model_version_service.find_all_versions_for_model(model_id=model_id)
     return ModelInfoResponse(
-        model_id=model.model_id, model_name=model.model_name, model_versions=versions, model_baseline=model_baseline,
+        model_id=model.model_id,
+        model_name=model.model_name,
+        model_prediction_classes=model.prediction_classes,
+        model_versions=versions,
+        model_baseline=model_baseline,
     )
 
 
@@ -180,4 +181,5 @@ def update_model(
         baseline=request.baseline,
         positive_class=request.positive_class,
     )
+
     return updated_model
