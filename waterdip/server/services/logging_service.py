@@ -33,7 +33,7 @@ from waterdip.server.db.models.models import (
     ModelVersionSchemaInDB,
 )
 from waterdip.server.services.dataset_service import DatasetService, ServiceBatchDataset
-from waterdip.server.services.model_service import ModelVersionService
+from waterdip.server.services.model_service import ModelService, ModelVersionService
 from waterdip.server.services.row_service import (
     BatchDatasetRowService,
     EventDatasetRowService,
@@ -222,6 +222,7 @@ class EventLoggingService:
         model_version_service: ModelVersionService = Depends(
             ModelVersionService.get_instance
         ),
+        model_service: ModelService = Depends(ModelService.get_instance),
         dataset_service: DatasetService = Depends(DatasetService.get_instance),
         row_service: EventDatasetRowService = Depends(
             EventDatasetRowService.get_instance
@@ -232,6 +233,7 @@ class EventLoggingService:
                 model_version_service=model_version_service,
                 dataset_service=dataset_service,
                 row_service=row_service,
+                model_service=model_service,
             )
         return cls._INSTANCE
 
@@ -240,10 +242,12 @@ class EventLoggingService:
         model_version_service: ModelVersionService,
         dataset_service: DatasetService,
         row_service: EventDatasetRowService,
+        model_service: ModelService = Depends(ModelService.get_instance),
     ):
         self._model_version_service = model_version_service
         self._dataset_service = dataset_service
         self._row_service = row_service
+        self._model_service = model_service
 
     @staticmethod
     def _convert_event_column(
@@ -311,6 +315,7 @@ class EventLoggingService:
         """
         converted_columns: List[EventDataColumnDB] = []
         prediction_cf: List = [None] * len(version_schema.predictions.keys())
+        prediction_clases: List = []
         for prediction_name, prediction_data in predictions.items():
             schema_details: ModelVersionSchemaFieldDetails = (
                 version_schema.predictions.get(prediction_name)
@@ -328,8 +333,9 @@ class EventLoggingService:
                 if schema_details.data_type == ColumnDataType.CATEGORICAL
                 else float(prediction_data)
             )
+            prediction_clases.append(prediction_data)
 
-        return converted_columns, prediction_cf
+        return converted_columns, prediction_cf, prediction_clases
 
     def _convert_classification_actuals(
         self,
@@ -391,9 +397,11 @@ class EventLoggingService:
     ) -> ServiceClassificationEventRow:
         """ """
         converted_features = self._convert_features(event.features, version_schema)
-        converted_predictions, prediction_cf = self._convert_classification_predictions(
-            event.predictions, version_schema
-        )
+        (
+            converted_predictions,
+            prediction_cf,
+            prediction_classes,
+        ) = self._convert_classification_predictions(event.predictions, version_schema)
         converted_actuals, actual_cf, is_match = [], None, None
 
         if event.actuals:
@@ -405,17 +413,20 @@ class EventLoggingService:
                 event.actuals, version_schema, prediction_cf
             )
 
-        return ServiceClassificationEventRow(
-            model_id=model_id,
-            model_version_id=model_version_id,
-            event_id=event.event_id if event.event_id else str(uuid.uuid4()),
-            row_id=uuid.uuid4(),
-            dataset_id=dataset_id,
-            columns=converted_features + converted_predictions + converted_actuals,
-            prediction_cf=prediction_cf,
-            actual_cf=actual_cf,
-            created_at=timestamp,
-            is_match=is_match,
+        return (
+            ServiceClassificationEventRow(
+                model_id=model_id,
+                model_version_id=model_version_id,
+                event_id=event.event_id if event.event_id else str(uuid.uuid4()),
+                row_id=uuid.uuid4(),
+                dataset_id=dataset_id,
+                columns=converted_features + converted_predictions + converted_actuals,
+                prediction_cf=prediction_cf,
+                actual_cf=actual_cf,
+                created_at=timestamp,
+                is_match=is_match,
+            ),
+            prediction_classes,
         )
 
     @staticmethod
@@ -441,10 +452,10 @@ class EventLoggingService:
         events: List[ServiceLogEvent],
         log_timestamp: Optional[datetime] = None,
     ) -> int:
-
         model_version: BaseModelVersionDB = self._model_version_service.find_by_id(
             model_version_id=model_version_id
         )
+
         event_dataset: DatasetDB = (
             self._dataset_service.find_event_dataset_by_model_version_id(
                 model_version_id=model_version_id
@@ -452,8 +463,9 @@ class EventLoggingService:
         )
 
         events_row_db: List[ServiceClassificationEventRow] = []
+        classes = []
         for event in events:
-            event_db = self._convert_classification_event(
+            event_db, prediction_classes = self._convert_classification_event(
                 model_id=model_version.model_id,
                 model_version_id=model_version_id,
                 dataset_id=event_dataset.dataset_id,
@@ -461,6 +473,10 @@ class EventLoggingService:
                 timestamp=self._event_timestamp(event, log_timestamp),
                 version_schema=model_version.version_schema,
             )
+            for prediction_class in prediction_classes:
+                classes.append(prediction_class)
             events_row_db.append(event_db)
+
+        self._model_service.update_prediction_classes(model_version.model_id, classes)
 
         return self._row_service.insert_rows(rows=events_row_db)

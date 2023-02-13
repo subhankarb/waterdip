@@ -13,7 +13,7 @@
 #  limitations under the License.
 
 from datetime import datetime
-from typing import Dict, Optional, TypeVar, Union
+from typing import Dict, List, Optional, TypeVar, Union
 from uuid import UUID
 
 from pydantic import BaseModel, Field, root_validator
@@ -40,6 +40,7 @@ class BaseModelDB(BaseModel):
         )
     )
     positive_class: Optional[Dict] = None
+    prediction_classes: Optional[List[Union[str, int, float]]] = Field(default=None)
 
     def dict(self, *args, **kwargs) -> "DictStrAny":
         model = super().dict(*args, **kwargs)

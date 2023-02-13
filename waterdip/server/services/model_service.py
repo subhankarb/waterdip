@@ -131,7 +131,6 @@ class ModelVersionService:
         model_version: str,
         version_schema: ModelVersionSchema,
     ) -> ModelVersionDB:
-
         model_version_id, serving_dataset_id = uuid.uuid4(), uuid.uuid4()
 
         event_dataset = ServiceEventDataset(
@@ -403,6 +402,24 @@ class ModelService:
             updates = {"baseline": baseline.dict()}
         elif property_name == "positive_class":
             updates = {"positive_class": positive_class}
+        updated_model = self._repository.update_model(
+            model_id=model_id, updates=updates
+        )
+        return updated_model
+
+    def update_prediction_classes(self, model_id: UUID, prediction_classes: List):
+        if prediction_classes is []:
+            return
+
+        model = self._repository.find_by_id(model_id)
+        previous_prediction_classes = model.prediction_classes
+        if previous_prediction_classes is not None:
+            prediction_classes.extend(previous_prediction_classes)
+
+        prediction_classes = list(set(prediction_classes))
+        updates = {
+            "prediction_classes": prediction_classes,
+        }
         updated_model = self._repository.update_model(
             model_id=model_id, updates=updates
         )
