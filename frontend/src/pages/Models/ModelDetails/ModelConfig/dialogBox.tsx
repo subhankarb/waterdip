@@ -175,16 +175,20 @@ const useStyles = makeStyles(() => ({
 type Props = {
   onSave: Function;
   onSelect: Function;
+  stringToMilliseconds: Function;
 };
 
-export const DialogBoxPart = ({ onSave, onSelect }: Props) => {
+export const DialogBoxPart = ({ onSave, onSelect, stringToMilliseconds }: Props) => {
   const now = new Date();
   const classes = useStyles();
   const [boxDisplay, setBoxDisplay] = useState(true);
+  const [timeDisplay, setTimeDisplay] = useState(false);
   const [selectDate, setSelectDate] = useState(false);
+  const [selectNumDays, setSelectNumDays] = useState(false);
   const [confiDisplay, setconfiDisplay] = useState(false);
   const [dataDisplay, setDataDisplay] = useState(false);
   const [dateRange, setDateRange] = useState([new Date(now.getTime() - 5 * 60 * 60 * 1000), now]);
+  const [days, setDays] = useState<string>('');
   const [data, setData] = useState<string>('');
   const [expandForm, setExpandForm] = useState(true);
   const { isUpdating, error, ModelUpdate } = useModelUpdate();
@@ -213,7 +217,7 @@ export const DialogBoxPart = ({ onSave, onSelect }: Props) => {
             className={classes.boxButton}
             onClick={() => {
               setBoxDisplay(false);
-              setSelectDate(true);
+              setTimeDisplay(true);
             }}
           >
             Production Data
@@ -231,15 +235,111 @@ export const DialogBoxPart = ({ onSave, onSelect }: Props) => {
           </button>
         </div>
       ) : null}
+      {timeDisplay === true ? (
+        <div className={classes.outerBox}>
+          <button
+            type="button"
+            className={classes.boxButton}
+            onClick={() => {
+              setTimeDisplay(false);
+              setSelectDate(true);
+            }}
+          >
+            Fixed Time Window
+          </button>
+          <button
+            type="button"
+            className={classes.boxButton}
+            onClick={() => {
+              setTimeDisplay(false);
+              setSelectNumDays(true);
+            }}
+          >
+            {' '}
+            Moving Time Window
+          </button>
+        </div>
+      ) : null}
+      {selectNumDays == true? (
+        <div className={classes.outerBox}>
+          <div className={classes.boxHeading}>
+            Select Moving Time Period
+          </div>
+          <Box className={classes.baseLineContent}>
+            <TextField
+              fullWidth
+              type="number" 
+              label="Number of Days"
+              value={days}
+              InputProps={{
+                inputProps: { min: 0 }
+              }}
+              onKeyPress={(event) => {
+                if (event?.key === '-' || event?.key === '+') {
+                  event.preventDefault();
+                }
+              }}
+              onChange={(e) => setDays(e.target.value)}
+              sx={{ mt: 2, mb: 2.5 }}
+              placeholder="7"
+            >
+            </TextField>
+          </Box>
+          <div className={classes.boxDiv}>
+            <button
+              type="button"
+              className={classes.confiSaveButton}
+              onClick={async () => {
+                if (days === "") {
+                  enqueueSnackbar(`Enter a valid number!`, { variant: 'error' });
+                  return;
+                };
+                await ModelUpdate({
+                  model_id: modelId,
+                  property_name: "baseline",
+                  baseline: {
+                    time_window : {
+                      time_window_type: "MOVING_TIME_WINDOW",
+                      moving_time_window: {
+                        time_period: days+"d"
+                      }
+                    }
+                  }
+                })
+                if (error) {
+                  enqueueSnackbar(`Something went wrong!`, { variant: 'error' });
+                }
+                else if (!isUpdating) {
+                  enqueueSnackbar(`Updated Successfully`, { variant: 'success' });
+                  setDateRange([new Date(now.getTime() - stringToMilliseconds(days)), new Date(now.getTime())])
+                }
+                setExpandForm(false);
+              }}
+            >
+              save
+            </button>
+            <button
+              type="button"
+              className={classes.confiBackButton}
+              onClick={() => {
+                setSelectNumDays(false);
+                setTimeDisplay(true);
+              }}
+            >
+              back
+            </button>
+          </div>
+        </div>
+      ) : null }
       {selectDate === true ? (
         <div className={classes.outerBox}>
           <div className={classes.boxHeading}>
-            select date range{' '}
+            Select Date Range{' '}
             <button
               type="button"
               onClick={() => {
                 setSelectDate(false);
-                setBoxDisplay(true);
+                setTimeDisplay(true);
               }}
               className={classes.dateBoxButton}
             >
@@ -268,7 +368,11 @@ export const DialogBoxPart = ({ onSave, onSelect }: Props) => {
                   property_name: "baseline",
                   baseline: {
                     time_window : {
-                      time_period: (dateRange[1].getTime() - dateRange[0].getTime()) /(1000 * 3600 * 24)+"d"
+                      time_window_type: "FIXED_TIME_WINDOW",
+                      fixed_time_window:  {
+                        start_time: dateRange[0].toISOString(),
+                        end_time: dateRange[1].toISOString()
+                      }
                     }
                   }
                 })

@@ -79,11 +79,19 @@ export const ConfigBaseLine = ({ path, data }: Props) => {
   )} `)
   const classes = useStyles();
   const [expandForm, setExpandForm] = useState(path);
-
+  
   useEffect(() => {
-    if (data && data.data && data.data.data) {
-      const milliseconds = stringToMilliseconds(data.data.data.model_baseline?.time_window?.time_period ? data.data.data.model_baseline.time_window.time_period : "30d");
-      setDateRange([new Date(now.getTime() - milliseconds), now]);
+    if (data && data.data && data.data.data && data.data.data.model_baseline?.time_window?.time_window_type) {
+      const timer = data.data.data && data.data.data.model_baseline?.time_window;
+      const window_type = data.data.data.model_baseline?.time_window?.time_window_type
+      if (window_type === "MOVING_TIME_WINDOW") {
+        const milliseconds = stringToMilliseconds(timer.moving_time_window.time_period)
+        setDateRange([new Date(now.getTime() - milliseconds), now]);
+      }
+      else if (window_type === "FIXED_TIME_WINDOW") {
+        setDateRange([new Date(timer.fixed_time_window.start_time), new Date(timer.fixed_time_window.end_time)]);
+      }
+      
     }
 
     console.log(dateRange)
@@ -114,7 +122,7 @@ export const ConfigBaseLine = ({ path, data }: Props) => {
           Configure baseline {'>'}
         </Button>
         <DialogAnimate open={expandForm} onClose={() => setExpandForm(false)}>
-          <DialogBoxPart onSelect={handleSelect} onSave={handleSave} />
+          <DialogBoxPart onSelect={handleSelect} onSave={handleSave} stringToMilliseconds={stringToMilliseconds}/>
         </DialogAnimate>
       </Box>
     </Box>

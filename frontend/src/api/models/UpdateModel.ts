@@ -16,7 +16,14 @@ interface UpdateModelParams {
     baseline?: {
       dataset_env?: string,
       time_window?: {
-        time_period: string,
+        time_window_type: string,
+        fixed_time_window?: {
+          start_time: string,
+          end_time: string
+        },
+        moving_time_window?: {
+          time_period: string
+        }
       }
     },
     positive_class?: any
