@@ -69,9 +69,13 @@ nav:
       - Model Performance: concepts/metric_type_model_performance.md
       - Drift: concepts/metric_type_drift.md
     - Monitor & Alerts: concepts/monitor_and_alerts.md
+    - Model & Versions: concepts/model_and_versions.md
   - Sending Data:
       - Uploading Baseline Dataset: sending_data/uploading_baseline_dataset.md
       - Sending Live Events: sending_data/sending_live_events.md
+  - Model Type:
+      - Binary Classification: model_types/binary_classification.md
+      - Multi Class Classification: model_types/multi_class_classification.md
   - Support:
     - Contact: support/contact.md
 
