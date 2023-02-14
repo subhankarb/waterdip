@@ -25,7 +25,7 @@ const ModelConfiguration = (d: any) => {
       <RootStyle>
         <Box>
           <ConfigBaseLine path={data} data={d}/>
-          <ConfigEvaluation />
+          <ConfigEvaluation data={d}/>
           <ConfigAdvanced />
         </Box>
       </RootStyle>

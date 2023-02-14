@@ -6,6 +6,9 @@ import { Box, TextField, MenuItem, Button } from '@material-ui/core';
 import { DialogAnimate } from '../../../../components/animate';
 import { DialogBoxPart, DeleteDialogBox } from './dialogBox';
 import { colors } from '../../../../theme/colors';
+import { useModelUpdate } from 'api/models/UpdateModel';
+import { useSnackbar } from 'notistack';
+import { useParams } from 'react-router-dom';
 
 const useStyles = makeStyles({
   card: {
@@ -130,21 +133,17 @@ export const ConfigBaseLine = ({ path, data }: Props) => {
 };
 
 
-export const ConfigEvaluation = () => {
+export const ConfigEvaluation = ({data}: any) => {
+  const res = data?.data?.data;
   const classes = useStyles();
-  const [data, setData] = useState<string>('');
+  const [posClass, setPosClass] = useState<string>('');
+  const { isUpdating, error, ModelUpdate } = useModelUpdate();
+  const { modelId } = useParams();
+  const { enqueueSnackbar } = useSnackbar();
   interface classList{
     classN : string;
   }
   
-  const allClasses: Array<classList> = [
-    {classN: "Extremely Positive"},
-    {classN: "Extremely Negative"},
-    {classN: "Positive"},
-    {classN: "Negative"}
-  ]
-
-
   return (
     <Box className={classes.card}>
       <Heading heading="Setup Positive Class" />
@@ -153,17 +152,37 @@ export const ConfigEvaluation = () => {
           select
           fullWidth
           label="Select positive class"
-          value={data}
-          onChange={(e) => setData(e.target.value)}
+          value={posClass}
+          onChange={(e) => setPosClass(e.target.value)}
           sx={{ mt: 2, mb: 2.5 }}
           placeholder="Choose the evaluation"
         >
-          {allClasses.map((c: any)=> (
-                <MenuItem value={c.classN}>{c.classN}</MenuItem>
+          {res.model_prediction_classes && res.model_prediction_classes.map((c: any)=> (
+                <MenuItem value={c}>{c}</MenuItem>
           ))}
         </TextField>
         <Box className={classes.btnContainer}>
-          <Button variant="contained" className={classes.btn}>
+          <Button variant="contained" className={classes.btn}
+            onClick={async () => {
+              if (posClass !== "") {
+                await ModelUpdate({
+                  model_id: modelId,
+                  property_name: "positive_class",
+                  positive_class: {
+                    name: posClass
+                  }
+                })
+                if (error) {
+                  enqueueSnackbar(`Something went wrong!`, { variant: 'error' });
+                }
+                else if (!isUpdating) {
+                  enqueueSnackbar(`Updated Successfully`, { variant: 'success' });
+                }
+              } else {
+                enqueueSnackbar(`No Class Selected`, { variant: 'info' })
+              }
+            }}
+          >
             Save
           </Button>
         </Box>
