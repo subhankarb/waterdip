@@ -70,57 +70,63 @@ export default function CollapsibleTableRow(props: { row: any, data_type: any })
         sx={{ border: `1px solid ${colors.tableHeadBack}`, borderBottom: 0 }}
         className={`${open ? classes.openBack : ''} borderBottom`}
       >
-        <TableCell className={(classes.tableCell, classes.name)}>
+        <TableCell className={(classes.tableCell, classes.name)}>{
+          row.histogram && Object.keys(row.histogram).length !== 0 ?
           <IconButton size="small" onClick={() => setOpen(!open)}>
             <Icon icon={open ? arrowIosUpwardFill : arrowIosDownwardFill} />
-          </IconButton>
+          </IconButton> : null
+          }
           &nbsp;
           {row.column_name}
         </TableCell>
 
-        <TableCell
-          className={classes.tableCell}
-          style={{ display: 'flex', justifyContent: 'center' }}
-        >
-          <ChartBar
-            name={row.column_name}
-            categories={row.histogram.bins}
-            data={row.histogram.val}
-            options={{
-              height: 60,
-              width: '200',
-              sparkline: true,
-              enableDataLabels: false,
-              showGridLines: false,
-              showYAxisLabels: false,
-              color: colors.graphDark,
-              followCursor: true,
-              tooltip: {
-                enabled: true,
+        {row.histogram && Object.keys(row.histogram).length !== 0 ? (
+          <TableCell
+            className={classes.tableCell}
+            style={{ display: 'flex', justifyContent: 'center' }}
+          >
+            <ChartBar
+              name={row.column_name}
+              categories={row.histogram.bins}
+              data={row.histogram.val}
+              options={{
+                height: 60,
+                width: '200',
+                sparkline: true,
+                enableDataLabels: false,
+                showGridLines: false,
+                showYAxisLabels: false,
+                color: colors.graphDark,
                 followCursor: true,
-                style: {
-                  fontSize: '12px',
-                  fontFamily: 'Poppins'
-                },
-                onDatasetHover: {
-                  highlightDataSeries: false
-                },
-                x: {
-                  show: false
-                },
-                y: {
-                  formatter: undefined,
-                  title: {
-                    formatter: () => ''
+                tooltip: {
+                  enabled: true,
+                  followCursor: true,
+                  style: {
+                    fontSize: '12px',
+                    fontFamily: 'Poppins'
+                  },
+                  onDatasetHover: {
+                    highlightDataSeries: false
+                  },
+                  x: {
+                    show: false
+                  },
+                  y: {
+                    formatter: undefined,
+                    title: {
+                      formatter: () => ''
+                    }
+                  },
+                  marker: {
+                    show: false
                   }
-                },
-                marker: {
-                  show: false
                 }
-              }
-            }}
-          />
-        </TableCell>
+              }}
+            />
+          </TableCell>
+        ): <TableCell className={classes.tableCell} align="center">
+        No Data Available
+      </TableCell>}
         {data_type === 'NUMERIC' && (
           <TableCell className={classes.tableCell} align="center">
             {row.zeros}&nbsp;&nbsp;
