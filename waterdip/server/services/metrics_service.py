@@ -342,4 +342,10 @@ class ClassificationPerformance:
         )
 
         result = hist.aggregation_result(time_range=time_range)
-        return result
+        response = {}
+        for key, value in result.items():
+            response[key] = []
+            for k in value:
+                response[key].append({k: value[k]})
+            response[key].sort(key=lambda x: list(x.keys())[0])
+        return response

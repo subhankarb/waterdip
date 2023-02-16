@@ -99,42 +99,43 @@ class TestMetricService:
         self.mock_mongo_backend.database[MONGO_COLLECTION_MODEL_VERSIONS].insert_many(
             [model_version, model_version_2]
         )
+        self.metricResponse = {
+            "accuracy": {
+                "29-01-2023": 0.5,
+            },
+            "true_positive": {
+                "29-01-2023": 0.5,
+            },
+            "false_negative": {
+                "29-01-2023": 0.5,
+            },
+            "true_negative": {
+                "29-01-2023": 0.5,
+            },
+            "false_positive": {
+                "29-01-2023": 0.5,
+            },
+            "precision": {
+                "29-01-2023": 0.5,
+            },
+            "recall": {
+                "29-01-2023": 0.5,
+            },
+            "sensitivity": {
+                "29-01-2023": 0.5,
+            },
+            "specificity": {
+                "29-01-2023": 0.5,
+            },
+            "f1": {
+                "29-01-2023": 0.5,
+            },
+        }
 
     def test_should_return_model_performance(self, mocker, mock_mongo_backend):
         mocker.patch(
             "waterdip.core.metrics.classification_metrics.ClassificationDateHistogramDBMetrics.aggregation_result",
-            return_value=PerfomanceMetricResponse(
-                accuracy={
-                    "29-01-2023": 0.5,
-                },
-                true_positive={
-                    "29-01-2023": 0.5,
-                },
-                false_negative={
-                    "29-01-2023": 0.5,
-                },
-                true_negative={
-                    "29-01-2023": 0.5,
-                },
-                false_positive={
-                    "29-01-2023": 0.5,
-                },
-                precision={
-                    "29-01-2023": 0.5,
-                },
-                recall={
-                    "29-01-2023": 0.5,
-                },
-                sensitivity={
-                    "29-01-2023": 0.5,
-                },
-                specificity={
-                    "29-01-2023": 0.5,
-                },
-                f1={
-                    "29-01-2023": 0.5,
-                },
-            ),
+            return_value=self.metricResponse,
         )
         mocker.patch(
             "waterdip.server.services.dataset_service.DatasetService.find_event_dataset_by_model_version_id",
@@ -167,47 +168,18 @@ class TestMetricService:
             ),
         )
 
-        assert model_performance.accuracy == {
-            "29-01-2023": 0.5,
-        }
+        assert model_performance["accuracy"] == [
+            {
+                "29-01-2023": 0.5,
+            }
+        ]
 
     def test_should_return_exception_if_positive_class_is_none(
         self, mocker, mock_mongo_backend
     ):
         mocker.patch(
             "waterdip.core.metrics.classification_metrics.ClassificationDateHistogramDBMetrics.aggregation_result",
-            return_value=PerfomanceMetricResponse(
-                accuracy={
-                    "29-01-2023": 0.5,
-                },
-                true_positive={
-                    "29-01-2023": 0.5,
-                },
-                false_negative={
-                    "29-01-2023": 0.5,
-                },
-                true_negative={
-                    "29-01-2023": 0.5,
-                },
-                false_positive={
-                    "29-01-2023": 0.5,
-                },
-                precision={
-                    "29-01-2023": 0.5,
-                },
-                recall={
-                    "29-01-2023": 0.5,
-                },
-                sensitivity={
-                    "29-01-2023": 0.5,
-                },
-                specificity={
-                    "29-01-2023": 0.5,
-                },
-                f1={
-                    "29-01-2023": 0.5,
-                },
-            ),
+            return_value=self.metricResponse,
         )
         mocker.patch(
             "waterdip.server.services.dataset_service.DatasetService.find_event_dataset_by_model_version_id",
@@ -246,38 +218,7 @@ class TestMetricService:
     def test_should_throw_error_if_dataset_id_is_none(self, mocker, mock_mongo_backend):
         mocker.patch(
             "waterdip.core.metrics.classification_metrics.ClassificationDateHistogramDBMetrics.aggregation_result",
-            return_value=PerfomanceMetricResponse(
-                accuracy={
-                    "29-01-2023": 0.5,
-                },
-                true_positive={
-                    "29-01-2023": 0.5,
-                },
-                false_negative={
-                    "29-01-2023": 0.5,
-                },
-                true_negative={
-                    "29-01-2023": 0.5,
-                },
-                false_positive={
-                    "29-01-2023": 0.5,
-                },
-                precision={
-                    "29-01-2023": 0.5,
-                },
-                recall={
-                    "29-01-2023": 0.5,
-                },
-                sensitivity={
-                    "29-01-2023": 0.5,
-                },
-                specificity={
-                    "29-01-2023": 0.5,
-                },
-                f1={
-                    "29-01-2023": 0.5,
-                },
-            ),
+            return_value=self.metricResponse,
         )
         mocker.patch(
             "waterdip.server.db.repositories.dataset_repository.DatasetRepository.find_datasets",
