@@ -116,8 +116,12 @@ class ClassificationDateHistogramDBMetrics(MongoMetric):
         for key, tp_value in true_positive_hist.items():
             fp_value = false_positive_hist[key]
             if tp_value is not None and fp_value is not None:
-                precision = tp_value / (tp_value + fp_value)
-                precision_hist[key] = precision
+                numerator = tp_value + fp_value
+                if numerator != 0:
+                    precision = tp_value / (tp_value + fp_value)
+                    precision_hist[key] = precision
+                else:
+                    precision_hist[key] = None
             else:
                 precision_hist[key] = None
         return precision_hist
@@ -128,8 +132,12 @@ class ClassificationDateHistogramDBMetrics(MongoMetric):
         for key, tp_value in true_positive_hist.items():
             fn_value = false_negative_hist[key]
             if tp_value is not None and fn_value is not None:
-                precision = tp_value / (tp_value + fn_value)
-                precision_hist[key] = precision
+                numerator = tp_value + fn_value
+                if numerator != 0:
+                    precision = tp_value / (tp_value + fn_value)
+                    precision_hist[key] = precision
+                else:
+                    precision_hist[key] = None
             else:
                 precision_hist[key] = None
         return precision_hist
@@ -140,8 +148,12 @@ class ClassificationDateHistogramDBMetrics(MongoMetric):
         for key, tp_value in true_positive_hist.items():
             fn_value = false_negative_hist[key]
             if tp_value is not None and fn_value is not None:
-                precision = tp_value / (tp_value + fn_value)
-                precision_hist[key] = precision
+                numerator = tp_value + fn_value
+                if numerator != 0:
+                    precision = tp_value / (tp_value + fn_value)
+                    precision_hist[key] = precision
+                else:
+                    precision_hist[key] = None
             else:
                 precision_hist[key] = None
         return precision_hist
@@ -152,8 +164,12 @@ class ClassificationDateHistogramDBMetrics(MongoMetric):
         for key, tn_value in true_negative_hist.items():
             fp_value = false_positive_hist[key]
             if tn_value is not None and fp_value is not None:
-                precision = tn_value / (tn_value + fp_value)
-                precision_hist[key] = precision
+                numerator = tn_value + fp_value
+                if numerator != 0:
+                    precision = tn_value / (tn_value + fp_value)
+                    precision_hist[key] = precision
+                else:
+                    precision_hist[key] = None
             else:
                 precision_hist[key] = None
         return precision_hist
@@ -164,12 +180,12 @@ class ClassificationDateHistogramDBMetrics(MongoMetric):
         for key, precision_value in precision_hist.items():
             recall_value = recall_hist[key]
             if precision_value is not None and recall_value is not None:
-                f1 = (
-                    2
-                    * (precision_value * recall_value)
-                    / (precision_value + recall_value)
-                )
-                f1_hist[key] = round(f1, 2)
+                numerator = precision_value + recall_value
+                if numerator != 0:
+                    f1 = 2 * (precision_value * recall_value) / numerator
+                    f1_hist[key] = round(f1, 2)
+                else:
+                    f1_hist[key] = None
             else:
                 f1_hist[key] = None
         return f1_hist
@@ -181,6 +197,7 @@ class ClassificationDateHistogramDBMetrics(MongoMetric):
             time_filter=self._time_filter_builder(time_range=time_range),
             **kwargs,
         )
+
         facets = self._collection.aggregate(agg_query).next()
 
         total_hist = facets["total_hist"]

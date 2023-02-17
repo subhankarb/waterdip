@@ -16,7 +16,7 @@ from datetime import datetime
 from uuid import UUID
 
 from tests.testing_helpers import MongodbBackendTesting, clean_model_data
-from waterdip.core.commons.models import DatasetType, TimeRange
+from waterdip.core.commons.models import DatasetType, Environment, TimeRange
 from waterdip.core.metrics.classification_metrics import (
     ClassificationDateHistogramDBMetrics,
 )
@@ -67,7 +67,7 @@ cf_batch_dataset = BaseDatasetDB(
     model_version_id=UUID(TEST_CLASSIFICATION_MODEL_VERSION_ID),
     dataset_type=DatasetType.BATCH,
     dataset_name="",
-    environment="TRAINING",
+    environment=Environment.TRAINING,
     created_at=datetime(year=2023, month=1, day=11),
 )
 cf_event_dataset = BaseDatasetDB(
@@ -76,11 +76,51 @@ cf_event_dataset = BaseDatasetDB(
     model_version_id=UUID(TEST_CLASSIFICATION_MODEL_VERSION_ID),
     dataset_type=DatasetType.EVENT,
     dataset_name="",
-    environment="PRODUCTION",
+    environment=Environment.PRODUCTION,
     created_at=datetime(year=2023, month=1, day=11),
 )
 
 event_rows = [
+    {
+        "created_at": datetime(year=2022, month=12, day=21),
+        "columns": [
+            {
+                "name": "p2",
+                "value_categorical": "false",
+                "data_type": "CATEGORICAL",
+                "mapping_type": "PREDICTION",
+            },
+            {
+                "name": "p2",
+                "value_categorical": "true",
+                "data_type": "CATEGORICAL",
+                "mapping_type": "ACTUAL",
+            },
+        ],
+        "prediction_cf": ["false"],
+        "actual_cf": ["true"],
+        "is_match": False,
+    },
+    {
+        "created_at": datetime(year=2022, month=12, day=22),
+        "columns": [
+            {
+                "name": "p2",
+                "value_categorical": "true",
+                "data_type": "CATEGORICAL",
+                "mapping_type": "PREDICTION",
+            },
+            {
+                "name": "p2",
+                "value_categorical": "true",
+                "data_type": "CATEGORICAL",
+                "mapping_type": "ACTUAL",
+            },
+        ],
+        "prediction_cf": ["true"],
+        "actual_cf": ["true"],
+        "is_match": True,
+    },
     {
         "created_at": datetime(year=2022, month=12, day=23),
         "columns": [
@@ -155,8 +195,8 @@ def setup_module():
     events = []
     for i in range(0, len(event_rows)):
         event = BaseClassificationEventRowDB(
-            model_id=TEST_CLASSIFICATION_MODEL_ID,
-            model_version_id=TEST_CLASSIFICATION_MODEL_VERSION_ID,
+            model_id=UUID(TEST_CLASSIFICATION_MODEL_ID),
+            model_version_id=UUID(TEST_CLASSIFICATION_MODEL_VERSION_ID),
             row_id=uuid.uuid4(),
             dataset_id=UUID(TEST_CLASSIFICATION_MODEL_EVENT_DATASET_ID),
             columns=[
@@ -192,3 +232,17 @@ class TestClassificationDateHist:
             )
         )
         assert result["accuracy"]["23-12-2022"] == 0.33
+
+    def test_should_return_classification_metrics_with_time_range(self):
+        clf_date_hist = ClassificationDateHistogramDBMetrics(
+            collection=database[MONGO_COLLECTION_EVENT_ROWS],
+            dataset_id=UUID(TEST_CLASSIFICATION_MODEL_EVENT_DATASET_ID),
+            positive_class="true",
+        )
+        result = clf_date_hist.aggregation_result(
+            time_range=TimeRange(
+                start_time=datetime(year=2022, month=12, day=21),
+                end_time=datetime(year=2022, month=12, day=22),
+            )
+        )
+        assert sorted(list(result["accuracy"].keys())) == ["21-12-2022", "22-12-2022"]
