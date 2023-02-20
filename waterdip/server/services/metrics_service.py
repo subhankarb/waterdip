@@ -345,7 +345,18 @@ class ClassificationPerformance:
         response = {}
         for key, value in result.items():
             response[key] = []
-            for k in value:
-                response[key].append({k: value[k]})
+            for date in value:
+                response[key].append({date: value[date]})
             response[key].sort(key=lambda x: list(x.keys())[0])
-        return response
+
+        output = {}
+        for key, value in response.items():
+            output[key] = {
+                "date": [],
+                "value": [],
+            }
+            for date in value:
+                output[key]["date"].append(list(date.keys())[0])
+                output[key]["value"].append(list(date.values())[0])
+
+        return output

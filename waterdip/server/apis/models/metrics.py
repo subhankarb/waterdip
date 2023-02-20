@@ -76,13 +76,13 @@ class PerfomanceMetricResponse(BaseModel):
         f1 of the model
     """
 
-    accuracy: List[Dict]
-    true_positive: List[Dict]
-    false_negative: List[Dict]
-    true_negative: List[Dict]
-    false_positive: List[Dict]
-    precision: List[Dict]
-    recall: List[Dict]
-    sensitivity: List[Dict]
-    specificity: List[Dict]
-    f1: List[Dict]
+    accuracy: Dict
+    true_positive: Dict
+    false_negative: Dict
+    true_negative: Dict
+    false_positive: Dict
+    precision: Dict
+    recall: Dict
+    sensitivity: Dict
+    specificity: Dict
+    f1: Dict

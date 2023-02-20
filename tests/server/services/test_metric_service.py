@@ -168,11 +168,7 @@ class TestMetricService:
             ),
         )
 
-        assert model_performance["accuracy"] == [
-            {
-                "29-01-2023": 0.5,
-            }
-        ]
+        assert model_performance["accuracy"] == {"date": ["29-01-2023"], "value": [0.5]}
 
     def test_should_return_exception_if_positive_class_is_none(
         self, mocker, mock_mongo_backend
