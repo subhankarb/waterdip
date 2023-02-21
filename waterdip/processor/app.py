@@ -27,7 +27,7 @@ celery_app.autodiscover_tasks()
 
 celery_app.conf.beat_schedule = {
     "generate_monitor_jobs_every_hour": {
-        "task": "generate_monitor_jobs",
+        "task": "create_process_monitor_jobs",
         "schedule": 3600,
     }
 }
