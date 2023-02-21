@@ -1,9 +1,6 @@
 import React, { useState, useEffect } from "react";
 import {
-  MenuItem,
-  Grid,
   Box,
-  TextField,
   DialogTitle,
   DialogContent,
   DialogActions,
@@ -14,7 +11,6 @@ import { experimentalStyled as styled } from "@material-ui/core/styles";
 import Page from "../../../../components/Page";
 import LoadingScreen from "../../../../components/LoadingScreen";
 import Scrollbar from "../../../../components/Scrollbar";
-import CollapsibleTable from "../../../../components/Tables/collapsible-table-1";
 import TabsPerformance from "./PerformanceTabs";
 import { Heading } from "../../../../components/Heading";
 import BaseLine from "./BaseLine";
@@ -23,11 +19,10 @@ import { useSelector } from "../../../../redux/store";
 import { DateRangeFilterState } from "../../../../redux/slices/dateRangeFilter";
 import { useModelPerformance } from "../../../../api/models/GetModelPerformance";
 import PerformanceChart from "./PerformanceChart";
-import { useSnackbar } from "notistack";
 import { AxiosError, AxiosRequestConfig } from "axios";
 import Button from "@material-ui/core/Button";
-import { DialogAnimate } from "components/animate";
 import { PATH_DASHBOARD } from "routes/paths";
+import VersionSelect from "./VersionSelect";
 
 const RootStyle = styled("div")({
   overflowY: "hidden",
@@ -42,24 +37,25 @@ function useQuery() {
 }
 
 const ModelPerformance = () => {
-  const [open, setOpen] = useState(false);
+  let query = useQuery();
   const [expandForm, setExpandForm] = useState(false);
   const { modelId } = useParams();
-  let query = useQuery();
   const versionId = query.get("version_id");
-  const { enqueueSnackbar } = useSnackbar();
+  const [given_versionId, setGivenVersionId] = useState(versionId ?? "");
+  const handleVersionChange = (version: string) => {
+    setGivenVersionId(version);
+  }
   const { fromDate, toDate } = useSelector(
     (state: { dateRangeFilter: DateRangeFilterState }) => state.dateRangeFilter
   );
   const { data, isLoading, error } = useModelPerformance({
     model_id: modelId,
-    model_version_id: versionId != null ? versionId : "",
+    model_version_id: given_versionId != null ? given_versionId : "",
     start_date: fromDate,
     end_date: toDate,
   });
-
   useEffect(() => {
-    console.log(error);
+    if (!error) setExpandForm(false);
     if ((error as AxiosError)?.response?.data.detail) {
       if (!expandForm) {
         setExpandForm(true);
@@ -96,9 +92,7 @@ const ModelPerformance = () => {
               navigate(
                 `${
                   PATH_DASHBOARD.general.models
-                }/${modelId}/configuration?version_id=${query.get(
-                  "version_id"
-                )}`
+                }/${modelId}/configuration?version_id=${versionId}`
               );
             }}
             color="primary"
@@ -129,14 +123,14 @@ const ModelPerformance = () => {
                 <Scrollbar>
                   <Box sx={{ px: 3, py: 2 }}>
                     <PerformanceChart
-                      dataValue={data.data[currentTab]}
+                      dateValue={data[currentTab]}
                       tabValue={currentTab}
                     />
                   </Box>
                 </Scrollbar>
               </Box>
-              <Box gridColumn="3/4" gridRow="2/3" sx={{ ml: 2 }}>
-                <BaseLine />
+              <Box gridColumn="3/4" gridRow="2/2" sx={{ ml: 2, mb: 5 }}>
+                <VersionSelect on_change={handleVersionChange} />
               </Box>
             </>
           ) : (

@@ -5,15 +5,16 @@ import { formattedDate, formatDateTime } from '../../../../utils/date';
 import { colors } from '../../../../theme/colors';
 
 type Props = {
-  dataValue: any;
+  dateValue: any;
   tabValue: string;
 };
 
-const PerformanceChart = ({ dataValue, tabValue }: Props) => {
+const PerformanceChart = ({ dateValue, tabValue }: Props) => {
+  
   const series = [
     {
       name: tabValue,
-      data: dataValue?.data.map((i: number) => Math.round(i * 1000) / 1000)
+      data: dateValue && dateValue.value ? dateValue.value : []
     }
   ];
 
@@ -40,12 +41,10 @@ const PerformanceChart = ({ dataValue, tabValue }: Props) => {
         rotate: -45,
         style: {}
       },
-      categories: dataValue.time_buckets
-        ? dataValue.time_buckets.map((item: any) => item.split('T')[0])
-        : []
+      categories: dateValue && dateValue.date ? dateValue.date : []
     },
     yaxis: {
-      decimalsInFloat: tabValue === 'accuracy' ? 0 : 3,
+      decimalsInFloat: 3,
 
       title: {
         text: tabValue,

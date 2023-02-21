@@ -57,9 +57,6 @@ export default function TabsPerformance({ onChange, currentTab }: Props) {
         <Tab className={classes.TabItem} value={'f1'} label="F1" />
         <Tab className={classes.TabItem} value={'sensitivity'} label="Sensitivity" />
         <Tab className={classes.TabItem} value={'specificity'} label="Specificity" />
-        <Tab className={classes.TabItem} value={'fp_rate'} label="FP Rate" />
-        <Tab className={classes.TabItem} value={'fn_rate'} label="FN Rate" />
-        <Tab className={classes.TabItem} value={'fn_density'} label="FN Density" />
       </Tabs>
     </div>
   );

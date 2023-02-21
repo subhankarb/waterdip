@@ -4,9 +4,10 @@ import { useSelector } from '../../../../redux/store';
 import { DateRangeFilterState } from '../../../../redux/slices/dateRangeFilter';
 import { formatDateTime } from '../../../../utils/date';
 import { Button } from '@material-ui/core';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { PATH_PAGE, PATH_DASHBOARD } from '../../../../routes/paths';
 import { colors } from '../../../../theme/colors';
+import { useMemo } from 'react';
 
 const useStyles = makeStyles({
   baseLine: {
@@ -42,10 +43,17 @@ const useStyles = makeStyles({
   }
 });
 
+function useQuery() {
+  const { search } = useLocation();
+
+  return useMemo(() => new URLSearchParams(search), [search]);
+}
+
 export default function BaseLine() {
   const navigate = useNavigate();
   const { modelId, tabName } = useParams();
   const classes = useStyles();
+  let query = useQuery();
   const now = new Date();
 
   const { fromDate, toDate } = useSelector(
@@ -66,7 +74,7 @@ export default function BaseLine() {
         <Button
           className={classes.contentButton}
           onClick={() =>
-            navigate(`${PATH_DASHBOARD.general.models}/${modelId}/configuration`, {
+            navigate(`${PATH_DASHBOARD.general.models}/${modelId}/configuration?version_id=${query.get('version_id')}`, {
               state: { baseline: true }
             })
           }

@@ -96,8 +96,6 @@ export const ConfigBaseLine = ({ path, data }: Props) => {
       }
       
     }
-
-    console.log(dateRange)
   }, [data]);
 
   useEffect(() => {
@@ -157,8 +155,8 @@ export const ConfigEvaluation = ({data}: any) => {
           sx={{ mt: 2, mb: 2.5 }}
           placeholder="Choose the evaluation"
         >
-          {res.model_prediction_classes && res.model_prediction_classes.map((c: any)=> (
-                <MenuItem value={c}>{c}</MenuItem>
+          {res.model_prediction_classes && res.model_prediction_classes.map((row_class: any)=> (
+                <MenuItem value={row_class}>{row_class}</MenuItem>
           ))}
         </TextField>
         <Box className={classes.btnContainer}>

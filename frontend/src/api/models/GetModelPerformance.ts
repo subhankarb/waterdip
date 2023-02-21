@@ -50,8 +50,8 @@ export const useModelPerformance: UseModelPerformance = (params) => {
     const apiParams = {
       model_id: params.model_id,
       model_version_id:params.model_version_id,
-      start_date: params.start_date,
-      end_date: params.end_date
+      start_time: params.start_date,
+      end_time: params.end_date
     };
     try{
       const response = await axios.get<GetModelInfoResponse>(
@@ -60,8 +60,7 @@ export const useModelPerformance: UseModelPerformance = (params) => {
           params: apiParams
         }
       )
-      console.log(response);
-      return response;
+      return response.data;
     } catch (error) {
       throw error;
     }
