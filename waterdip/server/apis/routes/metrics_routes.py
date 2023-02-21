@@ -66,13 +66,16 @@ def model_list(
 def metric_performance(
     model_id: UUID,
     model_version_id: UUID,
-    start_time: Optional[datetime] = datetime.utcnow() - timedelta(days=7),
-    end_time: Optional[datetime] = datetime.utcnow(),
+    time_range_param: TimeRangeParam = Depends(),
     metric_service: ClassificationPerformance = Depends(
         ClassificationPerformance.get_instance),
 ):
+    time_range = TimeRange(
+        start_time=time_range_param.start_time, end_time=time_range_param.end_time
+    )
+
     return metric_service.model_performance(
         model_id=model_id,
         model_version_id=model_version_id,
-        time_range=TimeRange(start_time=start_time, end_time=end_time),
+        time_range=time_range,
     )
