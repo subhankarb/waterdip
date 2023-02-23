@@ -29,6 +29,7 @@ from waterdip.core.metrics.data_metrics import (
     CountEmptyHistogram,
     NumericBasicMetrics,
     NumericCountHistogram,
+    NumericNestedCountDateHistogram,
 )
 from waterdip.server.db.models.dataset_rows import (
     BaseDatasetBatchRowDB,
@@ -270,7 +271,6 @@ class TestHistogramCategoricalFeatures:
         assert max(f4["count"]) == 2
 
     def test_should_apply_date_filter(self):
-
         hist = CategoricalCountHistogram(
             collection=database[MONGO_COLLECTION_EVENT_ROWS],
             dataset_id=UUID(DATASET_EVENT_ID_V2),
@@ -286,7 +286,6 @@ class TestHistogramCategoricalFeatures:
 
 class TestCountEmptyHistogram:
     def test_should_return_null_columns(self):
-
         hist = CountEmptyHistogram(
             collection=database[MONGO_COLLECTION_EVENT_ROWS],
             dataset_id=UUID(DATASET_EVENT_ID_V2),
@@ -356,3 +355,83 @@ class TestNumericCountHistogram:
             numeric_columns=["f3"],
         )
         assert numeric_basic_result["f3"]["bins"] == ["0", "2"]
+
+
+class TestNumericNestedCountDateHistogram:
+    def test_should_agg_facet_data(self):
+        facets = {
+            "09-02-2023:c1": [
+                {"_id": {"min": 18, "max": 34}, "count": 21},
+            ],
+            "09-02-2023:c2": [
+                {"_id": {"min": 1, "max": 7}, "count": 3},
+                {"_id": {"min": 7, "max": 14}, "count": 2},
+                {"_id": {"min": 14, "max": 21}, "count": 20},
+                {"_id": {"min": 21, "max": 28}, "count": 22},
+            ],
+        }
+        agg_data = NumericNestedCountDateHistogram._facet_to_date_agg(facets=facets)
+
+        assert len(agg_data.keys()) == 1
+        assert len(agg_data["09-02-2023"].keys()) == 2
+        assert len(agg_data["09-02-2023"]["c1"]) == 1
+        assert len(agg_data["09-02-2023"]["c2"]) == 4
+        assert agg_data["09-02-2023"]["c1"][0]["count"] == 21
+
+    def test_should_return_numeric_count_histogram_agg_result(self, mocker):
+        mocker.patch(
+            "waterdip.core.metrics.data_metrics.NumericNestedCountDateHistogram._get_mongo_response",
+            return_value={
+                "09-02-2023:c1": [
+                    {"_id": {"min": 18, "max": 34}, "count": 21},
+                ],
+                "09-02-2023:c2": [
+                    {"_id": {"min": 1, "max": 7}, "count": 3},
+                    {"_id": {"min": 7, "max": 14}, "count": 2},
+                    {"_id": {"min": 14, "max": 21}, "count": 20},
+                    {"_id": {"min": 21, "max": 28}, "count": 22},
+                ],
+            },
+        )
+        numeric_basic = NumericNestedCountDateHistogram(
+            collection=database[MONGO_COLLECTION_EVENT_ROWS],
+            dataset_id=UUID(DATASET_EVENT_ID_V2),
+        )
+        numeric_basic_result = numeric_basic.aggregation_result(
+            time_range=TimeRange(
+                start_time=datetime(year=2022, month=12, day=18),
+                end_time=datetime(year=2022, month=12, day=23),
+            ),
+            numeric_columns=["f3"],
+        )
+
+        assert list(numeric_basic_result.keys()) == ["09-02-2023"]
+
+        assert list(numeric_basic_result["09-02-2023"].keys()) == ["c1", "c2"]
+
+    def test_should_return_numeric_count_histogram(self, mocker):
+        """
+        Doing a patch here as MongoMock does not support $bucketAuto
+        """
+        mocker.patch(
+            "waterdip.core.metrics.data_metrics.NumericNestedCountDateHistogram.aggregation_result",
+            return_value={
+                "18-12-2022": {"f3": {"bins": ["0", "2"], "count": [1.0, 1.0]}},
+                "19-12-2022": {"f3": {"bins": ["1", "3"], "count": [1.0, 1.0]}},
+                "20-12-2022": {"f3": {"bins": ["5", "7"], "count": [1.0, 1.0]}},
+                "21-12-2022": {"f3": {"bins": ["5", "7"], "count": [1.0, 1.0]}},
+                "22-12-2022": {"f3": {"bins": ["5", "7"], "count": [1.0, 1.0]}},
+            },
+        )
+        numeric_basic = NumericNestedCountDateHistogram(
+            collection=database[MONGO_COLLECTION_EVENT_ROWS],
+            dataset_id=UUID(DATASET_EVENT_ID_V2),
+        )
+        numeric_basic_result = numeric_basic.aggregation_result(
+            time_range=TimeRange(
+                start_time=datetime(year=2022, month=12, day=18),
+                end_time=datetime(year=2022, month=12, day=23),
+            ),
+            numeric_columns=["f3"],
+        )
+        assert numeric_basic_result["18-12-2022"]["f3"]["bins"] == ["0", "2"]

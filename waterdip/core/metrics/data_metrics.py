@@ -12,6 +12,7 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 from abc import ABC
+from datetime import timedelta
 from typing import Any, Dict, List
 from uuid import UUID
 
@@ -58,18 +59,19 @@ class CategoricalCountHistogram(DataMetrics):
         >>>     dataset_id=DATASET_BATCH_ID_V2_3,
         >>> )
         >>> hist_result = hist.aggregation_result() # returns histogram result
-        >>> # res structure -> [{"column_name": "<name>", "bins": ["<bin1>"], "count": ["<bin1_count>"]}]
+        >>> # res structure -> { "column_name": { "bins": ["<bin1>"], "count": ["<bin1_count>"] } }
     """
 
     @property
     def metric_name(self) -> str:
         return "categorical_count_hist"
 
-    def aggregation_result(self, time_range: TimeRange = None) -> Dict[str, Dict]:
+    def aggregation_result(
+        self, time_range: TimeRange = None, **kwargs
+    ) -> Dict[str, Dict]:
         hist = {}
-
         agg_query = self._aggregation_query(
-            time_filter=self._time_filter_builder(time_range=time_range)
+            time_filter=self._time_filter_builder(time_range=time_range), kwargs=kwargs
         )
 
         for doc in self._collection.aggregate(agg_query):
@@ -77,13 +79,14 @@ class CategoricalCountHistogram(DataMetrics):
             column_value = doc["_id"]["column_value"]
             count = doc["count"]
             if column_name not in hist:
-                hist[column_name] = {"type": "CATEGORICAL", "bins": [], "count": []}
+                hist[column_name] = {"bins": [], "count": []}
             hist[column_name]["bins"].append(column_value)
             hist[column_name]["count"].append(count)
         return hist
 
-    def _aggregation_query(self, time_filter: Dict = None) -> List[Dict[str, Any]]:
-
+    def _aggregation_query(
+        self, time_filter: Dict = None, **kwargs
+    ) -> List[Dict[str, Any]]:
         return [
             {
                 "$match": {
@@ -110,6 +113,261 @@ class CategoricalCountHistogram(DataMetrics):
         ]
 
 
+class CategoricalNestedDateCountHistogram(DataMetrics):
+    """
+    The categorical nested date count histogram feature
+    measures count of each categorical column for every date
+
+    ...
+
+    Methods:
+    --------
+    aggregation_result()
+        returns count aggregation by categorical column names
+
+    Examples:
+        >>> from waterdip.core.metrics.data_metrics import CategoricalNestedDateCountHistogram
+        >>> DATASET_BATCH_ID_V2_3 = UUID("1d195bf6-7a1f-4a33-b7b1-37a603aadd33")
+        >>> mongo_collection: Collection
+        >>>
+        >>> hist = CategoricalNestedDateCountHistogram(
+        >>>     collection=mongo_collection,
+        >>>     dataset_id=DATASET_BATCH_ID_V2_3,
+        >>> )
+        >>> hist_result = hist.aggregation_result() # returns histogram result
+        >>> # result structure ->
+        >>> # {
+        >>> #   "01-01-2023": {"column_name": { "bins": ["<bin1>"], "count": ["<bin1_count>"] } }
+        >>> #   "02-01-2023": {"column_name": { "bins": ["<bin1>"], "count": ["<bin1_count>"] } }
+        >>> # }
+    """
+
+    @property
+    def metric_name(self) -> str:
+        return "categorical_count_date_hist"
+
+    def aggregation_result(
+        self, time_range: TimeRange = None, **kwargs
+    ) -> Dict[str, Dict]:
+        hist = {}
+        agg_query = self._aggregation_query(
+            time_filter=self._time_filter_builder(time_range=time_range), kwargs=kwargs
+        )
+
+        for doc in self._collection.aggregate(agg_query):
+            date_str = doc["_id"]["date_str"]
+            column_name = doc["_id"]["column_name"]
+            column_value = doc["_id"]["column_value"]
+            count = doc["count"]
+            if date_str not in hist:
+                hist[date_str] = {}
+            if column_name not in hist[date_str]:
+                hist[date_str][column_name] = {"bins": [], "count": []}
+            hist[date_str][column_name]["bins"].append(column_value)
+            hist[date_str][column_name]["count"].append(count)
+        return hist
+
+    def _aggregation_query(
+        self, time_filter: Dict = None, **kwargs
+    ) -> List[Dict[str, Any]]:
+        return [
+            {
+                "$match": {
+                    "dataset_id": str(self._dataset_id),
+                    **(time_filter if time_filter is not None else {}),
+                }
+            },
+            {
+                "$addFields": {
+                    "date_str": {
+                        "$dateToString": {"format": "%d-%m-%Y", "date": "$created_at"}
+                    }
+                }
+            },
+            {"$unwind": "$columns"},
+            {
+                "$match": {
+                    "columns.data_type": "CATEGORICAL",
+                    "columns.value_categorical": {"$ne": None},
+                }
+            },
+            {
+                "$group": {
+                    "_id": {
+                        "date_str": "$date_str",
+                        "column_name": "$columns.name",
+                        "column_value": "$columns.value_categorical",
+                    },
+                    "count": {"$sum": 1},
+                }
+            },
+        ]
+
+
+class NumericNestedCountDateHistogram(DataMetrics):
+    """
+    The numeric nested date count histogram feature
+    measures count of each numeric column for every date
+
+    ...
+    Methods:
+    --------
+    aggregation_result()
+        returns count aggregation by numeric column names
+
+    Examples:
+        >>> from waterdip.core.metrics.data_metrics import NumericNestedCountDateHistogram
+        >>> DATASET_EVENT_ID_V2_3 = UUID("1d195bf6-7a1f-4a33-b7b1-37a603aadd33")
+        >>> mongo_collection: Collection
+        >>>
+        >>> hist = NumericNestedCountDateHistogram(
+        >>>     collection=mongo_collection,
+        >>>     dataset_id=DATASET_EVENT_ID_V2_3,
+        >>> )
+        >>> hist_result = hist.aggregation_result() # returns histogram result
+        >>> # result structure ->
+        >>> # {
+        >>> #   "01-01-2023": {"column_name": { "bins": ["<bin1>"], "count": ["<bin1_count>"] } }
+        >>> #   "02-01-2023": {"column_name": { "bins": ["<bin1>"], "count": ["<bin1_count>"] } }
+        >>> # }
+
+    """
+
+    @property
+    def metric_name(self) -> str:
+        return "numeric_count_date_hist"
+
+    @staticmethod
+    def _facet_to_date_agg(facets: Dict) -> Dict:
+        """
+        Converts facet result to date aggregation
+        Args:
+            facets: facets result from mongodb aggregation
+
+        Returns:
+            date aggregation
+
+        Examples:
+            >>> facets = {
+            >>>     "01-01-2023:lead_time": [
+            >>>       {"_id": {}, "count": 1},
+            >>>       {"_id": {}, "count": 2},
+            >>>       {"_id": {}, "count": 3},
+            >>>     ],
+            >>>     "01-01-2023:lead_time_2": [
+            >>>       {"_id": {}, "count": 1},
+            >>>       {"_id": {}, "count": 2},
+            >>>       {"_id": {}, "count": 3},
+            >>>     ],
+            >>> }
+            >>> NumericNestedCountDateHistogram._facet_to_date_agg(facets)
+            >>> # returns
+            >>> # {
+            >>> #   "01-01-2023": {
+            >>> #       "lead_time":  [{"_id": {}, "count": 1}, {"_id": {}, "count": 2}, {"_id": {}, "count": 3}],]
+            >>> #       "lead_time_2": [{"_id": {}, "count": 1}, {"_id": {}, "count": 2}, {"_id": {}, "count": 3}],]
+            >>> #   }
+        """
+        agg = {}
+        for facet_key in facets.keys():
+            splits = facet_key.split(":")
+            date_str, numeric_column = splits[0], splits[1]
+            if date_str not in agg:
+                agg[date_str] = {}
+            agg[date_str][numeric_column] = facets[facet_key]
+        return agg
+
+    def _get_mongo_response(self, query: List[Dict[str, Any]]) -> Dict[str, Any]:
+        return self._collection.aggregate(query).next()
+
+    def aggregation_result(
+        self, numeric_columns: List, time_range: TimeRange = None, **kwargs
+    ) -> Dict[str, Any]:
+        hist: Dict[str, Dict] = {}
+
+        agg_query = self._aggregation_query(
+            numeric_columns=numeric_columns,
+            time_filter=self._time_filter_builder(time_range=time_range),
+            date_list=time_range.get_date_list,
+            kwargs=kwargs,
+        )
+        facets_response = self._get_mongo_response(query=agg_query)
+
+        facets_date_agg: Dict[str, Dict] = self._facet_to_date_agg(
+            facets=facets_response
+        )
+
+        for agg_date, facets_agg_value in facets_date_agg.items():
+            hist[agg_date] = {}
+            for numeric_column in facets_agg_value.keys():
+                hist[agg_date][numeric_column] = {}
+                nbins, count = [], []
+                for k, doc in enumerate(facets_agg_value[numeric_column]):
+                    count.append(doc["count"])
+                    lower_limit = 0 if not doc["_id"]["min"] else doc["_id"]["min"]
+                    nbins.append(lower_limit)
+                    if k == len(facets_agg_value[numeric_column]) - 1:
+                        nbins[k] = doc["_id"]["max"]
+
+                hist[agg_date][numeric_column]["bins"] = nbins
+                hist[agg_date][numeric_column]["count"] = count
+
+        return hist
+
+    def _aggregation_query(
+        self,
+        numeric_columns: List[str],
+        date_list: List[str],
+        time_filter: Dict = None,
+        **kwargs,
+    ) -> List[Dict[str, Any]]:
+        facet_query = {}
+        bins: Dict[str, List[str]] = kwargs.get("bins", None)
+
+        for date_str in date_list:
+            for column in numeric_columns:
+                query = [{"$match": {"columns.name": column, "date_str": date_str}}]
+                if bins is None:
+                    query.append(
+                        {
+                            "$bucketAuto": {
+                                "groupBy": "$columns.value_numeric",
+                                "buckets": 9,
+                            }
+                        }
+                    )
+                else:
+                    query.append(
+                        {
+                            "$bucket": {
+                                "groupBy": "$columns.value_numeric",
+                                "boundaries": bins[column],
+                                "default": bins[column][-1],
+                            }
+                        }
+                    )
+                facet_query[f"{date_str}:{column}"] = query
+
+        return [
+            {
+                "$match": {
+                    "dataset_id": str(self._dataset_id),
+                    **(time_filter if time_filter is not None else {}),
+                }
+            },
+            {
+                "$addFields": {
+                    "date_str": {
+                        "$dateToString": {"format": "%d-%m-%Y", "date": "$created_at"}
+                    }
+                }
+            },
+            {"$unwind": "$columns"},
+            {"$match": {"columns.data_type": "NUMERIC"}},
+            {"$facet": facet_query},
+        ]
+
+
 class NumericCountHistogram(DataMetrics):
     @property
     def metric_name(self) -> str:
@@ -123,6 +381,7 @@ class NumericCountHistogram(DataMetrics):
         agg_query = self._aggregation_query(
             numeric_columns=numeric_columns,
             time_filter=self._time_filter_builder(time_range=time_range),
+            kwargs=kwargs,
         )
         facets = self._collection.aggregate(agg_query).next()
         for numeric_column in facets:
@@ -144,12 +403,31 @@ class NumericCountHistogram(DataMetrics):
         self, numeric_columns: List, time_filter: Dict = None, **kwargs
     ) -> List[Dict[str, Any]]:
         facet_query = {}
+        bins: Dict[str, List[str]] = kwargs.get("bins", None)
 
-        for column in numeric_columns:
-            facet_query[column] = [
-                {"$match": {"columns.name": column}},
-                {"$bucketAuto": {"groupBy": "$columns.value_numeric", "buckets": 9}},
-            ]
+        if bins is None:
+            for column in numeric_columns:
+                facet_query[column] = [
+                    {"$match": {"columns.name": column}},
+                    {
+                        "$bucketAuto": {
+                            "groupBy": "$columns.value_numeric",
+                            "buckets": 9,
+                        }
+                    },
+                ]
+        else:
+            for column in numeric_columns:
+                facet_query[column] = [
+                    {"$match": {"columns.name": column}},
+                    {
+                        "$bucket": {
+                            "groupBy": "$columns.value_numeric",
+                            "boundaries": bins[column],
+                            "default": bins[column][-1],
+                        }
+                    },
+                ]
 
         return [
             {
@@ -333,7 +611,7 @@ class NumericBasicMetrics(DataMetrics):
         zero_values = facets["zero_values"]
         std_dev_values = facets["std_dev_values"] if "std_dev_values" in facets else []
 
-        for (average_value, total_value) in zip(average_values, total_values):
+        for average_value, total_value in zip(average_values, total_values):
             basic_metrics[average_value["_id"]["column_name"]] = {
                 "avg": round(average_value["avg"], 2)
             }
@@ -362,7 +640,6 @@ class NumericBasicMetrics(DataMetrics):
     def _aggregation_query(
         self, time_filter: Dict = None, **kwargs
     ) -> List[Dict[str, Any]]:
-
         facets = {
             "total": [
                 {

@@ -29,6 +29,7 @@ from waterdip.server.apis.models.params import RequestPagination, RequestSort
 from waterdip.server.db.models.monitors import (
     BaseMonitorCondition,
     BaseMonitorDB,
+    MonitorDB,
     MonitorIdentification,
 )
 from waterdip.server.db.repositories.monitor_repository import MonitorRepository
@@ -195,7 +196,7 @@ class MonitorService:
         pagination: Optional[RequestPagination] = None,
         model_id: Optional[UUID] = None,
         model_version_id: Optional[UUID] = None,
-    ) -> List[BaseMonitorDB]:
+    ) -> List[MonitorDB]:
         filters = {}
         if model_id:
             filters["monitor_identification.model_id"] = str(model_id)
@@ -223,4 +224,4 @@ class MonitorService:
         return self._repository.count_monitors(filters={})
 
     def delete_monitors_by_model_id(self, model_id: UUID):
-        self._repository.delete_monitors_by_model_id(model_id=str(model_id))
+        self._repository.delete_monitors_by_model_id(model_id=model_id)

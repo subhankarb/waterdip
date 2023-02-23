@@ -66,7 +66,7 @@ class ClassificationDateHistogramDBMetrics(MongoMetric):
         date_histogram = {}
         for item in histograms:
             date_id = item["_id"]
-            date_key = self._date_histogram_bucket_format(
+            date_key = self._date_histogram_bin_format(
                 day=date_id["day"], month=date_id["month"], year=date_id["year"]
             )
             date_histogram[date_key] = item["count"]
@@ -77,23 +77,6 @@ class ClassificationDateHistogramDBMetrics(MongoMetric):
 
         return date_histogram
 
-    @staticmethod
-    def _date_histogram_bucket_format(day: int, month: int, year: int):
-        hist_bin_day = f"{'0' if day < 10 else ''}{day}"
-        hist_bin_month = f"{'0' if month < 10 else ''}{month}"
-        return f"{hist_bin_day}-{hist_bin_month}-{year}"
-
-    def _get_date_hist_buckets(self, time_range: TimeRange) -> List[str]:
-        buckets: List[str] = []
-        delta = time_range.end_time - time_range.start_time
-        for i in range(delta.days + 1):
-            delta_day = time_range.start_time + timedelta(days=i)
-            bucket = self._date_histogram_bucket_format(
-                day=delta_day.day, month=delta_day.month, year=delta_day.year
-            )
-            buckets.append(bucket)
-
-        return buckets
 
     @property
     def metric_name(self) -> str:
@@ -191,7 +174,7 @@ class ClassificationDateHistogramDBMetrics(MongoMetric):
         return f1_hist
 
     def aggregation_result(self, time_range: TimeRange, **kwargs) -> Dict[str, Any]:
-        hist_buckets = self._get_date_hist_buckets(time_range=time_range)
+        hist_buckets = self._get_date_hist_bins(time_range=time_range)
         agg_query = self._aggregation_query(
             positive_class=self._positive_class,
             time_filter=self._time_filter_builder(time_range=time_range),

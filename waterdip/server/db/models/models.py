@@ -65,9 +65,7 @@ class ModelVersionSchemaFieldDetails(BaseModel):
     """
 
     data_type: ColumnDataType
-    list_index: Optional[
-        int
-    ]  # Can be used to link between prediction and prediction score columns
+    list_index: Optional[int]
 
 
 class ModelVersionSchemaInDB(BaseModel):

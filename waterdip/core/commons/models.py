@@ -12,7 +12,7 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
-from datetime import datetime
+from datetime import datetime, timedelta
 from enum import Enum
 from typing import List, Optional, Union
 from uuid import UUID
@@ -95,6 +95,12 @@ class TimeRange(BaseModel):
     start_time: datetime
     end_time: datetime
 
+    @property
+    def get_date_list(self) -> List[str]:
+        return [
+            (self.start_time + timedelta(days=x)).strftime("%d-%m-%Y")
+                for x in range(0, (self.end_time - self.start_time).days + 1)
+        ]
 
 class ModelBaselineTimeWindowType(str, Enum):
     """

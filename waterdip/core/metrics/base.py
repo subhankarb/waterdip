@@ -13,6 +13,7 @@
 #  limitations under the License.
 
 from abc import ABC, abstractmethod
+from datetime import timedelta
 from typing import Any, Dict, List
 
 from pymongo.collection import Collection
@@ -48,3 +49,21 @@ class MongoMetric(ABC):
                 }
             }
         return time_filter
+
+    @staticmethod
+    def _date_histogram_bin_format(day: int, month: int, year: int):
+        hist_bin_day = f"{'0' if day < 10 else ''}{day}"
+        hist_bin_month = f"{'0' if month < 10 else ''}{month}"
+        return f"{hist_bin_day}-{hist_bin_month}-{year}"
+
+    def _get_date_hist_bins(self, time_range: TimeRange) -> List[str]:
+        buckets: List[str] = []
+        delta = time_range.end_time - time_range.start_time
+        for i in range(delta.days + 1):
+            delta_day = time_range.start_time + timedelta(days=i)
+            bucket = self._date_histogram_bin_format(
+                day=delta_day.day, month=delta_day.month, year=delta_day.year
+            )
+            buckets.append(bucket)
+
+        return buckets
