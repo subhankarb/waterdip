@@ -22,7 +22,15 @@ from pydantic import ValidationError
 from tests.testing_helpers import MongodbBackendTesting
 from waterdip.core.commons.models import ColumnDataType, ColumnMappingType
 from waterdip.server.db.models.dataset_rows import BaseEventRowDB, EventDataColumnDB
-from waterdip.server.db.mongodb import MONGO_COLLECTION_EVENT_ROWS
+from waterdip.server.db.models.models import (
+    BaseModelVersionDB,
+    ModelVersionSchemaFieldDetails,
+    ModelVersionSchemaInDB,
+)
+from waterdip.server.db.mongodb import (
+    MONGO_COLLECTION_EVENT_ROWS,
+    MONGO_COLLECTION_MODEL_VERSIONS,
+)
 from waterdip.server.db.repositories.dataset_row_repository import (
     EventDatasetRowRepository,
 )
@@ -89,9 +97,27 @@ class TestRowService:
         self.mock_mongo_backend.database[MONGO_COLLECTION_EVENT_ROWS].insert_many(
             [event.dict() for event in self.events]
         )
+        self.mock_mongo_backend.database[MONGO_COLLECTION_MODEL_VERSIONS].insert_one(
+            BaseModelVersionDB(
+                model_version_id=self.model_version_id,
+                model_version="model_version_name",
+                model_id=self.model_id,
+                version_schema=ModelVersionSchemaInDB(
+                    features={
+                        "f1": ModelVersionSchemaFieldDetails(
+                            data_type=ColumnDataType.NUMERIC
+                        )
+                    },
+                    predictions={
+                        "p1": ModelVersionSchemaFieldDetails(
+                            data_type=ColumnDataType.NUMERIC
+                        )
+                    },
+                ),
+            ).dict()
+        )
 
     def test_should_retuturn_prediction_average(self):
-
         prediction_average = self.row_service.prediction_average(str(self.model_id))
 
         assert prediction_average["pred_average"] == 1

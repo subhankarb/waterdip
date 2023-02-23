@@ -239,7 +239,7 @@ class ModelPredictionHistogram(BaseModel):
     """
 
     predictions: DateHistogram
-    predictions_versions: List[Dict[str, DateHistogram]]
+    predictions_versions: List[Dict[str, Union[str, DateHistogram]]]
 
 
 class ModelOverviewAlerts(BaseModel):

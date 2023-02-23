@@ -12,6 +12,7 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 import json
+from datetime import datetime
 from typing import Dict, List
 from uuid import UUID
 
@@ -346,7 +347,7 @@ class ClassificationPerformance:
         for key, value in result.items():
             response[key] = []
             for date in value:
-                response[key].append({date: value[date]})
+                response[key].append({datetime.strptime(date, "%d-%m-%Y"): value[date]})
             response[key].sort(key=lambda x: list(x.keys())[0])
 
         output = {}
@@ -356,7 +357,7 @@ class ClassificationPerformance:
                 "value": [],
             }
             for date in value:
-                output[key]["date"].append(list(date.keys())[0])
+                output[key]["date"].append(list(date.keys())[0].strftime("%d-%m-%Y"))
                 output[key]["value"].append(list(date.values())[0])
 
         return output

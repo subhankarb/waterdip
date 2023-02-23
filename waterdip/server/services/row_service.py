@@ -28,7 +28,7 @@ from waterdip.server.db.repositories.dataset_row_repository import (
     BatchDatasetRowRepository,
     EventDatasetRowRepository,
 )
-from waterdip.server.db.repositories.model_repository import ModelRepository
+from waterdip.server.db.repositories.model_repository import ModelVersionRepository
 
 
 class ServiceDatasetBatchRow(BaseDatasetBatchRowDB):
@@ -36,7 +36,6 @@ class ServiceDatasetBatchRow(BaseDatasetBatchRowDB):
 
 
 class BatchDatasetRowService:
-
     _INSTANCE: "BatchDatasetRowService" = None
 
     @classmethod
@@ -70,7 +69,6 @@ class ServiceClassificationEventRow(BaseClassificationEventRowDB):
 
 
 class EventDatasetRowService:
-
     _INSTANCE: "EventDatasetRowService" = None
 
     @classmethod
@@ -79,13 +77,23 @@ class EventDatasetRowService:
         repository: EventDatasetRowRepository = Depends(
             EventDatasetRowRepository.get_instance
         ),
+        model_version_repository: ModelVersionRepository = Depends(
+            ModelVersionRepository.get_instance
+        ),
     ):
         if not cls._INSTANCE:
-            cls._INSTANCE = cls(repository=repository)
+            cls._INSTANCE = cls(
+                repository=repository, model_version_repository=model_version_repository
+            )
         return cls._INSTANCE
 
-    def __init__(self, repository: EventDatasetRowRepository):
+    def __init__(
+        self,
+        repository: EventDatasetRowRepository,
+        model_version_repository: ModelVersionRepository,
+    ):
         self._repository = repository
+        self._model_version_repository = model_version_repository
 
     def insert_rows(
         self, rows: Union[List[ServiceEventRow], List[ServiceClassificationEventRow]]
@@ -94,8 +102,7 @@ class EventDatasetRowService:
         return len(inserted_rows)
 
     def count_prediction_by_model_id(self, model_id: str) -> int:
-        total_predictions = self._repository.count_prediction_by_model_id(
-            model_id)
+        total_predictions = self._repository.count_prediction_by_model_id(model_id)
         return total_predictions
 
     def find_last_prediction_date(self, model_id: str) -> datetime:
@@ -118,8 +125,7 @@ class EventDatasetRowService:
         if window.days > days:
             window_date = datetime.utcnow() - days
         window_prediction_count = self._repository.prediction_count(
-            filter={"model_id": str(model_id), "created_at": {
-                "$gte": window_date}}
+            filter={"model_id": str(model_id), "created_at": {"$gte": window_date}}
         )
         if not window.days:
             """
@@ -155,8 +161,7 @@ class EventDatasetRowService:
             {"$sort": {"created_at": 1}},
             {"$group": {"_id": "$day", "count": {"$sum": 1}}},
         ]
-        week_stats = self._repository.agg_prediction(
-            agg_week_prediction_count_pipeline)
+        week_stats = self._repository.agg_prediction(agg_week_prediction_count_pipeline)
         day = []
         count = []
         for i in week_stats:
@@ -197,7 +202,6 @@ class EventDatasetRowService:
         }
 
     def prediction_histogram(self, model_id: str) -> dict:
-
         preidiction_histogram_pipeline = [
             {"$match": {"model_id": model_id}},
             {
@@ -235,7 +239,6 @@ class EventDatasetRowService:
         return DateHistogram(date_bins=date_bins, val=val)
 
     def prediction_histogram_version(self, model_id: str) -> dict:
-
         preidiction_histogram_pipeline = [
             {"$match": {"model_id": model_id}},
             {
@@ -282,17 +285,20 @@ class EventDatasetRowService:
         for versions_prediction in self._repository.agg_prediction(
             preidiction_histogram_pipeline
         ):
+            model_version = self._model_version_repository.find_by_id(
+                versions_prediction["_id"]
+            ).model_version
             date_bins = []
             val = []
             for i in versions_prediction["prediction"]:
-
                 date_bins.append(datetime(i["year"], i["month"], i["day"]))
                 val.append(i["count"])
             predictions_versions.append(
                 {
+                    "model_version": model_version,
                     versions_prediction["_id"]: DateHistogram(
                         date_bins=date_bins, val=val
-                    )
+                    ),
                 }
             )
         return predictions_versions
