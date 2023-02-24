@@ -16,8 +16,8 @@ const ChartLine = ({ state, data }: Props) => {
       data: data.predictions.val ? data.predictions.val : [],
     },
     ...data.predictions_versions.map((item: any) => {
-      const id = Object.keys(item)[0];
-      return { name: id, type: 'line', show: false, data: item[id].val };
+      const id = item.model_version;
+      return { name: id, type: 'line', show: false, data: item[Object.keys(item)[1]].val };
     })
   ]);
   const option: ApexOptions = {

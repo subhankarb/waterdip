@@ -223,7 +223,7 @@ const ModelOverview = () => {
     if (data) {
       setState(
         data.data.model_prediction_hist.predictions_versions.map((item: any) => {
-          const id = Object.keys(item)[0];
+          const id = item.model_version;
           return { [id]: false };
         })
       );
