@@ -11,7 +11,7 @@ type Props = {
 const ChartLine = ({ state, data }: Props) => {
   const [series, setSeries] = useState([
     {
-      name: 'hist',
+      name: 'Total prediction count',
       type: 'column',
       data: data.predictions.val ? data.predictions.val : [],
     },
@@ -57,7 +57,10 @@ const ChartLine = ({ state, data }: Props) => {
     },
     labels: data.predictions.date_bins ? data.predictions.date_bins : [],
     xaxis: {
-      type: 'datetime'
+      type: 'datetime',
+      labels: {
+        datetimeUTC: false
+      }
     },
     yaxis: {
       title: {

@@ -448,9 +448,9 @@ const ModelListTable = () => {
                       className={classes.tableRow}
                     >
                       <TableCell className={classes.tableCell} align="center">
-                        <Stack direction='column'>
+                        <Stack direction='column' gap='10px'>
                           <div>{row.model_name}</div>
-                          <Stack direction='row' justifyContent="space-around" alignItems="flex-end">
+                          <Stack gap='10px' direction='row' justifyContent="center" alignItems="center">
                             <div className={classes.modelid}>{row.model_id}</div>
                             <IconButton aria-label="Copy ModelID" onClick={
                               (e) => {

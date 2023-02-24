@@ -24,16 +24,21 @@ export const DataProfileStats = ({ datasetId, model_id, model_version_id }: any)
   const datasetInfo = data && data.data;
   return (
     <Box sx={{ marginTop: '30px' }}>
-      <Heading heading="Data Statistics" subtitle="Data Statistics" />
+      <Heading heading="Data Statistics" subtitle="Data Statistics for each columns" />
       {datasetInfo && datasetInfo.categorical_column_stats.length != 0 ?(
-        <CollapsibleTable
-          dataValue={datasetInfo.categorical_column_stats}
-          data_type="CATEGORICAL"
-        />
-      
+        <>
+          <Heading heading="Categorical Table" />
+          <CollapsibleTable
+            dataValue={datasetInfo.categorical_column_stats}
+            data_type="CATEGORICAL"
+         />
+        </>     
       ): null}
       {datasetInfo && datasetInfo.numeric_column_stats.length != 0  ?(
-        <CollapsibleTable dataValue={datasetInfo.numeric_column_stats} data_type="NUMERIC" />
+        <>
+          <Heading heading="Numeric Table" />
+          <CollapsibleTable dataValue={datasetInfo.numeric_column_stats} data_type="NUMERIC" />
+        </>
       ): null}
     </Box>
   );

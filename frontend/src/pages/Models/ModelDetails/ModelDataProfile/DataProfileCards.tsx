@@ -91,6 +91,7 @@ export const DataProfileVersionCard = ({ model_id, on_change }: Props) => {
     setSelected(event.target.value);
     on_change(event.target.value);
   }
+  console.log(modelOverview)
 
   return (
     <>
@@ -103,7 +104,7 @@ export const DataProfileVersionCard = ({ model_id, on_change }: Props) => {
             </MenuItem>
             {modelOverview && modelOverview?.data?.data?.model_versions?.map((row: any) => (
               <MenuItem value={row.model_version_id} key={row}>
-                {row.model_version_id}
+                {row.model_version}
               </MenuItem>
             ))}
           </Select>
@@ -117,9 +118,10 @@ export const DataDatasetSelectCard = (props: any) => {
 
   const classes = useStyles();
   const [selected, setSelected] = useState('');
+  const [selectedName, setSelectedName] = useState('');
   const handleChangeVersion = (event: any) => {
     setSelected(event.target.value);
-    props.on_change(event.target.value);
+    setSelectedName(data?.data.dataset_list.find(dataset => dataset.dataset_id === event.target.value)?.dataset_name || '');
   }
   const { data } = useGetDatasets({ version_id: props.version_id });
 
@@ -139,7 +141,10 @@ export const DataDatasetSelectCard = (props: any) => {
             );
           })}
         </Select>
-        <Box className={classes.cardHeading}>Date from {props.dateTimeString}</Box>
+        { 
+          selectedName === 'PRODUCTION' &&
+          <Box className={classes.cardHeading}>Date from {props.dateTimeString}</Box>
+        }
       </Box>
     </>
   );

@@ -16,6 +16,10 @@ import { makeStyles } from '@material-ui/core/styles';
 // ----------------------------------------------------------------------
 
 const useStyles = makeStyles(() => ({
+  containerTable: {
+    marginTop: '10px',
+    marginBottom: '50px'
+  },
   tableHead: {
     backgroundColor: '#E5E8EB',
     color: '#212B36',
@@ -33,7 +37,7 @@ export default function CollapsibleTable({ dataValue, data_type }: Props) {
   const classes = useStyles();
   return (
     <Scrollbar>
-      <TableContainer sx={{ minWidth: 1220, mt: 3 }}>
+      <TableContainer sx={{ minWidth: 1220, mt: 3 }} className={classes.containerTable}>
         <Table>
           <TableHead>
             <TableRow>

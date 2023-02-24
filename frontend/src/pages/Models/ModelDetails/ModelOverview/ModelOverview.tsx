@@ -245,7 +245,7 @@ const ModelOverview = () => {
         <LoadingScreen />
       </Box>
     );
-  const PERCENT1 = data?.data?.model_alert_overview.alert_percentage_change;
+  const PERCENT1 = data?.data?.model_prediction_overview.pred_percentage_change;
   const PERCENT2 = data?.data?.model_alert_overview.alert_percentage_change;
   return (
     <>
@@ -256,7 +256,7 @@ const ModelOverview = () => {
               <CardHeading heading="Model details" />
               <Grid item container xs={12}>
                 <Grid item xs={6}>
-                  <div className={classes.BoxSubHeading}># of versions</div>
+                  <div className={classes.BoxSubHeading}>Number of versions</div>
                 </Grid>
                 <Grid item xs={6}>
                   <div className={classes.modelDetailDiv}>{modelInfo?.numberOfVersions}</div>
@@ -278,7 +278,7 @@ const ModelOverview = () => {
           </Grid>
           <Grid item xs={12} sm={6} md={6} lg={3}>
             <Box sx={{ p: 3 }} className={classes.smallBox}>
-              <CardHeading heading="Today's Prediction" />
+              <CardHeading heading="Today's Prediction" subtitle={`Prediction volume changed ${PERCENT1}% compare to last 7 days average`}/>
               <Grid item container xs={12}>
                 <Grid item xs={6}>
                   <div className={classes.divNumber}>
@@ -335,7 +335,7 @@ const ModelOverview = () => {
           </Grid>
           <Grid item xs={12} sm={6} md={6} lg={3}>
             <Box sx={{ p: 3 }} className={classes.smallBox}>
-              <CardHeading heading="Average Prediction" subtitle="Average Prediction" />
+              <CardHeading heading="Average Prediction" subtitle="Average prediction volume in last 7 days" />
 
               <div className={classes.divNumber}>{data?.data.model_prediction_overview.pred_average}</div>
               <Box sx={{ color: colors.textLight, fontSize: '.7rem', mt: 1, fontWeight: 500 }}>
@@ -415,7 +415,7 @@ const ModelOverview = () => {
             >
               <Grid item container justifyContent="space-between" xs={12}>
                 <Grid item>
-                  <Heading heading="PREDICTION VOLUME" subtitle="prediction volume" />
+                  <Heading heading="PREDICTION VOLUME" subtitle="Model prediction volume per day" />
                 </Grid>
                 <Grid item>
                   <div>
@@ -437,12 +437,12 @@ const ModelOverview = () => {
                         background: colors.white,
                         border: `1px solid ${colors.tableHeadBack}`,
                         borderRadius: '2px',
-                        width: '140px',
+                        width: '160px',
                         height: '30px',
                         boxShadow: 'none'
                       }}
                     >
-                      Target class&nbsp;&nbsp;
+                      Model Version&nbsp;&nbsp;
                       <Icon width={16} height={16} icon={downwardOutline} />
                     </Button>
                     <StyledMenu
@@ -505,7 +505,7 @@ const ModelOverview = () => {
                 maxHeight: '360px'
               }}
             >
-              <Heading heading="LATEST ALERTS" subtitle="Latest alerts" />
+              <Heading heading="LATEST ALERTS" subtitle="Last five alerts" />
               <Scrollbar>
                 <TableContainer className={classes.container}>
                   <Table>
