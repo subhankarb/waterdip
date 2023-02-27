@@ -30,17 +30,29 @@ from waterdip.core.metrics.data_metrics import (
 
 class PSIMetrics(MongoMetric):
     """
-    1. Get Baseline Distribution
-        - Get Numeric feature Distribution and Bins
-        - Get Categorical feature Distribution
-    2. Get Production Distribution
-        - get Numeric feature Distribution using Bins
-        - Get Categorical feature Distribution
-    3. get Production Distribution
-        - get Numeric feature Distribution using Bins per day
-        - Get Categorical feature Distribution per day
-    3. PSI for every feature per day
-    4. PSI for every feature
+    PSI Metrics
+
+    This metric is used to calculate the PSI between two datasets.
+    The baseline dataset is used to calculate the expected distribution of the data.
+    The current dataset is used to calculate the actual distribution of the data.
+    The PSI is calculated by comparing the expected and actual distribution of the data.
+    The PSI is calculated for each categorical and numeric field in the dataset.
+
+    The PSI is calculated using the following formula:
+    PSI = SUM( (actual - expected) * log(actual / expected) )
+
+    Attributes:
+    ----------
+    collection:
+        The collection object for the production dataset
+    dataset_id:
+        The dataset id for the production dataset
+    baseline_dataset_id:
+        The dataset id for the baseline dataset
+    baseline_collection:
+        The collection object for the baseline dataset
+    baseline_time_range:
+        The time range for the baseline dataset
     """
 
     def __init__(
@@ -76,11 +88,19 @@ class PSIMetrics(MongoMetric):
     def metric_name(self) -> str:
         return "drift_psi"
 
-    def _calculate_numeric_baseline_distribution(
+    def _numeric_baseline_distribution(
         self, numeric_columns: List
     ) -> (Dict[str, Dict], Dict[str, List[str]]):
         """
-        Will return count histogram for each feature and bins for each feature
+        Will return count histogram for each feature
+        Args:
+            numeric_columns:
+                List of numeric columns
+        Returns:
+            columns_histogram: Dict[str, Dict]
+                Count histogram for each feature
+            bins: Dict[str, List[str]]
+                Bins for each numeric column
         """
         columns_histogram = self._numeric_count_histogram_baseline.aggregation_result(
             numeric_columns=numeric_columns, time_range=self._baseline_time_range
@@ -91,26 +111,65 @@ class PSIMetrics(MongoMetric):
 
         return columns_histogram, bins
 
-    def _calculate_numeric_production_distribution(
+    def _numeric_production_distribution(
         self, numeric_columns: List, bins: Dict[str, List[str]], time_range: TimeRange
     ) -> Dict[str, Dict]:
+        """
+        Will return count histogram for each feature
+        Args:
+            numeric_columns:
+                List of numeric columns
+            bins:
+                Bins for each numeric column, already calculated in baseline
+            time_range:
+                Time range for the production dataset
+
+        Returns:
+            columns_histogram: Dict[str, Dict]
+                Count histogram for each feature
+        """
         columns_histogram = self._numeric_count_date_histogram.aggregation_result(
             numeric_columns=numeric_columns, time_range=time_range, bins=bins
         )
         return columns_histogram
 
-    def _calculate_categorical_baseline_distribution(self) -> Dict[str, Dict]:
+    def _categorical_baseline_distribution(self) -> Dict[str, Dict]:
+        """
+        Will return count histogram for each feature for the baseline dataset
+        Returns:
+            columns_histogram: Dict[str, Dict]
+                Count histogram for each feature
+
+        """
         return self._cat_count_histogram_baseline.aggregation_result(
             time_range=self._baseline_time_range
         )
 
-    def _calculate_categorical_production_distribution(
+    def _categorical_production_distribution(
         self, time_range: TimeRange
     ) -> Dict[str, Dict]:
+        """
+        Will return count histogram for each feature for the production dataset
+        Args:
+            time_range:
+                Time range for the production dataset
+        Returns:
+            columns_histogram: Dict[str, Dict]
+                Count histogram for each feature
+        """
         return self._cat_count_date_histogram.aggregation_result(time_range=time_range)
 
     @staticmethod
     def count_to_density(count_array: List[int]) -> List[float]:
+        """
+        Will convert count array to density array
+        Args:
+            count_array: List[int]
+                Count array
+        Returns:
+            density_array: List[float]
+                Density array
+        """
         array = np.array(count_array)
         total = np.sum(array)
         array = array / total
@@ -118,6 +177,19 @@ class PSIMetrics(MongoMetric):
 
     @staticmethod
     def psi_from_bins(baseline_density: List[float], production_density: List[float]):
+        """
+        Will calculate the PSI value from the density arrays.
+        The PSI is calculated using the following formula:
+        PSI = SUM( (actual - expected) * log(actual / expected) )
+
+        Args:
+            baseline_density: List[float]
+                density array for the baseline dataset
+            production_density: List[float]
+                density array for the production dataset
+        Returns:
+            psi_value: float
+        """
         return np.sum(
             [
                 (n - b) * np.log(n / b)
@@ -125,12 +197,27 @@ class PSIMetrics(MongoMetric):
             ]
         ).tolist()
 
-    def calculate_psi_value(
+    def _calculate_psi_value(
         self,
         columns: List[str],
         baseline_distribution: Dict[str, Dict],
         production_distribution: Dict[str, Dict],
     ) -> Dict:
+        """
+        Will calculate the PSI value for each column
+        Args:
+            columns: List[str]
+                List of columns
+            baseline_distribution: Dict[str, Dict]
+                Baseline distribution
+            production_distribution: Dict[str, Dict]
+                Production distribution
+
+        Returns:
+            psi_values: Dict
+                PSI value for each column
+
+        """
         psi_values = {}
         for column in columns:
             if column in baseline_distribution and column in production_distribution:
@@ -145,16 +232,28 @@ class PSIMetrics(MongoMetric):
                 psi_values[column] = psi_value
         return psi_values
 
-    def _psi_numeric_date_agg(self, numeric_columns: List, time_range: TimeRange):
+    def _psi_numeric_date_agg(
+        self, numeric_columns: List, time_range: TimeRange
+    ) -> Dict[str, Dict[str, float]]:
+        """
+        Will calculate the PSI value for each numeric column for
+        each date in the production dataset
+        Args:
+            numeric_columns: List[str]
+                List of numeric columns
+            time_range: TimeRange
+                Time range for the production dataset
+        Returns:
+            psi_numeric_date_agg: Dict[str, Dict[str, float]]
+                PSI value for each numeric column for each date in the production dataset
+        """
         psi_numeric_date_agg = {}
-        (
-            numeric_baseline_distribution,
-            bins,
-        ) = self._calculate_numeric_baseline_distribution(
+
+        numeric_baseline_distribution, bins = self._numeric_baseline_distribution(
             numeric_columns=numeric_columns
         )
         numeric_production_distribution_date_agg = (
-            self._calculate_numeric_production_distribution(
+            self._numeric_production_distribution(
                 numeric_columns=numeric_columns, bins=bins, time_range=time_range
             )
         )
@@ -163,7 +262,7 @@ class PSIMetrics(MongoMetric):
             date_str,
             numeric_production_distribution,
         ) in numeric_production_distribution_date_agg.items():
-            numeric_psi_values_ny_columns = self.calculate_psi_value(
+            numeric_psi_values_ny_columns = self._calculate_psi_value(
                 columns=numeric_columns,
                 baseline_distribution=numeric_baseline_distribution,
                 production_distribution=numeric_production_distribution,
@@ -173,20 +272,30 @@ class PSIMetrics(MongoMetric):
 
     def _psi_categorical_date_agg(
         self, categorical_columns: List, time_range: TimeRange
-    ):
+    ) -> Dict[str, Dict[str, float]]:
+        """
+        Will calculate the PSI value for each categorical column for each date in the production dataset
+        Args:
+            categorical_columns: List[str]
+                List of categorical columns
+            time_range: TimeRange
+                Time range for the production dataset
+
+        Returns: Dict[str, Dict[str, float]]
+            PSI value for each categorical column for each date in the production dataset
+        """
         psi_cat_date_agg = {}
-        categorical_baseline_distribution = (
-            self._calculate_categorical_baseline_distribution()
-        )
+        categorical_baseline_distribution = self._categorical_baseline_distribution()
+
         categorical_production_distribution_date_agg = (
-            self._calculate_categorical_production_distribution(time_range=time_range)
+            self._categorical_production_distribution(time_range=time_range)
         )
 
         for (
             date_str,
             categorical_production_distribution,
         ) in categorical_production_distribution_date_agg.items():
-            categorical_psi_values_ny_columns = self.calculate_psi_value(
+            categorical_psi_values_ny_columns = self._calculate_psi_value(
                 columns=categorical_columns,
                 baseline_distribution=categorical_baseline_distribution,
                 production_distribution=categorical_production_distribution,
@@ -201,9 +310,23 @@ class PSIMetrics(MongoMetric):
         categorical_columns: List,
         time_range: TimeRange,
         **kwargs
-    ) -> Dict[str, Any]:
+    ) -> Dict[str, Dict[str, float]]:
+        """
+        Will calculate the PSI value for each column for each date in the production dataset
 
-        psi_date_agg = {}
+
+        Args:
+            numeric_columns: List[str]
+            categorical_columns: List[str]
+            time_range: TimeRange
+            **kwargs:
+
+        Returns:
+            psi_date_agg: Dict[str, Dict[str, float]]
+                PSI value for each column for each date in the production dataset
+        """
+        psi_date_agg: Dict[str, Dict[str, float]] = {}
+
         psi_numeric_date_agg = self._psi_numeric_date_agg(
             numeric_columns=numeric_columns, time_range=time_range
         )
@@ -222,3 +345,43 @@ class PSIMetrics(MongoMetric):
 
     def _aggregation_query(self, *args, **kwargs) -> List[Dict[str, Any]]:
         pass
+
+    @staticmethod
+    def _average_psi_column_agg(calculate_psi_values: Dict[str, Dict[str, float]]):
+        """
+        Will calculate the average PSI value for each column
+        Args:
+            calculate_psi_values: Dict[str, Dict[str, float]]
+                PSI value for each column for each date in the production dataset
+
+        Returns:
+            average_psi_column_agg: Dict[str, float]
+                Average PSI value for each column
+        """
+        average_psi_column_agg = {}
+        for date_str, psi_values in calculate_psi_values.items():
+            for column, psi_value in psi_values.items():
+                if column not in average_psi_column_agg:
+                    average_psi_column_agg[column] = []
+                average_psi_column_agg[column].append(psi_value)
+        return {
+            column: np.mean(psi_values).tolist()
+            for column, psi_values in average_psi_column_agg.items()
+        }
+
+    @staticmethod
+    def _average_psi_date_agg(calculate_psi_values: Dict[str, Dict[str, float]]):
+        """
+        Will calculate the average PSI value for each date
+        Args:
+            calculate_psi_values: Dict[str, Dict[str, float]]
+                PSI value for each column for each date in the production dataset
+
+        Returns:
+            average_psi_date_agg: Dict[str, float]
+                Average PSI value for each date
+        """
+        average_psi_date_agg = {}
+        for date_str, psi_values in calculate_psi_values.items():
+            average_psi_date_agg[date_str] = np.mean(list(psi_values.values()))
+        return average_psi_date_agg
