@@ -46,9 +46,13 @@ Check out the [contributions guide](https://github.com/waterdipai/waterdip/blob/
 
 **Waterdip contributors: :blue_heart:**
 
-<a href="https://github.com/waterdipai/waterdip/graphs/contributors">
-  <img alt="contributors" src="https://contrib.rocks/image?repo=waterdipai/waterdip" />
-</a>
+<a href="https://github.com/subhankarb"><img src="https://avatars.githubusercontent.com/u/2178361?v=4" width="50" height="50" alt=""/></a>
+<a href="https://github.com/niyasrad"><img src="https://avatars.githubusercontent.com/u/84234554?v=4" width="50" height="50" alt=""/></a>
+<a href="https://github.com/WeryZebra-Yue"><img src="https://avatars.githubusercontent.com/u/75676675?v=4" width="50" height="50" alt=""/></a>
+<a href="https://github.com/Godzilla5111"><img src="https://avatars.githubusercontent.com/u/62075225?v=4" width="50" height="50" alt=""/></a>
+<a href="https://github.com/sumitmeel77"><img src="https://avatars.githubusercontent.com/u/65071769?v=4" width="50" height="50" alt=""/></a>
+<a href="https://github.com/paridhisharma24"><img src="https://avatars.githubusercontent.com/u/56148030?v=4" width="50" height="50" alt=""/></a>
+<a href="https://github.com/gaurav-wdi"><img src="https://avatars.githubusercontent.com/u/82873511?v=4" width="50" height="50" alt=""/></a>
+<a href="https://github.com/Pratik-Kumar-621"><img src="https://avatars.githubusercontent.com/u/70286186?v=4" width="50" height="50" alt=""/></a>
 
-Made with [contrib.rocks](https://contrib.rocks).
 
