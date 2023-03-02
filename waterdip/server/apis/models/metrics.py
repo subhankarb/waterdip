@@ -86,3 +86,16 @@ class PerfomanceMetricResponse(BaseModel):
     sensitivity: Dict
     specificity: Dict
     f1: Dict
+
+
+class PSIMetricResponse(BaseModel):
+    """
+    PSI model API response
+
+    Attributes:
+    ------------------
+    psi:
+        psi of the model
+    """
+
+    drift_psi: List[Dict[datetime, Dict[str, float]]]

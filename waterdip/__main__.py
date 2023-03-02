@@ -20,4 +20,5 @@ if __name__ == "__main__":
         port=4422,
         host="0.0.0.0",
         access_log=True,
+        reload=True
     )

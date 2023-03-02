@@ -12,7 +12,7 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 import json
-from datetime import datetime
+from datetime import datetime, timedelta
 from typing import Dict, List
 from uuid import UUID
 
@@ -34,13 +34,17 @@ from waterdip.core.metrics.data_metrics import (
     NumericBasicMetrics,
     NumericCountHistogram,
 )
+from waterdip.core.metrics.drift_psi import PSIMetrics
 from waterdip.server.apis.models.metrics import (
     CategoricalColumnStats,
     DatasetMetricsResponse,
     NumericColumnStats,
 )
 from waterdip.server.commons.config import settings
-from waterdip.server.db.models.models import ModelVersionSchemaInDB
+from waterdip.server.db.models.models import (
+    ModelBaselineTimeWindowType,
+    ModelVersionSchemaInDB,
+)
 from waterdip.server.db.repositories.dataset_row_repository import (
     BatchDatasetRowRepository,
     EventDatasetRowRepository,
@@ -360,4 +364,127 @@ class ClassificationPerformance:
                 output[key]["date"].append(list(date.keys())[0].strftime("%d-%m-%Y"))
                 output[key]["value"].append(list(date.values())[0])
 
+        return output
+
+
+class PSIMetricService:
+    _INSTANCE: "PSIMetricService" = None
+
+    @classmethod
+    def get_instance(
+        cls,
+        event_repo: EventDatasetRowRepository = Depends(
+            EventDatasetRowRepository.get_instance
+        ),
+        batch_repo: BatchDatasetRowRepository = Depends(
+            BatchDatasetRowRepository.get_instance
+        ),
+        dataset_service: DatasetService = Depends(DatasetService.get_instance),
+        model_service: ModelService = Depends(ModelService.get_instance),
+        model_version_service: ModelVersionService = Depends(
+            ModelVersionService.get_instance
+        ),
+    ):
+        if not cls._INSTANCE:
+            cls._INSTANCE = cls(
+                event_repo=event_repo,
+                batch_repo=batch_repo,
+                dataset_service=dataset_service,
+                model_service=model_service,
+                model_version_service=model_version_service,
+            )
+        return cls._INSTANCE
+
+    def __init__(
+        self,
+        event_repo: EventDatasetRowRepository,
+        batch_repo: BatchDatasetRowRepository,
+        dataset_service: DatasetService,
+        model_service: ModelService,
+        model_version_service: ModelVersionService,
+    ):
+        self._event_repo = event_repo
+        self._batch_repo = batch_repo
+        self._dataset_service = dataset_service
+        self._model_service = model_service
+        self._model_version_service = model_version_service
+
+    def metric_psi(
+        self,
+        model_id: UUID,
+        model_version_id: UUID,
+        time_range: TimeRange,
+    ):
+        dataset_id = self._dataset_service.find_event_dataset_by_model_version_id(
+            model_version_id
+        ).dataset_id
+
+        baseline = self._model_service.find_by_id(model_id).baseline
+        baseline_dataset_id = None
+        baseline_collection = None
+        baseline_time_range = None
+
+        if baseline.dataset_env is not None:
+            baseline_dataset_id = self._dataset_service.find_dataset_by_filter(
+                {
+                    "model_version_id": str(model_version_id),
+                    "environment": baseline.dataset_env,
+                    "dataset_type": DatasetType.BATCH,
+                }
+            ).dataset_id
+            baseline_collection = self._batch_repo.collection
+
+        elif baseline.time_window is not None:
+            baseline_dataset_id = self._dataset_service.find_dataset_by_filter(
+                {
+                    "model_version_id": str(model_version_id),
+                    "dataset_type": DatasetType.EVENT,
+                }
+            ).dataset_id
+            baseline_collection = self._event_repo.collection
+            time_window = baseline.time_window
+            if (
+                time_window.time_window_type
+                == ModelBaselineTimeWindowType.FIXED_TIME_WINDOW
+            ):
+                baseline_time_range = TimeRange(
+                    start_time=time_window.fixed_time_window.start_time,
+                    end_time=time_window.fixed_time_window.end_time,
+                )
+            else:
+                baseline_time_range = TimeRange(
+                    start_time=datetime.utcnow()
+                    - timedelta(
+                        datetime.strptime(
+                            baseline.time_window.moving_time_window.time_period, "%dd"
+                        ).day
+                        - datetime.strptime(
+                            baseline.time_window.moving_time_window.skip_period, "%dd"
+                        ).day
+                    ),
+                    end_time=datetime.utcnow(),
+                )
+
+        metric = PSIMetrics(
+            collection=self._event_repo.collection,
+            dataset_id=dataset_id,
+            baseline_dataset_id=baseline_dataset_id,
+            baseline_collection=baseline_collection,
+            baseline_time_range=baseline_time_range,
+        )
+
+        (
+            numeric_columns,
+            categorical_columns,
+        ) = self._model_version_service.find_categorised_columns(model_version_id)
+
+        results = metric.aggregation_result(
+            time_range=time_range,
+            numeric_columns=numeric_columns,
+            categorical_columns=categorical_columns,
+        )
+        output = []
+        for key, value in results.items():
+            output.append({datetime.strptime(key, "%d-%m-%Y"): value})
+        output = sorted(output, key=lambda x: list(x.keys())[0])
         return output

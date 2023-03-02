@@ -150,3 +150,11 @@ class DatasetService:
 
     def delete_datasets_by_model_id(self, model_id: UUID):
         self._repository.delete_datasets_by_model_id(str(model_id))
+
+    def find_dataset_by_filter(self, filters: dict) -> DatasetDB:
+        dataset_list: List[DatasetDB] = self._repository.find_datasets(filters=filters)
+
+        if len(dataset_list) == 0:
+            raise EntityNotFoundError(name=str(filters), type="Dataset")
+
+        return dataset_list[0]

@@ -12,9 +12,6 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
-from uuid import UUID
-
-from fastapi import APIRouter, Depends
 from datetime import datetime, timedelta
 from typing import Optional
 from uuid import UUID
@@ -22,13 +19,17 @@ from uuid import UUID
 from fastapi import APIRouter, Depends
 
 from waterdip.core.commons.models import TimeRange
-from waterdip.server.apis.models.metrics import DatasetMetricsResponse, PerfomanceMetricResponse
+from waterdip.server.apis.models.metrics import (
+    DatasetMetricsResponse,
+    PerfomanceMetricResponse,
+    PSIMetricResponse,
+)
 from waterdip.server.apis.models.params import TimeRangeParam
-from waterdip.server.services.metrics_service import DatasetMetricsService
-from waterdip.core.commons.models import TimeRange
-from waterdip.server.apis.models.params import TimeRangeParam
-
-from waterdip.server.services.metrics_service import ClassificationPerformance
+from waterdip.server.services.metrics_service import (
+    ClassificationPerformance,
+    DatasetMetricsService,
+    PSIMetricService,
+)
 
 router = APIRouter()
 
@@ -41,8 +42,7 @@ def model_list(
     model_version_id: UUID,
     dataset_id: UUID,
     time_range_param: TimeRangeParam = Depends(),
-    service: DatasetMetricsService = Depends(
-        DatasetMetricsService.get_instance),
+    service: DatasetMetricsService = Depends(DatasetMetricsService.get_instance),
 ):
     time_range = TimeRange(
         start_time=time_range_param.start_time, end_time=time_range_param.end_time
@@ -68,7 +68,8 @@ def metric_performance(
     model_version_id: UUID,
     time_range_param: TimeRangeParam = Depends(),
     metric_service: ClassificationPerformance = Depends(
-        ClassificationPerformance.get_instance),
+        ClassificationPerformance.get_instance
+    ),
 ):
     time_range = TimeRange(
         start_time=time_range_param.start_time, end_time=time_range_param.end_time
@@ -78,4 +79,27 @@ def metric_performance(
         model_id=model_id,
         model_version_id=model_version_id,
         time_range=time_range,
+    )
+
+
+@router.get(
+    "/metric.psi",
+    response_model=PSIMetricResponse,
+    name="metric:psi",
+)
+def metric_psi(
+    model_id: UUID,
+    model_version_id: UUID,
+    time_range_param: TimeRangeParam = Depends(),
+    metric_service: PSIMetricService = Depends(PSIMetricService.get_instance),
+):
+    time_range = TimeRange(
+        start_time=time_range_param.start_time, end_time=time_range_param.end_time
+    )
+    return PSIMetricResponse(
+        drift_psi=metric_service.metric_psi(
+            model_id=model_id,
+            model_version_id=model_version_id,
+            time_range=time_range,
+        )
     )

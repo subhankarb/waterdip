@@ -123,7 +123,7 @@ class EventDatasetRowService:
         window = datetime.utcnow() - start_date
         window_date = datetime.utcnow() - timedelta(days=window.days)
         if window.days > days:
-            window_date = datetime.utcnow() - days
+            window_date = datetime.utcnow() - timedelta(days=days)
         window_prediction_count = self._repository.prediction_count(
             filter={"model_id": str(model_id), "created_at": {"$gte": window_date}}
         )
