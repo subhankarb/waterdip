@@ -50,6 +50,10 @@ from waterdip.server.db.models.models import (
     ModelVersionSchemaFieldDetails,
     ModelVersionSchemaInDB,
 )
+from waterdip.server.apis.models.metrics import (
+    PSIMetricResponse,
+    PSIFeatureBreakdown
+)
 from waterdip.server.db.mongodb import (
     MONGO_COLLECTION_MODEL_VERSIONS,
     MONGO_COLLECTION_MODELS,
@@ -206,7 +210,8 @@ class TestMetricService:
             dataset_service=DatasetService.get_instance(
                 DatasetRepository.get_instance(self.mock_mongo_backend)
             ),
-            event_repo=EventDatasetRowRepository.get_instance(self.mock_mongo_backend),
+            event_repo=EventDatasetRowRepository.get_instance(
+                self.mock_mongo_backend),
         )
         self.psi_metric_service = PSIMetricService.get_instance(
             model_service=ModelService.get_instance(
@@ -218,8 +223,10 @@ class TestMetricService:
             dataset_service=DatasetService.get_instance(
                 DatasetRepository.get_instance(self.mock_mongo_backend)
             ),
-            event_repo=EventDatasetRowRepository.get_instance(self.mock_mongo_backend),
-            batch_repo=BatchDatasetRowRepository.get_instance(self.mock_mongo_backend),
+            event_repo=EventDatasetRowRepository.get_instance(
+                self.mock_mongo_backend),
+            batch_repo=BatchDatasetRowRepository.get_instance(
+                self.mock_mongo_backend),
         )
 
         self.mock_mongo_backend.database[MONGO_COLLECTION_MODELS].insert_many(
@@ -278,6 +285,11 @@ class TestMetricService:
                 "psi": 0.5,
             }
         }
+        self.psiMetricServiceResponse = PSIMetricResponse(
+            feat_breakdown=[PSIFeatureBreakdown(name='psi', driftscore=0.5)],
+            data=[0.5],
+            time_buckets=['22-02-2023'],
+        )
         self.dataset = BaseEventRowDB(
             row_id=uuid.uuid4(),
             dataset_id=uuid.uuid4(),
@@ -334,7 +346,8 @@ class TestMetricService:
             ),
         )
 
-        assert model_performance["accuracy"] == {"date": ["29-01-2023"], "value": [0.5]}
+        assert model_performance["accuracy"] == {
+            "date": ["29-01-2023"], "value": [0.5]}
 
     def test_should_return_exception_if_positive_class_is_none(
         self, mocker, mock_mongo_backend
@@ -450,9 +463,7 @@ class TestMetricService:
                 end_time="2023-02-02T13:07:43.170771",
             ),
         )
-        assert psi_metric == [
-            {datetime.strptime("22-02-2023", "%d-%m-%Y"): {"psi": 0.5}}
-        ]
+        assert psi_metric == self.psiMetricServiceResponse
 
     def test_should_return_psi_metric_for_model_with_fixed_time_window(
         self, mocker, mock_mongo_backend
@@ -502,9 +513,7 @@ class TestMetricService:
                 end_time="2023-02-02T13:07:43.170771",
             ),
         )
-        assert psi_metric == [
-            {datetime.strptime("22-02-2023", "%d-%m-%Y"): {"psi": 0.5}}
-        ]
+        assert psi_metric == self.psiMetricServiceResponse
 
     def test_should_return_psi_metric_for_model_with_moving_time_window(
         self, mocker, mock_mongo_backend
@@ -554,13 +563,12 @@ class TestMetricService:
                 end_time="2023-02-02T13:07:43.170771",
             ),
         )
-        assert psi_metric == [
-            {datetime.strptime("22-02-2023", "%d-%m-%Y"): {"psi": 0.5}}
-        ]
+        assert psi_metric == self.psiMetricServiceResponse
 
     @classmethod
     def teardown_class(self):
-        self.mock_mongo_backend.database[MONGO_COLLECTION_MODELS].delete_many({})
+        self.mock_mongo_backend.database[MONGO_COLLECTION_MODELS].delete_many({
+        })
         self.mock_mongo_backend.database[MONGO_COLLECTION_MODEL_VERSIONS].delete_many(
             {}
         )

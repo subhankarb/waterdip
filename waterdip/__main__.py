@@ -15,10 +15,4 @@
 if __name__ == "__main__":
     import uvicorn
 
-    uvicorn.run(
-        "waterdip:app",
-        port=4422,
-        host="0.0.0.0",
-        access_log=True,
-        reload=True
-    )
+    uvicorn.run("waterdip:app", port=4422, host="0.0.0.0", access_log=True)

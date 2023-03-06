@@ -39,6 +39,7 @@ from waterdip.server.apis.models.metrics import (
     CategoricalColumnStats,
     DatasetMetricsResponse,
     NumericColumnStats,
+    PSIMetricResponse,
 )
 from waterdip.server.commons.config import settings
 from waterdip.server.db.models.models import (
@@ -483,8 +484,17 @@ class PSIMetricService:
             numeric_columns=numeric_columns,
             categorical_columns=categorical_columns,
         )
-        output = []
-        for key, value in results.items():
-            output.append({datetime.strptime(key, "%d-%m-%Y"): value})
-        output = sorted(output, key=lambda x: list(x.keys())[0])
-        return output
+        feat_breakdown = [
+            {"driftscore": value, "name": key}
+            for key, value in metric._average_psi_column_agg(results).items()
+        ]
+        date_agg = metric._average_psi_date_agg(results)
+        time_buckets = []
+        data = []
+        for key, value in date_agg.items():
+            time_buckets.append(key)
+            data.append(value)
+
+        return PSIMetricResponse(
+            feat_breakdown=feat_breakdown, time_buckets=time_buckets, data=data
+        )

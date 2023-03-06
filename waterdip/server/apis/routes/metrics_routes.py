@@ -96,10 +96,8 @@ def metric_psi(
     time_range = TimeRange(
         start_time=time_range_param.start_time, end_time=time_range_param.end_time
     )
-    return PSIMetricResponse(
-        drift_psi=metric_service.metric_psi(
-            model_id=model_id,
-            model_version_id=model_version_id,
-            time_range=time_range,
-        )
+    return metric_service.metric_psi(
+        model_id=model_id,
+        model_version_id=model_version_id,
+        time_range=time_range,
     )

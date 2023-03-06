@@ -88,6 +88,22 @@ class PerfomanceMetricResponse(BaseModel):
     f1: Dict
 
 
+class PSIFeatureBreakdown(BaseModel):
+    """
+    PSI feature breakdown API response
+
+    Attributes:
+    ------------------
+    name:
+        name of the feature
+    driftscore:
+        driftscore of the feature
+    """
+
+    name: str
+    driftscore: float
+
+
 class PSIMetricResponse(BaseModel):
     """
     PSI model API response
@@ -98,4 +114,6 @@ class PSIMetricResponse(BaseModel):
         psi of the model
     """
 
-    drift_psi: List[Dict[datetime, Dict[str, float]]]
+    feat_breakdown: List[PSIFeatureBreakdown]
+    data: List[float]
+    time_buckets: List[str]
