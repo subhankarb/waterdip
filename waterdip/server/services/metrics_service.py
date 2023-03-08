@@ -491,6 +491,7 @@ class PSIMetricService:
         date_agg = metric._average_psi_date_agg(results)
         time_buckets = []
         data = []
+
         for key, value in date_agg.items():
             time_buckets.append(key)
             data.append(value)

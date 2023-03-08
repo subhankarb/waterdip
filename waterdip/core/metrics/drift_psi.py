@@ -326,17 +326,18 @@ class PSIMetrics(MongoMetric):
                 PSI value for each column for each date in the production dataset
         """
         psi_date_agg: Dict[str, Dict[str, float]] = {}
-
-        psi_numeric_date_agg = self._psi_numeric_date_agg(
-            numeric_columns=numeric_columns, time_range=time_range
-        )
+        psi_numeric_date_agg = {}
+        if numeric_columns:
+            psi_numeric_date_agg = self._psi_numeric_date_agg(
+                numeric_columns=numeric_columns, time_range=time_range
+            )
         pas_cat_date_agg = self._psi_categorical_date_agg(
             categorical_columns=categorical_columns, time_range=time_range
         )
 
         for date_str in time_range.get_date_list:
             psi_date_agg[date_str] = {}
-            if date_str in psi_numeric_date_agg:
+            if date_str in psi_numeric_date_agg and numeric_columns:
                 psi_date_agg[date_str].update(psi_numeric_date_agg[date_str])
             if date_str in pas_cat_date_agg:
                 psi_date_agg[date_str].update(pas_cat_date_agg[date_str])
@@ -383,5 +384,8 @@ class PSIMetrics(MongoMetric):
         """
         average_psi_date_agg = {}
         for date_str, psi_values in calculate_psi_values.items():
-            average_psi_date_agg[date_str] = np.mean(list(psi_values.values()))
+            if psi_values:
+                average_psi_date_agg[date_str] = np.mean(list(psi_values.values()))
+            else:
+                average_psi_date_agg[date_str] = 0
         return average_psi_date_agg
