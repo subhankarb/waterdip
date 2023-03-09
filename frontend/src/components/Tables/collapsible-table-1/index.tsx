@@ -41,11 +41,8 @@ export default function CollapsibleTable({ tablehead_name, dataValue }: Props) {
               <TableCell className={classes.tableHead} width="20">
                 &nbsp;&nbsp;&nbsp;&nbsp;{tablehead_name}
               </TableCell>
-              <TableCell className={classes.tableHead} align="center" width="60">
-                Histogram
-              </TableCell>
               <TableCell className={classes.tableHead} align="center" width="20">
-                Impact
+                Drift Score
               </TableCell>
             </TableRow>
           </TableHead>

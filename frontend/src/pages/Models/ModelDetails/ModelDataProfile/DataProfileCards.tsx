@@ -122,6 +122,7 @@ export const DataDatasetSelectCard = (props: any) => {
   const handleChangeVersion = (event: any) => {
     setSelected(event.target.value);
     setSelectedName(data?.data.dataset_list.find(dataset => dataset.dataset_id === event.target.value)?.dataset_name || '');
+    props.on_change(event.target.value);
   }
   const { data } = useGetDatasets({ version_id: props.version_id });
 

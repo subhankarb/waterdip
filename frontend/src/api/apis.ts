@@ -8,6 +8,7 @@ export const GET_MODELS_API = makeUrl('list.models');
 export const GET_MODEL_Info_API = makeUrl('model.info');
 export const GET_MODEL_Overview_API = makeUrl('model.overview');
 export const GET_MODEL_PERFORMANCE_API = makeUrl('metric.performance');
+export const GET_METRICS_PSI = makeUrl('metric.psi')
 export const CREATE_MODEL_API = makeUrl('model.register');
 export const GET_MODEL_VERSION_INFO_API = makeUrl('model.version.info')
 export const UPDATE_MODEL_API = makeUrl('model.update');

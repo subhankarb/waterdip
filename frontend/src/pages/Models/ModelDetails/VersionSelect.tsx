@@ -1,8 +1,8 @@
-import { Heading } from "../../../../components/Heading";
+import { Heading } from "../../../components/Heading";
 import { makeStyles } from "@material-ui/styles";
 import { MenuItem } from "@material-ui/core";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
-import { colors } from "../../../../theme/colors";
+import { colors } from "../../../theme/colors";
 import { useEffect, useMemo, useState } from "react";
 import { Select } from "@material-ui/core";
 import { useModelInfo } from "api/models/GetModelInfo";
@@ -30,11 +30,11 @@ const useStyles = makeStyles({
   },
   baseLine: {
     paddingLeft: ".8rem",
-    marginTop: "-2rem",
   },
   baseLineContent: {
     marginTop: ".6rem",
     width: "100%",
+    maxWidth: "250px",
     color: colors.text,
     background: colors.boxBackground,
     borderRadius: "4px",
@@ -60,7 +60,7 @@ function useQuery() {
   return useMemo(() => new URLSearchParams(search), [search]);
 }
 
-export default function VersionSelect({ on_change }: any) {
+export default function VersionSelect({ on_change, subtitle }: any) {
   const navigate = useNavigate();
   const { modelId, tabName } = useParams();
   const classes = useStyles();
@@ -80,7 +80,7 @@ export default function VersionSelect({ on_change }: any) {
     <div className={classes.baseLine}>
       <Heading
         heading="Model Version"
-        subtitle="Select a version to view performance"
+        subtitle={subtitle}
       />
       <div className={classes.baseLineContent}>
         <div className={classes.contentHeading}>Select Version</div>
@@ -97,7 +97,7 @@ export default function VersionSelect({ on_change }: any) {
           {modelOverview &&
             modelOverview?.data?.data?.model_versions?.map((row: any) => (
               <MenuItem value={row.model_version_id} key={row}>
-                {row.model_version_id}
+                {row.model_version}
               </MenuItem>
             ))}
         </Select>

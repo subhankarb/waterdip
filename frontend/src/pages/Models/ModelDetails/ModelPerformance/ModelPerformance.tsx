@@ -22,7 +22,7 @@ import PerformanceChart from "./PerformanceChart";
 import { AxiosError, AxiosRequestConfig } from "axios";
 import Button from "@material-ui/core/Button";
 import { PATH_DASHBOARD } from "routes/paths";
-import VersionSelect from "./VersionSelect";
+import VersionSelect from "../VersionSelect";
 
 const RootStyle = styled("div")({
   overflowY: "hidden",
@@ -130,7 +130,7 @@ const ModelPerformance = () => {
                 </Scrollbar>
               </Box>
               <Box gridColumn="3/4" gridRow="2/2" sx={{ ml: 2, mb: 5 }}>
-                <VersionSelect on_change={handleVersionChange} />
+                <VersionSelect on_change={handleVersionChange} subtitle="Select a version to view performance"/>
               </Box>
             </>
           ) : (
