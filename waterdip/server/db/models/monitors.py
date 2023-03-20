@@ -43,7 +43,7 @@ class BaseMonitorDB(BaseModel):
     monitor_condition: BaseMonitorCondition = Field(...)
     count_of_alerts: Optional[int]
     model_name: Optional[str]
-    last_run: Optional[str]
+    last_run: Optional[datetime]
     created_at: datetime
     severity: MonitorSeverity = Field(default=MonitorSeverity.LOW)
 

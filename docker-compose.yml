@@ -44,6 +44,7 @@ services:
     environment:
       - WD_MONGODB_URL=mongodb://dbuser:dbpass@wd-mongodb:27017/waterdip
       - WD_MONGODB_DATABASE=waterdip
+      - REDIS_URL=redis://wd-redis:6379
     networks:
       - waterdip
     depends_on:

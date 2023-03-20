@@ -29,7 +29,7 @@ Waterdip is an Open Source ML Observability platform that allows ML Engineers an
 
 ## Why ML Observability is needed?
 
-**APM (Application Performance Monitoring)** tools are used to monitor the performance of applications. AMP tools are kind if mandatory part of dev stack. Without AMP tools, it is very difficult to monitor the performance of applications.
+**APM (Application Performance Monitoring)** tools are used to monitor the performance of applications. AMP tools are mandatory part of dev stack. Without AMP tools, it is very difficult to monitor the performance of applications.
 
 But for Data and ML products regular APM tools are not enough. We need a new kind of tools that can monitor the performance of Data and ML applications.
 

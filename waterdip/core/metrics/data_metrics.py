@@ -611,10 +611,12 @@ class NumericBasicMetrics(DataMetrics):
         zero_values = facets["zero_values"]
         std_dev_values = facets["std_dev_values"] if "std_dev_values" in facets else []
 
-        for average_value, total_value in zip(average_values, total_values):
+        for average_value in average_values:
             basic_metrics[average_value["_id"]["column_name"]] = {
                 "avg": round(average_value["avg"], 2)
             }
+
+        for total_value in total_values:
             basic_metrics[total_value["_id"]["column_name"]]["total"] = total_value[
                 "count"
             ]

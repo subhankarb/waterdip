@@ -16,6 +16,8 @@ from abc import ABC, abstractmethod
 from datetime import datetime, timedelta
 from typing import Any, Dict, List
 
+from loguru import logger
+
 from waterdip.core.commons.models import TimeRange
 from waterdip.core.metrics.data_metrics import CountEmptyHistogram, DataMetrics
 from waterdip.core.monitors.evaluators.base import MonitorEvaluator
@@ -79,6 +81,7 @@ class EmptyValueEvaluator(DataQualityMonitorEvaluator):
 
     def evaluate(self, **kwargs) -> List[Dict]:
         empties = self._get_metrics()
+        logger.debug(f"Empties we got : [{empties}]")
         violations: List[Dict] = []
         for col in self._get_columns():
             empty = empties.get(col)

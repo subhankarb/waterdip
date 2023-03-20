@@ -30,7 +30,7 @@ def process_monitor(self, monitor):
     """
     Process a single incoming monitor data using MonitorProcessor
     """
-    logger.info(f"Starting processing monitor job: [{monitor.monitor_name}]")
+    logger.info(f"Starting processing monitor job: [{monitor}]")
     mongo_backend = MongodbBackend.get_instance()
 
     processor = MonitorProcessor(
